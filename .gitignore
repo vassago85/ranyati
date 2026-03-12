@@ -1,0 +1,16 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.backup
+.env.production
+
+# Laravel app-level ignores are handled by apps/group/.gitignore
