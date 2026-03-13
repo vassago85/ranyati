@@ -1,0 +1,11 @@
+.git
+.gitignore
+.env
+.env.*
+*.md
+apps/group/node_modules
+apps/group/public/build
+apps/group/public/hot
+apps/group/vendor
+apps/group/storage/logs/*
+apps/group/.phpunit.cache

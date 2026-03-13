@@ -1,6 +1,14 @@
+# Stage 1: Build frontend assets with Node 22
+FROM node:22-alpine AS frontend
+WORKDIR /build
+COPY apps/group/package.json apps/group/package-lock.json ./
+RUN npm ci
+COPY apps/group/ ./
+RUN npm run build
+
+# Stage 2: PHP application
 FROM php:8.3-fpm-alpine
 
-# Install system dependencies (no Chromium/Browsershot)
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -13,11 +21,8 @@ RUN apk add --no-cache \
     zip \
     unzip \
     oniguruma-dev \
-    icu-dev \
-    nodejs \
-    npm
+    icu-dev
 
-# Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) \
     pdo_mysql \
@@ -29,30 +34,27 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     zip \
     intl
 
-# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy application files from apps/group/
 COPY apps/group/ .
 
-# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Install Node dependencies and build frontend assets
-RUN npm ci && npm run build && rm -rf node_modules
+# Copy pre-built frontend assets from stage 1
+COPY --from=frontend /build/public/build/ public/build/
 
-# Copy Docker configuration files
+# Verify the build output exists
+RUN test -f public/build/manifest.json || (echo "ERROR: Vite manifest missing" && exit 1)
+
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 
-# Copy entrypoint
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Create required directories
 RUN mkdir -p /var/log/supervisor /run/nginx /var/log/php
 
 EXPOSE 80
