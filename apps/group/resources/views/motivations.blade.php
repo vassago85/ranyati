@@ -236,7 +236,7 @@
             </div>
             <div class="border-t border-zinc-800 py-6">
                 <p class="text-center text-xs text-zinc-500">
-                    &copy; {{ date('Y') }} Ranyati Group (Pty) Ltd. All rights reserved.
+                    &copy; {{ date('Y') }} Ranyati Firearm Motivations (Pty) Ltd. All rights reserved.
                 </p>
             </div>
         </div>
