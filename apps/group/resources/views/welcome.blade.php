@@ -101,15 +101,15 @@
                 </a>
 
                 {{-- Center: Division pill buttons --}}
-                <div class="hidden sm:flex items-center justify-center gap-3">
-                    <a href="https://motivations.ranyati.co.za" class="inline-flex items-center justify-center rounded-xl bg-[#F58220]/10 ring-1 ring-[#F58220]/15 h-10 p-[5px] transition hover:bg-[#F58220]/20" title="Motivations">
-                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-full w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                <div class="hidden sm:flex items-center justify-center gap-2">
+                    <a href="https://motivations.ranyati.co.za" class="inline-flex items-center justify-center rounded-lg bg-[#F58220]/10 ring-1 ring-[#F58220]/15 h-5 px-2 transition hover:bg-[#F58220]/20" title="Motivations">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-[10px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
                     </a>
-                    <a href="https://nrapa.ranyati.co.za" class="inline-flex items-center justify-center rounded-xl bg-sky-400/10 ring-1 ring-sky-400/15 h-10 p-[5px] transition hover:bg-sky-400/20" title="NRAPA">
-                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-full w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                    <a href="https://nrapa.ranyati.co.za" class="inline-flex items-center justify-center rounded-lg bg-sky-400/10 ring-1 ring-sky-400/15 h-5 px-2 transition hover:bg-sky-400/20" title="NRAPA">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-[10px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
                     </a>
-                    <a href="https://storage.ranyati.co.za" class="inline-flex items-center justify-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/15 h-10 p-[5px] transition hover:bg-emerald-400/20" title="Storage">
-                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-full w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                    <a href="https://storage.ranyati.co.za" class="inline-flex items-center justify-center rounded-lg bg-emerald-400/10 ring-1 ring-emerald-400/15 h-5 px-2 transition hover:bg-emerald-400/20" title="Storage">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-[10px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
                     </a>
                 </div>
 
