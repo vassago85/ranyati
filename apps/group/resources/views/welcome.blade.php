@@ -94,28 +94,27 @@
     {{-- Header --}}
     <header class="absolute inset-x-0 top-0 z-50">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="flex items-center justify-between py-4 border-b border-white/[0.04]">
-                <a href="/">
-                    <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" class="h-8 w-auto object-contain" />
+            <div class="flex items-center py-4 border-b border-white/[0.04]">
+                {{-- Left: Ranyati Group logo --}}
+                <a href="/" class="shrink-0">
+                    <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" class="h-[38px] w-auto object-contain" />
                 </a>
 
-                <div class="flex items-center gap-4">
-                    {{-- Division quick-access buttons --}}
-                    <div class="hidden sm:flex items-center gap-0.5">
-                        <a href="https://motivations.ranyati.co.za" class="rounded px-2 py-1 transition hover:bg-white/[0.06]" title="Motivations">
-                            <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-5 w-auto object-contain opacity-45 hover:opacity-100 transition-opacity" />
-                        </a>
-                        <a href="https://nrapa.ranyati.co.za" class="rounded px-2 py-1 transition hover:bg-white/[0.06]" title="NRAPA">
-                            <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-5 w-auto object-contain opacity-45 hover:opacity-100 transition-opacity" />
-                        </a>
-                        <a href="https://storage.ranyati.co.za" class="rounded px-2 py-1 transition hover:bg-white/[0.06]" title="Storage">
-                            <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-5 w-auto object-contain opacity-45 hover:opacity-100 transition-opacity" />
-                        </a>
-                    </div>
+                {{-- Center: Division pill buttons --}}
+                <div class="hidden sm:flex flex-1 items-center justify-center gap-3">
+                    <a href="https://motivations.ranyati.co.za" class="inline-flex items-center rounded-xl bg-[#F58220]/10 ring-1 ring-[#F58220]/15 px-2 py-1 transition hover:bg-[#F58220]/20" title="Motivations">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-[30px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                    </a>
+                    <a href="https://nrapa.ranyati.co.za" class="inline-flex items-center rounded-xl bg-sky-400/10 ring-1 ring-sky-400/15 px-2 py-1 transition hover:bg-sky-400/20" title="NRAPA">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-[30px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                    </a>
+                    <a href="https://storage.ranyati.co.za" class="inline-flex items-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/15 px-2 py-1 transition hover:bg-emerald-400/20" title="Storage">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-[30px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                    </a>
+                </div>
 
-                    <span class="hidden sm:block h-4 w-px bg-white/[0.06]"></span>
-
-                    {{-- Contact --}}
+                {{-- Right: Contact --}}
+                <div class="flex items-center gap-4 shrink-0 ml-auto sm:ml-0">
                     <a href="tel:+27871510987" class="hidden sm:flex items-center gap-1.5 text-[12px] text-white/35 hover:text-white/70 transition-colors">
                         <svg class="size-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
                         +27 87 151 0987
