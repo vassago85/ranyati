@@ -32,6 +32,25 @@
         .animate-fade-up { animation: fade-up 0.6s ease-out forwards; }
         .animate-fade-up-delay { animation: fade-up 0.6s ease-out 0.15s forwards; opacity: 0; }
         .animate-fade-up-delay-2 { animation: fade-up 0.6s ease-out 0.3s forwards; opacity: 0; }
+
+        .header-pills, .header-contact { display: none; }
+        .header-logo { width: 100%; }
+        .footer-grid { display: flex; flex-direction: column; gap: 32px; padding: 40px 0; }
+        .footer-center { align-items: flex-start; text-align: left; }
+        .footer-center .footer-pills { align-items: flex-start; }
+        .footer-right { align-items: flex-start; }
+        .footer-right-inner { align-items: flex-start; }
+
+        @media (min-width: 768px) {
+            .header-pills { display: flex; }
+            .header-contact { display: flex; }
+            .header-logo { width: 25%; }
+            .footer-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; padding: 56px 0; }
+            .footer-center { align-items: center; text-align: center; }
+            .footer-center .footer-pills { align-items: center; }
+            .footer-right { align-items: flex-end; }
+            .footer-right-inner { align-items: flex-end; }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-white text-zinc-900 antialiased">
@@ -40,14 +59,14 @@
     <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(6,30,60,0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
         <div style="max-width: 80rem; margin: 0 auto; padding: 0 1.5rem;">
             <div style="display: flex; align-items: center; padding: 14px 0;">
-                {{-- Left 25%: Logo --}}
-                <div style="width: 25%; flex-shrink: 0;">
+                {{-- Left: Logo --}}
+                <div class="header-logo" style="flex-shrink: 0;">
                     <a href="https://ranyati.co.za">
                         <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 26px; width: auto; object-fit: contain;" />
                     </a>
                 </div>
-                {{-- Center 50%: Division pill buttons --}}
-                <div style="width: 50%; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                {{-- Center: Division pill buttons --}}
+                <div class="header-pills" style="width: 50%; align-items: center; justify-content: center; gap: 12px;">
                     <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(245,130,32,0.2)'" onmouseout="this.style.background='rgba(245,130,32,0.1)'">
                         <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
                     </a>
@@ -58,8 +77,8 @@
                         <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
                     </a>
                 </div>
-                {{-- Right 25%: Contact stacked --}}
-                <div style="width: 25%; display: flex; flex-direction: column; align-items: flex-end; gap: 0;">
+                {{-- Right: Contact stacked --}}
+                <div class="header-contact" style="width: 25%; flex-direction: column; align-items: flex-end; gap: 0;">
                     <a href="tel:+27871510987" style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
                         <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
                         +27 87 151 0987
@@ -237,7 +256,7 @@
     {{-- Footer --}}
     <footer style="background: #020810; border-top: 1px solid rgba(255,255,255,0.04);">
         <div style="max-width: 80rem; margin: 0 auto; padding: 0 24px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; padding: 56px 0;">
+            <div class="footer-grid">
                 {{-- Left: Ranyati Group --}}
                 <div style="text-align: left;">
                     <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 32px; width: auto; object-fit: contain;" />
@@ -247,9 +266,9 @@
                     </p>
                 </div>
                 {{-- Center: Divisions --}}
-                <div style="text-align: center; display: flex; flex-direction: column; align-items: center;">
+                <div class="footer-center" style="display: flex; flex-direction: column;">
                     <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">Divisions</h4>
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px; align-items: center;">
+                    <div class="footer-pills" style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
                         <a href="https://ranyati.co.za" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
                             <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain;" />
                         </a>
@@ -262,9 +281,9 @@
                     </div>
                 </div>
                 {{-- Right: Contact --}}
-                <div style="display: flex; flex-direction: column; align-items: flex-end;">
+                <div class="footer-right" style="display: flex; flex-direction: column;">
                     <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">Contact</h4>
-                    <div style="margin-top: 16px; display: flex; flex-direction: column; align-items: flex-end; gap: 0;">
+                    <div class="footer-right-inner" style="margin-top: 16px; display: flex; flex-direction: column; gap: 0;">
                         <a href="tel:+27871510987" style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
                             <svg style="width: 14px; height: 14px; flex-shrink: 0; color: rgba(255,255,255,0.15);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
                             +27 87 151 0987
