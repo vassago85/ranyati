@@ -203,8 +203,8 @@
 
                 {{-- Motivations --}}
                 <a href="https://motivations.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #F58220;">
-                    <div class="icon-box flex items-center justify-center rounded-xl bg-[#F58220]/10 ring-1 ring-[#F58220]/15 w-full h-16 px-3">
-                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-12 w-auto object-contain" />
+                    <div class="icon-box flex items-center justify-center rounded-xl" style="width: 100%; height: 80px; padding: 8px 12px; background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15); overflow: hidden;">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 64px; max-width: 100%; width: auto; height: auto; object-fit: contain;" />
                     </div>
                     <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">Motivations</h2>
                     <p class="mt-7 text-[10px] font-bold uppercase tracking-[0.2em] text-[#F58220]/60">Licence Applications</p>
@@ -219,8 +219,8 @@
 
                 {{-- NRAPA --}}
                 <a href="https://nrapa.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #38bdf8;">
-                    <div class="icon-box flex items-center justify-center rounded-xl bg-sky-400/10 ring-1 ring-sky-400/15 w-full h-16 px-3">
-                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-12 w-auto object-contain" />
+                    <div class="icon-box flex items-center justify-center rounded-xl" style="width: 100%; height: 80px; padding: 8px 12px; background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15); overflow: hidden;">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 64px; max-width: 100%; width: auto; height: auto; object-fit: contain;" />
                     </div>
                     <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">NRAPA</h2>
                     <p class="mt-7 text-[10px] font-bold uppercase tracking-[0.2em] text-sky-400/50">Members Portal</p>
@@ -235,8 +235,8 @@
 
                 {{-- Storage --}}
                 <a href="https://storage.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #34d399;">
-                    <div class="icon-box flex items-center justify-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/15 w-full h-16 px-3">
-                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-12 w-auto object-contain" />
+                    <div class="icon-box flex items-center justify-center rounded-xl" style="width: 100%; height: 80px; padding: 8px 12px; background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15); overflow: hidden;">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 64px; max-width: 100%; width: auto; height: auto; object-fit: contain;" />
                     </div>
                     <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">Storage</h2>
                     <p class="mt-7 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400/50">Secure Custody</p>
