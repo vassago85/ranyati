@@ -94,17 +94,39 @@
     {{-- Header: single row --}}
     <header class="absolute inset-x-0 top-0 z-50">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="flex items-center justify-between py-5 border-b border-white/[0.04]">
+            <div class="flex items-center justify-between py-4 border-b border-white/[0.04]">
                 <a href="/">
                     <img src="{{ asset('ranyati-group-logo.png') }}" alt="Ranyati Group" class="h-8 w-auto object-contain" />
                 </a>
+
+                {{-- Division quick-access logos --}}
+                <div class="hidden md:flex items-center gap-1">
+                    <a href="https://motivations.ranyati.co.za"
+                       class="flex items-center rounded-lg px-3 py-1.5 transition-colors hover:bg-white/[0.05]"
+                       title="Ranyati Motivations">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-6 w-auto object-contain opacity-50 hover:opacity-100 transition-opacity" />
+                    </a>
+                    <span class="h-4 w-px bg-white/[0.06]"></span>
+                    <a href="https://nrapa.ranyati.co.za"
+                       class="flex items-center rounded-lg px-3 py-1.5 transition-colors hover:bg-white/[0.05]"
+                       title="NRAPA Members Portal">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-6 w-auto object-contain opacity-50 hover:opacity-100 transition-opacity" />
+                    </a>
+                    <span class="h-4 w-px bg-white/[0.06]"></span>
+                    <a href="https://storage.ranyati.co.za"
+                       class="flex items-center rounded-lg px-3 py-1.5 transition-colors hover:bg-white/[0.05]"
+                       title="Ranyati Storage">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-6 w-auto object-contain opacity-50 hover:opacity-100 transition-opacity" />
+                    </a>
+                </div>
+
                 <div class="flex items-center gap-5">
-                    <a href="tel:+27871510987" class="hidden sm:flex items-center gap-1.5 text-[12px] text-white/35 hover:text-white/70 transition-colors">
+                    <a href="tel:+27871510987" class="hidden lg:flex items-center gap-1.5 text-[12px] text-white/35 hover:text-white/70 transition-colors">
                         <svg class="size-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
                         +27 87 151 0987
                     </a>
-                    <span class="hidden sm:block h-3 w-px bg-white/[0.08]"></span>
-                    <a href="mailto:info@firearmmotivations.co.za" class="hidden sm:flex items-center gap-1.5 text-[12px] text-white/35 hover:text-white/70 transition-colors">
+                    <span class="hidden lg:block h-3 w-px bg-white/[0.08]"></span>
+                    <a href="mailto:info@firearmmotivations.co.za" class="hidden lg:flex items-center gap-1.5 text-[12px] text-white/35 hover:text-white/70 transition-colors">
                         <svg class="size-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
                         info@firearmmotivations.co.za
                     </a>
