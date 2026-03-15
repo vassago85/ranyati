@@ -153,7 +153,7 @@
 
             {{-- Heading --}}
             <h1 class="mt-10 text-[2.5rem] font-black leading-[1.05] tracking-[-0.03em] text-white sm:text-[3.25rem] lg:text-[4rem] anim-1">
-                Comprehensive Firearm<br class="hidden sm:block"> Motivations
+                Comprehensive<br> Firearm Motivations
             </h1>
             <p class="mt-4 text-[13px] font-semibold uppercase tracking-[0.25em] text-[#F58220]/70 anim-1">
                 A Division of Ranyati Group
