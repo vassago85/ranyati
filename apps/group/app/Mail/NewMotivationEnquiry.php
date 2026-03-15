@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\MotivationEnquiry;
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -25,8 +26,10 @@ class NewMotivationEnquiry extends Mailable
             $subject .= ' (NRAPA ' . $this->enquiry->membership_number . ')';
         }
 
+        $recipient = Setting::get('notification_email', 'info@firearmmotivations.co.za');
+
         return new Envelope(
-            to: ['info@firearmmotivations.co.za'],
+            to: [$recipient],
             subject: $subject,
         );
     }
