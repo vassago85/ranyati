@@ -151,7 +151,7 @@
 
             {{-- Badge --}}
             <div class="anim inline-flex items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] px-5 py-2.5">
-                <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" class="h-[42px] w-auto object-contain opacity-60" />
+                <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 37px; width: auto; object-fit: contain; opacity: 0.6;" />
             </div>
 
             {{-- Heading + Est. 2006 --}}
