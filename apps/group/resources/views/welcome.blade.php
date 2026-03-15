@@ -97,19 +97,19 @@
             <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6 py-4 border-b border-white/[0.04]">
                 {{-- Left: Ranyati Group logo --}}
                 <a href="/" class="shrink-0">
-                    <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" class="h-3 w-auto object-contain" />
+                    <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 28px; width: auto; object-fit: contain;" />
                 </a>
 
                 {{-- Center: Division pill buttons --}}
-                <div class="hidden sm:flex items-center justify-center gap-2">
-                    <a href="https://motivations.ranyati.co.za" class="inline-flex items-center justify-center rounded-lg bg-[#F58220]/10 ring-1 ring-[#F58220]/15 h-5 px-2 transition hover:bg-[#F58220]/20" title="Motivations">
-                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-[10px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                <div class="hidden sm:flex items-center justify-center" style="gap: 10px;">
+                    <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; height: 28px; padding: 5px 10px; border-radius: 10px; background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15); transition: background 0.2s;" onmouseover="this.style.background='rgba(245,130,32,0.2)'" onmouseout="this.style.background='rgba(245,130,32,0.1)'">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="height: 16px; width: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
                     </a>
-                    <a href="https://nrapa.ranyati.co.za" class="inline-flex items-center justify-center rounded-lg bg-sky-400/10 ring-1 ring-sky-400/15 h-5 px-2 transition hover:bg-sky-400/20" title="NRAPA">
-                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-[10px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                    <a href="https://nrapa.ranyati.co.za" title="NRAPA" style="display: inline-flex; align-items: center; justify-content: center; height: 28px; padding: 5px 10px; border-radius: 10px; background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15); transition: background 0.2s;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.1)'">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="height: 16px; width: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
                     </a>
-                    <a href="https://storage.ranyati.co.za" class="inline-flex items-center justify-center rounded-lg bg-emerald-400/10 ring-1 ring-emerald-400/15 h-5 px-2 transition hover:bg-emerald-400/20" title="Storage">
-                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-[10px] w-auto object-contain opacity-60 hover:opacity-100 transition-opacity" />
+                    <a href="https://storage.ranyati.co.za" title="Storage" style="display: inline-flex; align-items: center; justify-content: center; height: 28px; padding: 5px 10px; border-radius: 10px; background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15); transition: background 0.2s;" onmouseover="this.style.background='rgba(52,211,153,0.2)'" onmouseout="this.style.background='rgba(52,211,153,0.1)'">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="height: 16px; width: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
                     </a>
                 </div>
 
