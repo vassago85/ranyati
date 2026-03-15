@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ranyati Storage — Secure Firearm Storage</title>
     <meta name="description" content="Professional secure firearm storage, safe custody, and estate administration services. A division of Ranyati Group.">
+    <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])

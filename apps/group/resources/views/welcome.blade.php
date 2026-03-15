@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ranyati Group — Firearm Administration Specialists Since 2006</title>
     <meta name="description" content="Ranyati Group provides comprehensive firearm motivations, SAPS-accredited membership through NRAPA, and secure firearm storage solutions in South Africa.">
+    <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
