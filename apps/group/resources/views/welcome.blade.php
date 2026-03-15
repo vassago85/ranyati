@@ -130,8 +130,8 @@
         <div class="relative z-10 mx-auto max-w-3xl px-6 text-center lg:px-8 pt-28 pb-20 sm:pb-24">
 
             {{-- Badge --}}
-            <div class="anim inline-flex items-center gap-2 rounded-full border border-white/[0.06] bg-white/[0.03] px-5 py-2">
-                <span class="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/40">Ranyati Group</span>
+            <div class="anim inline-flex items-center justify-center rounded-full border border-white/[0.06] bg-white/[0.03] px-5 py-2.5">
+                <img src="{{ asset('ranyati-group-logo.png') }}" alt="Ranyati Group" class="h-5 w-auto object-contain opacity-60" />
             </div>
 
             {{-- Heading + Est. 2006 --}}
@@ -187,13 +187,11 @@
 
                 {{-- Motivations --}}
                 <a href="https://motivations.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #F58220;">
-                    <div class="icon-box flex size-16 items-center justify-center rounded-2xl bg-[#F58220]/10 ring-1 ring-[#F58220]/15">
-                        <svg class="size-7 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
-                        </svg>
+                    <div class="icon-box inline-flex items-center justify-center rounded-xl bg-[#F58220]/10 ring-1 ring-[#F58220]/15 px-5 py-3">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-8 w-auto object-contain" />
                     </div>
-                    <h2 class="mt-7 text-xl font-bold tracking-tight text-white">Motivations</h2>
-                    <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#F58220]/60">Licence Applications</p>
+                    <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">Motivations</h2>
+                    <p class="mt-7 text-[10px] font-bold uppercase tracking-[0.2em] text-[#F58220]/60">Licence Applications</p>
                     <p class="mt-5 flex-1 text-[14px] leading-[1.75] text-white/40">
                         Professional assistance with firearm motivations, renewals, and compliance documentation.
                     </p>
@@ -205,13 +203,11 @@
 
                 {{-- NRAPA --}}
                 <a href="https://nrapa.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #38bdf8;">
-                    <div class="icon-box flex size-16 items-center justify-center rounded-2xl bg-sky-400/10 ring-1 ring-sky-400/15">
-                        <svg class="size-7 text-sky-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-                        </svg>
+                    <div class="icon-box inline-flex items-center justify-center rounded-xl bg-sky-400/10 ring-1 ring-sky-400/15 px-5 py-3">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-8 w-auto object-contain" />
                     </div>
-                    <h2 class="mt-7 text-xl font-bold tracking-tight text-white">NRAPA</h2>
-                    <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-sky-400/50">Members Portal</p>
+                    <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">NRAPA</h2>
+                    <p class="mt-7 text-[10px] font-bold uppercase tracking-[0.2em] text-sky-400/50">Members Portal</p>
                     <p class="mt-5 flex-1 text-[14px] leading-[1.75] text-white/40">
                         SAPS-accredited association services for dedicated sport and hunter status, compliance, and member administration.
                     </p>
@@ -223,13 +219,11 @@
 
                 {{-- Storage --}}
                 <a href="https://storage.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #34d399;">
-                    <div class="icon-box flex size-16 items-center justify-center rounded-2xl bg-emerald-400/10 ring-1 ring-emerald-400/15">
-                        <svg class="size-7 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z"/>
-                        </svg>
+                    <div class="icon-box inline-flex items-center justify-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/15 px-5 py-3">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-8 w-auto object-contain" />
                     </div>
-                    <h2 class="mt-7 text-xl font-bold tracking-tight text-white">Storage</h2>
-                    <p class="mt-2 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400/50">Secure Custody</p>
+                    <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">Storage</h2>
+                    <p class="mt-7 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400/50">Secure Custody</p>
                     <p class="mt-5 flex-1 text-[14px] leading-[1.75] text-white/40">
                         Secure firearm storage, structured custody administration, and dedicated infrastructure for compliant safekeeping.
                     </p>
