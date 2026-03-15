@@ -222,14 +222,18 @@
                         </p>
                         <p class="mt-2 text-xs text-zinc-500">A Division of Ranyati Group</p>
                     </div>
-                    <div class="flex gap-12">
-                        <div>
-                            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Ranyati Group</h4>
-                            <ul class="mt-3 space-y-2">
-                                <li><a href="https://ranyati.co.za" class="text-sm text-zinc-400 hover:text-white transition">Group Home</a></li>
-                                <li><a href="https://nrapa.ranyati.co.za" class="text-sm text-zinc-400 hover:text-white transition">NRAPA</a></li>
-                                <li><a href="https://storage.ranyati.co.za" class="text-sm text-zinc-400 hover:text-white transition">Storage</a></li>
-                            </ul>
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400">Ranyati Group</h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+                            <a href="https://ranyati.co.za" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">
+                                <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain;" />
+                            </a>
+                            <a href="https://nrapa.ranyati.co.za" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.1)'">
+                                <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain;" />
+                            </a>
+                            <a href="https://storage.ranyati.co.za" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(52,211,153,0.2)'" onmouseout="this.style.background='rgba(52,211,153,0.1)'">
+                                <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain;" />
+                            </a>
                         </div>
                     </div>
                 </div>
