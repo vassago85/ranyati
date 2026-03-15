@@ -15,8 +15,8 @@
 
         .hero-section {
             background:
-                radial-gradient(ellipse 90% 70% at 50% 30%, rgba(52,211,153,0.2) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(52,211,153,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse 90% 70% at 50% 30%, rgba(11,78,162,0.45) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(11,78,162,0.2) 0%, transparent 50%),
                 radial-gradient(ellipse 50% 35% at 20% 60%, rgba(6,30,60,0.4) 0%, transparent 50%),
                 linear-gradient(180deg, #0a3a78 0%, #072e60 30%, #051d3d 60%, #030f1e 85%, #020810 100%);
         }
@@ -41,12 +41,12 @@
         }
 
         .btn-cta {
-            background: linear-gradient(135deg, #34d399 0%, #059669 100%);
-            box-shadow: 0 2px 12px -2px rgba(52,211,153,0.4), 0 0 0 1px rgba(52,211,153,0.15);
+            background: linear-gradient(135deg, #F58220 0%, #d46f16 100%);
+            box-shadow: 0 2px 12px -2px rgba(245,130,32,0.4), 0 0 0 1px rgba(245,130,32,0.15);
             transition: all 0.25s ease;
         }
         .btn-cta:hover {
-            box-shadow: 0 6px 24px -4px rgba(52,211,153,0.5), 0 0 0 1px rgba(52,211,153,0.25);
+            box-shadow: 0 6px 24px -4px rgba(245,130,32,0.5), 0 0 0 1px rgba(245,130,32,0.25);
             transform: translateY(-2px);
         }
 
@@ -155,7 +155,7 @@
             <h1 class="mt-10 text-[2.5rem] font-black leading-[1.05] tracking-[-0.03em] text-white sm:text-[3.25rem] lg:text-[4rem] anim-1">
                 Secure Firearm<br class="hidden sm:block"> Storage
             </h1>
-            <p class="mt-4 text-[13px] font-semibold uppercase tracking-[0.25em] text-emerald-400/70 anim-1">
+            <p class="mt-4 text-[13px] font-semibold uppercase tracking-[0.25em] text-[#F58220]/70 anim-1">
                 A Division of Ranyati Group
             </p>
 
@@ -178,17 +178,17 @@
             <div class="mt-14 anim-4">
                 <div class="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-2 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-6 py-3 backdrop-blur-sm">
                     <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
-                        <svg class="size-3.5 text-emerald-400/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+                        <svg class="size-3.5 text-[#F58220]/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
                         Established 2006
                     </div>
                     <span class="hidden sm:block h-3 w-px bg-white/[0.06]"></span>
                     <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
-                        <svg class="size-3.5 text-emerald-400/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd"/></svg>
+                        <svg class="size-3.5 text-[#F58220]/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd"/></svg>
                         FCA Compliant Facilities
                     </div>
                     <span class="hidden sm:block h-3 w-px bg-white/[0.06]"></span>
                     <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
-                        <svg class="size-3.5 text-emerald-400/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+                        <svg class="size-3.5 text-[#F58220]/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
                         Full Chain of Custody
                     </div>
                 </div>
@@ -201,7 +201,7 @@
         <div class="mx-auto max-w-6xl px-6 lg:px-8 pb-28 sm:pb-36">
 
             <div class="text-center mb-16 anim-5">
-                <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-emerald-400/60">What We Offer</p>
+                <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-[#F58220]/60">What We Offer</p>
                 <h2 class="mt-4 text-[2rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.5rem]">
                     Professional storage services
                 </h2>
@@ -213,8 +213,8 @@
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 anim-5">
 
                 <div class="card-service rounded-2xl p-8">
-                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
-                        <svg class="size-6 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
+                        <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
                         </svg>
                     </div>
@@ -233,8 +233,8 @@
                 </div>
 
                 <div class="card-service rounded-2xl p-8">
-                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
-                        <svg class="size-6 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
+                        <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
                         </svg>
                     </div>
@@ -255,8 +255,8 @@
             <div class="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
                 <div class="card-service rounded-2xl p-8 text-center">
-                    <div class="mx-auto flex size-12 items-center justify-center rounded-xl" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
-                        <svg class="size-6 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <div class="mx-auto flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
+                        <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
                         </svg>
                     </div>
@@ -275,8 +275,8 @@
                 </div>
 
                 <div class="card-service rounded-2xl p-8 text-center">
-                    <div class="mx-auto flex size-12 items-center justify-center rounded-xl" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
-                        <svg class="size-6 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <div class="mx-auto flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
+                        <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
                         </svg>
                     </div>

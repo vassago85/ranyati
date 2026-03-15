@@ -15,8 +15,8 @@
 
         .hero-section {
             background:
-                radial-gradient(ellipse 90% 70% at 50% 30%, rgba(245,130,32,0.25) 0%, transparent 60%),
-                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(245,130,32,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 90% 70% at 50% 30%, rgba(11,78,162,0.45) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(11,78,162,0.2) 0%, transparent 50%),
                 radial-gradient(ellipse 50% 35% at 20% 60%, rgba(6,30,60,0.4) 0%, transparent 50%),
                 linear-gradient(180deg, #0a3a78 0%, #072e60 30%, #051d3d 60%, #030f1e 85%, #020810 100%);
         }
