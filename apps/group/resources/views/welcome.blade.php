@@ -97,7 +97,7 @@
             <div class="grid grid-cols-[auto_1fr_auto] items-center gap-6 py-4 border-b border-white/[0.04]">
                 {{-- Left: Ranyati Group logo --}}
                 <a href="/" class="shrink-0">
-                    <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" class="h-8 w-auto object-contain" />
+                    <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" class="h-5 w-auto object-contain" />
                 </a>
 
                 {{-- Center: Division pill buttons --}}
