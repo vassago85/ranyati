@@ -90,6 +90,40 @@
             </div>
         </div>
 
+        {{-- Turnstile (Bot Protection) --}}
+        <div style="grid-column: 1 / -1; margin-top: 8px;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Cloudflare Turnstile (Bot Protection)</h2>
+                    <span class="badge {{ ($turnstileStatus ?? 'pending') === 'configured' ? 'badge-green' : 'badge-orange' }}">
+                        {{ ($turnstileStatus ?? 'pending') === 'configured' ? 'Configured' : 'Not Configured' }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label for="turnstile_site_key" class="form-label">Site Key</label>
+                            <input type="text" id="turnstile_site_key" name="turnstile_site_key" class="form-input" placeholder="0x4AAAAAAA..." value="{{ $settings['turnstile_site_key'] ?? '' }}">
+                            <div class="form-hint">The public site key shown to visitors.</div>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label for="turnstile_secret_key" class="form-label">Secret Key</label>
+                            <input type="password" id="turnstile_secret_key" name="turnstile_secret_key" class="form-input" placeholder="{{ ($settings['turnstile_secret_key'] ?? '') ? '••••••••••••' : '0x4AAAAAAA...' }}" value="">
+                            @if($settings['turnstile_secret_key'] ?? '')
+                                <div class="form-hint">A key is already saved. Leave blank to keep it.</div>
+                            @else
+                                <div class="form-hint">The server-side secret key for verification.</div>
+                            @endif
+                        </div>
+                    </div>
+                    <p style="margin-top:12px;font-size:12px;color:rgba(255,255,255,0.25);">
+                        Get your keys from <a href="https://dash.cloudflare.com/?to=/:account/turnstile" target="_blank" style="color:#38bdf8;text-decoration:underline;text-underline-offset:2px;">Cloudflare Dashboard → Turnstile</a>.
+                        The widget appears on the enquiry form to prevent spam submissions.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <div style="margin-top: 24px; display: flex; align-items: center; gap: 12px;">
             <button type="submit" class="btn btn-primary">
                 <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>

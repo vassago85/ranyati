@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Enquire — Ranyati Motivations</title>
     <meta name="description" content="Submit an enquiry for a professional firearm motivation. A division of Ranyati Group.">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
+    @if($turnstileSiteKey)
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; background: #020810; }
@@ -35,6 +39,10 @@
         .btn-cta:hover {
             box-shadow: 0 6px 24px -4px rgba(245,130,32,0.5), 0 0 0 1px rgba(245,130,32,0.25);
             transform: translateY(-2px);
+        }
+        .btn-cta:disabled {
+            opacity: 0.5; cursor: not-allowed; transform: none;
+            box-shadow: 0 2px 12px -2px rgba(245,130,32,0.2);
         }
 
         @keyframes fadeUp {
@@ -66,37 +74,51 @@
         }
 
         .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(255,255,255,0.04);
-            color: #fff;
-            font-size: 14px;
-            font-family: 'Inter', system-ui, sans-serif;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
+            width: 100%; padding: 12px 16px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
+            color: #fff; font-size: 14px; font-family: 'Inter', system-ui, sans-serif;
+            transition: border-color 0.2s, box-shadow 0.2s; outline: none;
         }
-        .form-input:focus {
-            border-color: rgba(245,130,32,0.5);
-            box-shadow: 0 0 0 3px rgba(245,130,32,0.12);
-        }
-        .form-input::placeholder {
-            color: rgba(255,255,255,0.25);
-        }
-        .form-input option {
-            background: #0c2341;
-            color: #fff;
-        }
+        .form-input:focus { border-color: rgba(245,130,32,0.5); box-shadow: 0 0 0 3px rgba(245,130,32,0.12); }
+        .form-input::placeholder { color: rgba(255,255,255,0.25); }
+        .form-input option { background: #0c2341; color: #fff; }
         .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: rgba(255,255,255,0.45);
-            margin-bottom: 6px;
+            display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-bottom: 6px;
         }
+
+        .otp-inputs { display: flex; gap: 8px; justify-content: center; }
+        .otp-inputs input {
+            width: 48px; height: 56px; text-align: center; font-size: 22px; font-weight: 700;
+            font-family: monospace; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04);
+            color: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .otp-inputs input:focus { border-color: #F58220; box-shadow: 0 0 0 3px rgba(245,130,32,0.15); }
+
+        .step-indicator { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; }
+        .step-dot {
+            width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.12);
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #F58220; width: 24px; border-radius: 4px; }
+        .step-dot.done { background: #34d399; }
+        .step-line { width: 32px; height: 1px; background: rgba(255,255,255,0.08); }
+
+        .verified-badge {
+            display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px;
+            border-radius: 999px; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2);
+            font-size: 11px; font-weight: 600; color: #34d399;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .shake { animation: shake 0.4s ease; }
+
+        .cf-turnstile { display: flex; justify-content: center; margin-top: 4px; }
     </style>
 </head>
 <body class="min-h-screen antialiased text-white">
@@ -150,7 +172,102 @@
             <div class="emblem-ring w-[900px] h-[900px] sm:w-[1100px] sm:h-[1100px]" style="border-color: rgba(255,255,255,0.015);"></div>
         </div>
 
-        <div class="relative z-10 mx-auto w-full max-w-xl px-6 pt-28 pb-20">
+        <div class="relative z-10 mx-auto w-full max-w-xl px-6 pt-28 pb-20"
+             x-data="{
+                step: {{ $errors->any() ? 2 : 1 }},
+                email: '{{ old('email', $prefill['email'] ?? '') }}',
+                emailVerified: {{ $errors->any() ? 'true' : 'false' }},
+                otpCode: '',
+                otpDigits: ['', '', '', '', '', ''],
+                sending: false,
+                verifying: false,
+                otpSent: false,
+                otpError: '',
+                cooldown: 0,
+                cooldownTimer: null,
+
+                async sendOtp() {
+                    if (!this.email || this.sending) return;
+                    this.sending = true;
+                    this.otpError = '';
+                    try {
+                        const res = await fetch('{{ route('enquire.send-otp') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ email: this.email }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) {
+                            this.otpError = data.error || 'Failed to send code.';
+                        } else {
+                            this.otpSent = true;
+                            this.cooldown = 60;
+                            this.startCooldown();
+                        }
+                    } catch (e) {
+                        this.otpError = 'Network error. Please try again.';
+                    } finally {
+                        this.sending = false;
+                    }
+                },
+
+                startCooldown() {
+                    if (this.cooldownTimer) clearInterval(this.cooldownTimer);
+                    this.cooldownTimer = setInterval(() => {
+                        this.cooldown--;
+                        if (this.cooldown <= 0) clearInterval(this.cooldownTimer);
+                    }, 1000);
+                },
+
+                handleOtpInput(index, event) {
+                    const val = event.target.value.replace(/\D/g, '');
+                    this.otpDigits[index] = val.slice(-1);
+                    event.target.value = this.otpDigits[index];
+                    if (val && index < 5) {
+                        this.$refs['otp' + (index + 1)].focus();
+                    }
+                    this.otpCode = this.otpDigits.join('');
+                    if (this.otpCode.length === 6) {
+                        this.verifyOtp();
+                    }
+                },
+
+                handleOtpKeydown(index, event) {
+                    if (event.key === 'Backspace' && !this.otpDigits[index] && index > 0) {
+                        this.$refs['otp' + (index - 1)].focus();
+                    }
+                },
+
+                handleOtpPaste(event) {
+                    const text = (event.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+                    if (text.length === 6) {
+                        event.preventDefault();
+                        for (let i = 0; i < 6; i++) {
+                            this.otpDigits[i] = text[i];
+                            if (this.$refs['otp' + i]) this.$refs['otp' + i].value = text[i];
+                        }
+                        this.otpCode = text;
+                        this.$refs.otp5.focus();
+                        this.verifyOtp();
+                    }
+                },
+
+                async verifyOtp() {
+                    if (this.otpCode.length !== 6 || this.verifying) return;
+                    this.verifying = true;
+                    this.otpError = '';
+
+                    const cacheKey = 'otp:' + this.email.toLowerCase().trim();
+
+                    this.emailVerified = true;
+                    this.step = 2;
+                    this.verifying = false;
+                },
+             }">
 
             {{-- Badge --}}
             <div class="text-center anim">
@@ -186,86 +303,162 @@
             </div>
             @endif
 
-            {{-- Form --}}
             @unless(session('success'))
-            <form method="POST" action="{{ route('enquire.submit') }}" class="mt-8 space-y-5 anim-3">
-                @csrf
 
-                <input type="hidden" name="source" value="{{ ($prefill['membership'] ?? null) ? 'nrapa_endorsement' : 'motivations_website' }}">
+            {{-- Step indicator --}}
+            <div class="step-indicator mt-8 anim-3">
+                <div class="step-dot" :class="step >= 1 ? (step > 1 ? 'done' : 'active') : ''"></div>
+                <div class="step-line"></div>
+                <div class="step-dot" :class="step >= 2 ? 'active' : ''"></div>
+            </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                        <label for="name" class="form-label">Full Name <span style="color: #F58220;">*</span></label>
-                        <input type="text" id="name" name="name" required class="form-input" placeholder="John Doe" value="{{ old('name', $prefill['name'] ?? '') }}">
-                        @error('name') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label for="email" class="form-label">Email <span style="color: #F58220;">*</span></label>
-                        <input type="email" id="email" name="email" required class="form-input" placeholder="john@example.com" value="{{ old('email', $prefill['email'] ?? '') }}">
-                        @error('email') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+            {{-- STEP 1: Email Verification --}}
+            <div x-show="step === 1" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="anim-3">
+                <div style="text-align:center;margin-bottom:24px;">
+                    <h2 style="font-size:16px;font-weight:700;color:#fff;">Step 1: Verify Your Email</h2>
+                    <p style="font-size:13px;color:rgba(255,255,255,0.35);margin-top:4px;">We'll send a 6-digit code to confirm your email address.</p>
+                </div>
+
+                <div style="margin-bottom:16px;">
+                    <label for="verify-email" class="form-label">Email Address <span style="color: #F58220;">*</span></label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" id="verify-email" x-model="email" class="form-input" placeholder="john@example.com" required :disabled="otpSent" :style="otpSent ? 'opacity:0.6' : ''">
+                        <button type="button" @click="sendOtp()" :disabled="sending || !email || cooldown > 0" class="btn-cta" style="white-space:nowrap;padding:12px 20px;border-radius:12px;border:none;font-size:13px;font-weight:700;color:#fff;cursor:pointer;">
+                            <span x-show="!sending && !otpSent">Send Code</span>
+                            <span x-show="!sending && otpSent && cooldown > 0" x-text="'Resend (' + cooldown + 's)'"></span>
+                            <span x-show="!sending && otpSent && cooldown <= 0">Resend</span>
+                            <span x-show="sending">Sending...</span>
+                        </button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                        <label for="phone" class="form-label">Phone</label>
-                        <input type="tel" id="phone" name="phone" class="form-input" placeholder="+27 82 000 0000" value="{{ old('phone') }}">
-                        @error('phone') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                    </div>
-                    <div>
-                        <label for="membership_number" class="form-label">NRAPA Membership #</label>
-                        <input type="text" id="membership_number" name="membership_number" class="form-input" placeholder="Optional" value="{{ old('membership_number', $prefill['membership'] ?? '') }}">
-                        @error('membership_number') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                    </div>
-                </div>
+                <template x-if="otpError">
+                    <div style="padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-size:13px;margin-bottom:16px;text-align:center;" x-text="otpError"></div>
+                </template>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <template x-if="otpSent">
                     <div>
-                        <label for="endorsement_type" class="form-label">Endorsement Type</label>
-                        <select id="endorsement_type" name="endorsement_type" class="form-input">
-                            <option value="">Select type...</option>
-                            @php
-                                $types = ['New Application', 'Renewal', 'Additional', 'Transfer', 'Other'];
-                                $selectedType = old('endorsement_type', $prefill['type'] ?? '');
-                            @endphp
-                            @foreach($types as $type)
-                                <option value="{{ $type }}" @selected($selectedType === $type)>{{ $type }}</option>
-                            @endforeach
-                        </select>
-                        @error('endorsement_type') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:16px;text-align:center;">
+                            Enter the 6-digit code sent to <strong x-text="email" style="color:#fff;"></strong>
+                        </p>
+                        <div class="otp-inputs" @paste="handleOtpPaste($event)">
+                            <input type="text" inputmode="numeric" maxlength="1" x-ref="otp0" @input="handleOtpInput(0, $event)" @keydown="handleOtpKeydown(0, $event)">
+                            <input type="text" inputmode="numeric" maxlength="1" x-ref="otp1" @input="handleOtpInput(1, $event)" @keydown="handleOtpKeydown(1, $event)">
+                            <input type="text" inputmode="numeric" maxlength="1" x-ref="otp2" @input="handleOtpInput(2, $event)" @keydown="handleOtpKeydown(2, $event)">
+                            <input type="text" inputmode="numeric" maxlength="1" x-ref="otp3" @input="handleOtpInput(3, $event)" @keydown="handleOtpKeydown(3, $event)">
+                            <input type="text" inputmode="numeric" maxlength="1" x-ref="otp4" @input="handleOtpInput(4, $event)" @keydown="handleOtpKeydown(4, $event)">
+                            <input type="text" inputmode="numeric" maxlength="1" x-ref="otp5" @input="handleOtpInput(5, $event)" @keydown="handleOtpKeydown(5, $event)">
+                        </div>
+                        <p style="font-size:11px;color:rgba(255,255,255,0.2);text-align:center;margin-top:12px;">
+                            Didn't receive it? Check your spam folder or click resend.
+                        </p>
                     </div>
-                    <div>
-                        <label for="purpose" class="form-label">Purpose</label>
-                        <select id="purpose" name="purpose" class="form-input">
-                            <option value="">Select purpose...</option>
-                            @php
-                                $purposes = ['Self Defence', 'Sport Shooting', 'Hunting', 'Occasional Hunting & Sport Shooting', 'Business / Work', 'Other'];
-                                $selectedPurpose = old('purpose', $prefill['purpose'] ?? '');
-                            @endphp
-                            @foreach($purposes as $purpose)
-                                <option value="{{ $purpose }}" @selected($selectedPurpose === $purpose)>{{ $purpose }}</option>
-                            @endforeach
-                        </select>
-                        @error('purpose') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                </template>
+            </div>
+
+            {{-- STEP 2: Full Form --}}
+            <div x-show="step === 2" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                <div style="text-align:center;margin-bottom:20px;">
+                    <h2 style="font-size:16px;font-weight:700;color:#fff;">Step 2: Your Details</h2>
+                    <div style="margin-top:8px;">
+                        <span class="verified-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" style="width:12px;height:12px;">
+                                <path fill-rule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clip-rule="evenodd" />
+                            </svg>
+                            <span x-text="email"></span>
+                        </span>
                     </div>
                 </div>
 
-                <div>
-                    <label for="message" class="form-label">Additional Information</label>
-                    <textarea id="message" name="message" rows="4" class="form-input" placeholder="Tell us more about your requirements...">{{ old('message') }}</textarea>
-                    @error('message') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
-                </div>
+                <form method="POST" action="{{ route('enquire.submit') }}" class="space-y-5">
+                    @csrf
 
-                <div class="pt-2">
-                    <button type="submit" class="btn-cta w-full rounded-xl px-6 py-3.5 text-sm font-bold text-white tracking-wide">
-                        Submit Enquiry
-                    </button>
-                </div>
+                    <input type="hidden" name="email" :value="email">
+                    <input type="hidden" name="otp" :value="otpCode">
+                    <input type="hidden" name="source" value="{{ ($prefill['membership'] ?? null) ? 'nrapa_endorsement' : 'motivations_website' }}">
 
-                <p class="text-center text-[11px] text-white/20 leading-relaxed">
-                    Your information is protected and will only be used to contact you regarding your motivation enquiry.
-                </p>
-            </form>
+                    @error('otp') <div style="padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-size:13px;text-align:center;">{{ $message }}</div> @enderror
+                    @error('turnstile') <div style="padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-size:13px;text-align:center;">{{ $message }}</div> @enderror
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label for="name" class="form-label">Full Name <span style="color: #F58220;">*</span></label>
+                            <input type="text" id="name" name="name" required class="form-input" placeholder="John Doe" value="{{ old('name', $prefill['name'] ?? '') }}">
+                            @error('name') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label class="form-label">Email</label>
+                            <div class="form-input" style="opacity:0.5;cursor:not-allowed;" x-text="email"></div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" id="phone" name="phone" class="form-input" placeholder="+27 82 000 0000" value="{{ old('phone') }}">
+                            @error('phone') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="membership_number" class="form-label">NRAPA Membership #</label>
+                            <input type="text" id="membership_number" name="membership_number" class="form-input" placeholder="Optional" value="{{ old('membership_number', $prefill['membership'] ?? '') }}">
+                            @error('membership_number') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label for="endorsement_type" class="form-label">Endorsement Type</label>
+                            <select id="endorsement_type" name="endorsement_type" class="form-input">
+                                <option value="">Select type...</option>
+                                @php
+                                    $types = ['New Application', 'Renewal', 'Additional', 'Transfer', 'Other'];
+                                    $selectedType = old('endorsement_type', $prefill['type'] ?? '');
+                                @endphp
+                                @foreach($types as $type)
+                                    <option value="{{ $type }}" @selected($selectedType === $type)>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                            @error('endorsement_type') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                        <div>
+                            <label for="purpose" class="form-label">Purpose</label>
+                            <select id="purpose" name="purpose" class="form-input">
+                                <option value="">Select purpose...</option>
+                                @php
+                                    $purposes = ['Self Defence', 'Sport Shooting', 'Hunting', 'Occasional Hunting & Sport Shooting', 'Business / Work', 'Other'];
+                                    $selectedPurpose = old('purpose', $prefill['purpose'] ?? '');
+                                @endphp
+                                @foreach($purposes as $purpose)
+                                    <option value="{{ $purpose }}" @selected($selectedPurpose === $purpose)>{{ $purpose }}</option>
+                                @endforeach
+                            </select>
+                            @error('purpose') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="message" class="form-label">Additional Information</label>
+                        <textarea id="message" name="message" rows="4" class="form-input" placeholder="Tell us more about your requirements...">{{ old('message') }}</textarea>
+                        @error('message') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    @if($turnstileSiteKey)
+                    <div class="cf-turnstile" data-sitekey="{{ $turnstileSiteKey }}" data-theme="dark"></div>
+                    @error('cf-turnstile-response') <p class="mt-1 text-xs text-red-400 text-center">{{ $message }}</p> @enderror
+                    @endif
+
+                    <div class="pt-2">
+                        <button type="submit" class="btn-cta w-full rounded-xl px-6 py-3.5 text-sm font-bold text-white tracking-wide">
+                            Submit Enquiry
+                        </button>
+                    </div>
+
+                    <p class="text-center text-[11px] text-white/20 leading-relaxed">
+                        Your information is protected and will only be used to contact you regarding your motivation enquiry.
+                    </p>
+                </form>
+            </div>
+
             @endunless
 
             @if(session('success'))
@@ -330,5 +523,13 @@
         </div>
     </footer>
 
+    <script>
+        document.addEventListener('alpine:init', () => {
+            // Fix x-ref for OTP inputs (Alpine template refs need explicit binding)
+            Alpine.directive('otp-focus', (el, { expression }, { evaluate }) => {
+                el.focus();
+            });
+        });
+    </script>
 </body>
 </html>

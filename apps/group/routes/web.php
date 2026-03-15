@@ -4,7 +4,10 @@ use App\Mail\NewMotivationEnquiry;
 use App\Models\MotivationEnquiry;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,7 +29,36 @@ Route::get('/storage', fn () => view('storage-landing'));
 
 Route::get('/enquire', fn (Request $request) => view('enquire', [
     'prefill' => $request->only(['name', 'email', 'type', 'purpose', 'membership']),
+    'turnstileSiteKey' => Setting::get('turnstile_site_key', ''),
 ]))->name('enquire');
+
+Route::post('/enquire/send-otp', function (Request $request) {
+    $request->validate(['email' => 'required|email|max:255']);
+
+    $email = strtolower(trim($request->email));
+    $rateLimitKey = 'otp-send:' . $email;
+
+    if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
+        return response()->json([
+            'error' => 'Too many attempts. Please wait ' . RateLimiter::availableIn($rateLimitKey) . ' seconds.',
+        ], 429);
+    }
+
+    RateLimiter::hit($rateLimitKey, 120);
+
+    $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    Cache::put("otp:{$email}", $code, now()->addMinutes(10));
+
+    try {
+        Mail::send('emails.otp-verification', ['code' => $code], function ($message) use ($email) {
+            $message->to($email)->subject('Your Verification Code — Ranyati Motivations');
+        });
+    } catch (\Throwable $e) {
+        return response()->json(['error' => 'Failed to send verification email. Please try again.'], 500);
+    }
+
+    return response()->json(['message' => 'Verification code sent.']);
+})->name('enquire.send-otp');
 
 Route::post('/enquire', function (Request $request) {
     $validated = $request->validate([
@@ -38,9 +70,33 @@ Route::post('/enquire', function (Request $request) {
         'membership_number' => 'nullable|string|max:100',
         'message' => 'nullable|string|max:2000',
         'source' => 'nullable|string|max:100',
+        'otp' => 'required|string|size:6',
+        'cf-turnstile-response' => 'required|string',
     ]);
 
-    $enquiry = MotivationEnquiry::create($validated);
+    $email = strtolower(trim($validated['email']));
+    $cachedCode = Cache::get("otp:{$email}");
+
+    if (! $cachedCode || $cachedCode !== $validated['otp']) {
+        return back()->withInput()->withErrors(['otp' => 'Invalid or expired verification code.']);
+    }
+
+    $turnstileSecret = Setting::get('turnstile_secret_key', '');
+    if ($turnstileSecret) {
+        $turnstileResponse = Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+            'secret' => $turnstileSecret,
+            'response' => $validated['cf-turnstile-response'],
+            'remoteip' => $request->ip(),
+        ]);
+
+        if (! $turnstileResponse->json('success')) {
+            return back()->withInput()->withErrors(['turnstile' => 'Bot verification failed. Please try again.']);
+        }
+    }
+
+    Cache::forget("otp:{$email}");
+
+    $enquiry = MotivationEnquiry::create(collect($validated)->except(['otp', 'cf-turnstile-response'])->toArray());
 
     Mail::send(new NewMotivationEnquiry($enquiry));
 
@@ -122,7 +178,8 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
     Route::get('/settings', function () {
         $keys = ['mail_mailer', 'mailgun_domain', 'mailgun_secret', 'mailgun_endpoint',
-                 'mail_from_name', 'mail_from_address', 'notification_email'];
+                 'mail_from_name', 'mail_from_address', 'notification_email',
+                 'turnstile_site_key', 'turnstile_secret_key'];
         $settings = [];
         foreach ($keys as $key) {
             $settings[$key] = Setting::get($key);
@@ -131,16 +188,21 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         $mailStatus = ($settings['mailgun_domain'] && $settings['mailgun_secret'] && $settings['mail_mailer'] === 'mailgun')
             ? 'configured' : 'pending';
 
-        return view('admin.settings', compact('settings', 'mailStatus'));
+        $turnstileStatus = ($settings['turnstile_site_key'] && $settings['turnstile_secret_key'])
+            ? 'configured' : 'pending';
+
+        return view('admin.settings', compact('settings', 'mailStatus', 'turnstileStatus'));
     })->name('settings');
 
     Route::post('/settings', function (Request $request) {
         $fields = ['mail_mailer', 'mailgun_domain', 'mailgun_endpoint',
-                   'mail_from_name', 'mail_from_address', 'notification_email'];
+                   'mail_from_name', 'mail_from_address', 'notification_email',
+                   'turnstile_site_key'];
 
         foreach ($fields as $field) {
             if ($request->has($field)) {
-                Setting::set($field, $request->input($field), 'mail');
+                $group = str_starts_with($field, 'turnstile') ? 'security' : 'mail';
+                Setting::set($field, $request->input($field), $group);
             }
         }
 
@@ -148,7 +210,11 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             Setting::set('mailgun_secret', $request->input('mailgun_secret'), 'mail');
         }
 
-        return back()->with('success', 'Mail settings saved successfully.');
+        if ($request->filled('turnstile_secret_key')) {
+            Setting::set('turnstile_secret_key', $request->input('turnstile_secret_key'), 'security');
+        }
+
+        return back()->with('success', 'Settings saved successfully.');
     })->name('settings.save');
 
     Route::post('/settings/test', function (Request $request) {
