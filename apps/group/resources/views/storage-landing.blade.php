@@ -37,20 +37,41 @@
 <body class="min-h-screen bg-white text-zinc-900 antialiased">
 
     {{-- Header --}}
-    <header class="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#061e3c]/90 backdrop-blur-xl">
-        <nav class="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
-            <a href="https://ranyati.co.za" class="text-sm font-medium text-zinc-400 hover:text-white transition flex items-center gap-2">
-                <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
-                Ranyati Group
-            </a>
-            <span class="text-xl font-extrabold text-white tracking-tight">
-                Ranyati <span class="text-[#F58220]">Storage</span>
-            </span>
-            <div class="hidden sm:flex items-center gap-8">
-                <a href="#services" class="text-sm font-medium text-zinc-300 hover:text-white transition">Services</a>
-                <a href="#why" class="text-sm font-medium text-zinc-300 hover:text-white transition">Why Us</a>
+    <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(6,30,60,0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+        <div style="max-width: 80rem; margin: 0 auto; padding: 0 1.5rem;">
+            <div style="display: flex; align-items: center; padding: 14px 0;">
+                {{-- Left 25%: Logo --}}
+                <div style="width: 25%; flex-shrink: 0;">
+                    <a href="https://ranyati.co.za">
+                        <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 26px; width: auto; object-fit: contain;" />
+                    </a>
+                </div>
+                {{-- Center 50%: Division pill buttons --}}
+                <div style="width: 50%; display: flex; align-items: center; justify-content: center; gap: 12px;">
+                    <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(245,130,32,0.2)'" onmouseout="this.style.background='rgba(245,130,32,0.1)'">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    </a>
+                    <a href="https://nrapa.ranyati.co.za" title="NRAPA" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.1)'">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    </a>
+                    <a href="https://storage.ranyati.co.za" title="Storage" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(52,211,153,0.2)'" onmouseout="this.style.background='rgba(52,211,153,0.1)'">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    </a>
+                </div>
+                {{-- Right 25%: Contact stacked --}}
+                <div style="width: 25%; display: flex; flex-direction: column; align-items: flex-end; gap: 0;">
+                    <a href="tel:+27871510987" style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                        <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
+                        +27 87 151 0987
+                    </a>
+                    <div style="width: 100%; height: 1px; background: rgba(255,255,255,0.06); margin: 5px 0;"></div>
+                    <a href="mailto:info@firearmmotivations.co.za" style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
+                        <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
+                        info@firearmmotivations.co.za
+                    </a>
+                </div>
             </div>
-        </nav>
+        </div>
     </header>
 
     {{-- Hero --}}
@@ -58,9 +79,9 @@
         <div class="hero-pattern absolute inset-0"></div>
         <div class="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">
             <div class="animate-fade-up">
-                <span class="inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#F58220]">
-                    A Division of Ranyati Group
-                </span>
+                <div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.03); padding: 3px 20px;">
+                    <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Ranyati Storage" style="height: 74px; width: auto; object-fit: contain; opacity: 1;" />
+                </div>
             </div>
             <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl animate-fade-up-delay" style="text-wrap: balance">
                 Secure Firearm<br>Storage
