@@ -203,7 +203,7 @@
 
                 {{-- Motivations --}}
                 <a href="https://motivations.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #F58220;">
-                    <div class="icon-box inline-flex items-center justify-center rounded-xl bg-[#F58220]/10 ring-1 ring-[#F58220]/15 px-0.5 py-0.5">
+                    <div class="icon-box flex items-center justify-center rounded-xl bg-[#F58220]/10 ring-1 ring-[#F58220]/15 w-full h-16 px-3">
                         <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" class="h-12 w-auto object-contain" />
                     </div>
                     <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">Motivations</h2>
@@ -219,7 +219,7 @@
 
                 {{-- NRAPA --}}
                 <a href="https://nrapa.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #38bdf8;">
-                    <div class="icon-box inline-flex items-center justify-center rounded-xl bg-sky-400/10 ring-1 ring-sky-400/15 px-0.5 py-0.5">
+                    <div class="icon-box flex items-center justify-center rounded-xl bg-sky-400/10 ring-1 ring-sky-400/15 w-full h-16 px-3">
                         <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" class="h-12 w-auto object-contain" />
                     </div>
                     <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">NRAPA</h2>
@@ -235,7 +235,7 @@
 
                 {{-- Storage --}}
                 <a href="https://storage.ranyati.co.za" class="card-division group flex flex-col rounded-2xl p-8 sm:p-9" style="--accent: #34d399;">
-                    <div class="icon-box inline-flex items-center justify-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/15 px-0.5 py-0.5">
+                    <div class="icon-box flex items-center justify-center rounded-xl bg-emerald-400/10 ring-1 ring-emerald-400/15 w-full h-16 px-3">
                         <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" class="h-12 w-auto object-contain" />
                     </div>
                     <h2 class="mt-7 text-xl font-bold tracking-tight text-white sr-only">Storage</h2>
