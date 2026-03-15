@@ -11,27 +11,64 @@
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        .hero-gradient {
-            background: linear-gradient(135deg, #061e3c 0%, #0B4EA2 50%, #083A7A 100%);
+        body { font-family: 'Inter', system-ui, sans-serif; background: #020810; }
+
+        .hero-section {
+            background:
+                radial-gradient(ellipse 90% 70% at 50% 30%, rgba(245,130,32,0.25) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(245,130,32,0.1) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 35% at 20% 60%, rgba(6,30,60,0.4) 0%, transparent 50%),
+                linear-gradient(180deg, #0a3a78 0%, #072e60 30%, #051d3d 60%, #030f1e 85%, #020810 100%);
         }
-        .hero-pattern {
-            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-            background-size: 40px 40px;
+
+        .emblem-ring {
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 50%;
+            position: absolute;
         }
-        .card-hover {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+        .card-service {
+            background: linear-gradient(180deg, rgba(12,35,65,0.7) 0%, rgba(8,22,42,0.8) 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.15, 1);
         }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px -12px rgba(11,78,162,0.15);
+        .card-service:hover {
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-6px);
+            box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6), 0 0 1px 0 rgba(255,255,255,0.1);
         }
-        @keyframes fade-up {
-            from { opacity: 0; transform: translateY(20px); }
+
+        .btn-cta {
+            background: linear-gradient(135deg, #F58220 0%, #d46f16 100%);
+            box-shadow: 0 2px 12px -2px rgba(245,130,32,0.4), 0 0 0 1px rgba(245,130,32,0.15);
+            transition: all 0.25s ease;
+        }
+        .btn-cta:hover {
+            box-shadow: 0 6px 24px -4px rgba(245,130,32,0.5), 0 0 0 1px rgba(245,130,32,0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(255,255,255,0.18);
+            transition: all 0.25s ease;
+        }
+        .btn-outline:hover {
+            border-color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.05);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-up { animation: fade-up 0.6s ease-out forwards; }
-        .animate-fade-up-delay { animation: fade-up 0.6s ease-out 0.15s forwards; opacity: 0; }
-        .animate-fade-up-delay-2 { animation: fade-up 0.6s ease-out 0.3s forwards; opacity: 0; }
+        .anim   { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .anim-1 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards; opacity: 0; }
+        .anim-2 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards; opacity: 0; }
+        .anim-3 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards; opacity: 0; }
+        .anim-4 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s forwards; opacity: 0; }
+        .anim-5 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards; opacity: 0; }
 
         .header-pills, .header-contact { display: none; }
         .header-logo { width: 100%; }
@@ -53,12 +90,12 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-white text-zinc-900 antialiased">
+<body class="min-h-screen antialiased text-white">
 
     {{-- Header --}}
-    <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(6,30,60,0.9); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+    <header style="position: absolute; top: 0; left: 0; right: 0; z-index: 50;">
         <div style="max-width: 80rem; margin: 0 auto; padding: 0 1.5rem;">
-            <div style="display: flex; align-items: center; padding: 14px 0;">
+            <div style="display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
                 {{-- Left: Logo --}}
                 <div class="header-logo" style="flex-shrink: 0;">
                     <a href="https://ranyati.co.za">
@@ -94,162 +131,181 @@
     </header>
 
     {{-- Hero --}}
-    <section class="hero-gradient relative overflow-hidden pt-32 pb-28 sm:pt-40 sm:pb-36">
-        <div class="hero-pattern absolute inset-0"></div>
-        <div class="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">
-            <div class="animate-fade-up">
-                <div style="display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.03); padding: 3px 20px;">
-                    <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Ranyati Motivations" style="height: 74px; width: auto; object-fit: contain; opacity: 1;" />
-                </div>
+    <section class="hero-section relative min-h-[85vh] flex flex-col items-center justify-center overflow-hidden">
+
+        {{-- Emblem rings --}}
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+            <div class="emblem-ring w-[400px] h-[400px] sm:w-[550px] sm:h-[550px]" style="border-color: rgba(255,255,255,0.03);"></div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+            <div class="emblem-ring w-[600px] h-[600px] sm:w-[800px] sm:h-[800px]" style="border-color: rgba(255,255,255,0.02);"></div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+            <div class="emblem-ring w-[900px] h-[900px] sm:w-[1100px] sm:h-[1100px]" style="border-color: rgba(255,255,255,0.015);"></div>
+        </div>
+
+        <div class="relative z-10 mx-auto max-w-3xl px-6 text-center lg:px-8 pt-28 pb-20 sm:pb-24">
+
+            {{-- Badge --}}
+            <div class="anim" style="display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.03); padding: 3px 20px;">
+                <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Ranyati Motivations" style="height: 74px; width: auto; object-fit: contain; opacity: 1;" />
             </div>
-            <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl animate-fade-up-delay" style="text-wrap: balance">
-                Comprehensive Firearm<br>Motivations
+
+            {{-- Heading --}}
+            <h1 class="mt-10 text-[2.5rem] font-black leading-[1.05] tracking-[-0.03em] text-white sm:text-[3.25rem] lg:text-[4rem] anim-1">
+                Comprehensive Firearm<br class="hidden sm:block"> Motivations
             </h1>
-            <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-zinc-300 animate-fade-up-delay-2">
+            <p class="mt-4 text-[13px] font-semibold uppercase tracking-[0.25em] text-[#F58220]/70 anim-1">
+                A Division of Ranyati Group
+            </p>
+
+            {{-- Supporting paragraph --}}
+            <p class="mx-auto mt-7 max-w-lg text-[15px] leading-[1.8] text-white/45 anim-2">
                 Professional motivations for firearm licence applications, renewals, and compliance support. We simplify a complex legal process so you can focus on responsible firearm ownership.
             </p>
-        </div>
-        <div class="absolute bottom-0 left-0 right-0">
-            <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full" preserveAspectRatio="none">
-                <path d="M0 80L1440 80L1440 0C1440 0 1080 60 720 60C360 60 0 0 0 0L0 80Z" fill="white"/>
-            </svg>
+
+            {{-- CTAs --}}
+            <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 anim-3">
+                <a href="#services" class="btn-cta rounded-xl px-8 py-3.5 text-[13px] font-bold text-white tracking-wide">
+                    Our Services
+                </a>
+                <a href="mailto:info@firearmmotivations.co.za" class="btn-outline rounded-xl px-8 py-3.5 text-[13px] font-semibold text-white/50 hover:text-white tracking-wide">
+                    Get in Touch
+                </a>
+            </div>
+
+            {{-- Trust strip --}}
+            <div class="mt-14 anim-4">
+                <div class="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-2 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-6 py-3 backdrop-blur-sm">
+                    <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
+                        <svg class="size-3.5 text-[#F58220]/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+                        Established 2006
+                    </div>
+                    <span class="hidden sm:block h-3 w-px bg-white/[0.06]"></span>
+                    <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
+                        <svg class="size-3.5 text-[#F58220]/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd"/></svg>
+                        FCA Compliance Experts
+                    </div>
+                    <span class="hidden sm:block h-3 w-px bg-white/[0.06]"></span>
+                    <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
+                        <svg class="size-3.5 text-[#F58220]/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+                        Professional Motivations
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     {{-- Services --}}
-    <section id="services" class="bg-white py-24">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="text-center">
-                <span class="inline-block rounded-full bg-[#F58220]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#F58220]">
-                    What We Do
-                </span>
-                <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl" style="text-wrap: balance">
+    <section id="services" class="relative bg-[#020810]">
+        <div class="mx-auto max-w-6xl px-6 lg:px-8 pb-28 sm:pb-36">
+
+            <div class="text-center mb-16 anim-5">
+                <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-[#F58220]/60">What We Do</p>
+                <h2 class="mt-4 text-[2rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.5rem]">
                     Expert motivation services
                 </h2>
-                <p class="mx-auto mt-4 max-w-xl text-base text-zinc-500">
+                <p class="mx-auto mt-5 max-w-xl text-[15px] leading-[1.8] text-white/40">
                     Nearly two decades of experience in firearm administration, delivered by professionals who understand the Firearms Control Act inside and out.
                 </p>
             </div>
 
-            <div class="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#F58220]/10 group-hover:bg-[#F58220]/15 transition">
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 anim-5">
+
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
                         <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
                         </svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">New Licence Motivations</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Comprehensive motivations for new firearm licence applications, covering self-defence, sport shooting, hunting, and professional use.</p>
+                    <h3 class="mt-6 text-base font-bold text-white">New Licence Motivations</h3>
+                    <p class="mt-3 text-[14px] leading-[1.75] text-white/40">Comprehensive motivations for new firearm licence applications, covering self-defence, sport shooting, hunting, and professional use.</p>
                 </div>
 
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#0B4EA2]/10 group-hover:bg-[#0B4EA2]/15 transition">
-                        <svg class="size-6 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15);">
+                        <svg class="size-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182"/>
                         </svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Licence Renewals</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Timely and thorough renewal motivations to ensure continuity of your existing firearm licences before expiry.</p>
+                    <h3 class="mt-6 text-base font-bold text-white">Licence Renewals</h3>
+                    <p class="mt-3 text-[14px] leading-[1.75] text-white/40">Timely and thorough renewal motivations to ensure continuity of your existing firearm licences before expiry.</p>
                 </div>
 
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#F58220]/10 group-hover:bg-[#F58220]/15 transition">
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
                         <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>
                         </svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Compliance Support</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Ongoing guidance on Firearms Control Act compliance, documentation requirements, and regulatory changes that affect your licences.</p>
+                    <h3 class="mt-6 text-base font-bold text-white">Compliance Support</h3>
+                    <p class="mt-3 text-[14px] leading-[1.75] text-white/40">Ongoing guidance on Firearms Control Act compliance, documentation requirements, and regulatory changes that affect your licences.</p>
                 </div>
 
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#0B4EA2]/10 group-hover:bg-[#0B4EA2]/15 transition">
-                        <svg class="size-6 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15);">
+                        <svg class="size-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/>
                         </svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Dedicated Status Applications</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Motivations for dedicated sport shooter or hunter status through our accredited association, NRAPA.</p>
+                    <h3 class="mt-6 text-base font-bold text-white">Dedicated Status Applications</h3>
+                    <p class="mt-3 text-[14px] leading-[1.75] text-white/40">Motivations for dedicated sport shooter or hunter status through our accredited association, NRAPA.</p>
                 </div>
 
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#F58220]/10 group-hover:bg-[#F58220]/15 transition">
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
                         <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z"/>
                         </svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Appeals &amp; Reviews</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Assistance with appeals against refused applications and reviews of existing licence conditions.</p>
+                    <h3 class="mt-6 text-base font-bold text-white">Appeals &amp; Reviews</h3>
+                    <p class="mt-3 text-[14px] leading-[1.75] text-white/40">Assistance with appeals against refused applications and reviews of existing licence conditions.</p>
                 </div>
 
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#0B4EA2]/10 group-hover:bg-[#0B4EA2]/15 transition">
-                        <svg class="size-6 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15);">
+                        <svg class="size-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
                         </svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Estate Administration</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Assistance with the administration of firearms in deceased estates, including transfers and surrender processes.</p>
+                    <h3 class="mt-6 text-base font-bold text-white">Estate Administration</h3>
+                    <p class="mt-3 text-[14px] leading-[1.75] text-white/40">Assistance with the administration of firearms in deceased estates, including transfers and surrender processes.</p>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    {{-- Process --}}
-    <section id="process" class="bg-zinc-50 py-24 border-y border-zinc-100">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="text-center">
-                <span class="inline-block rounded-full bg-[#0B4EA2]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#0B4EA2]">
-                    How It Works
-                </span>
-                <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl" style="text-wrap: balance">
+            </div>
+
+            {{-- Process --}}
+            <div class="mt-28 text-center">
+                <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-sky-400/50">How It Works</p>
+                <h2 class="mt-4 text-[2rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.5rem]">
                     Simple, professional process
                 </h2>
             </div>
 
-            <div class="mt-16 mx-auto max-w-3xl">
-                <div class="space-y-8">
-                    <div class="flex gap-6">
-                        <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#0B4EA2] text-white font-bold text-sm">1</div>
-                        <div>
-                            <h3 class="text-base font-bold text-zinc-900">Consultation</h3>
-                            <p class="mt-1 text-sm text-zinc-500">We assess your requirements and advise on the appropriate licence category, supporting documents, and process.</p>
-                        </div>
+            <div class="mt-16 mx-auto max-w-3xl space-y-8">
+                <div class="flex gap-6">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full text-white font-bold text-sm" style="background: linear-gradient(135deg, #F58220 0%, #d46f16 100%);">1</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Consultation</h3>
+                        <p class="mt-1 text-[14px] leading-[1.75] text-white/40">We assess your requirements and advise on the appropriate licence category, supporting documents, and process.</p>
                     </div>
-                    <div class="flex gap-6">
-                        <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#0B4EA2] text-white font-bold text-sm">2</div>
-                        <div>
-                            <h3 class="text-base font-bold text-zinc-900">Documentation</h3>
-                            <p class="mt-1 text-sm text-zinc-500">We prepare your comprehensive motivation, ensuring it meets all legal requirements and addresses the specific criteria assessed by the registrar.</p>
-                        </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full text-white font-bold text-sm" style="background: linear-gradient(135deg, #F58220 0%, #d46f16 100%);">2</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Documentation</h3>
+                        <p class="mt-1 text-[14px] leading-[1.75] text-white/40">We prepare your comprehensive motivation, ensuring it meets all legal requirements and addresses the specific criteria assessed by the registrar.</p>
                     </div>
-                    <div class="flex gap-6">
-                        <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#0B4EA2] text-white font-bold text-sm">3</div>
-                        <div>
-                            <h3 class="text-base font-bold text-zinc-900">Submission &amp; Follow-up</h3>
-                            <p class="mt-1 text-sm text-zinc-500">We guide you through the submission process and provide ongoing support until your application is finalised.</p>
-                        </div>
+                </div>
+                <div class="flex gap-6">
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full text-white font-bold text-sm" style="background: linear-gradient(135deg, #F58220 0%, #d46f16 100%);">3</div>
+                    <div>
+                        <h3 class="text-base font-bold text-white">Submission &amp; Follow-up</h3>
+                        <p class="mt-1 text-[14px] leading-[1.75] text-white/40">We guide you through the submission process and provide ongoing support until your application is finalised.</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    {{-- CTA --}}
-    <section class="hero-gradient relative overflow-hidden">
-        <div class="absolute top-0 left-0 right-0">
-            <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full" preserveAspectRatio="none">
-                <path d="M0 0L1440 0L1440 60C1440 60 1080 10 720 10C360 10 0 60 0 60L0 0Z" fill="#fafafa"/>
-            </svg>
-        </div>
-        <div class="hero-pattern absolute inset-0"></div>
-        <div class="relative mx-auto max-w-4xl px-6 pt-28 pb-20 text-center">
-            <h2 class="text-3xl font-extrabold text-white sm:text-4xl" style="text-wrap: balance">
-                Let us handle your motivation
-            </h2>
-            <p class="mx-auto mt-4 max-w-xl text-base text-zinc-300">
-                With nearly two decades of experience, our team knows exactly what the registrar is looking for. Get it right the first time.
-            </p>
         </div>
     </section>
 
