@@ -10,12 +10,13 @@
     <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
     @if($turnstileSiteKey)
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        [x-cloak] { display: none !important; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #020810; }
 
         .hero-section {
@@ -174,6 +175,7 @@
         </div>
 
         <div class="relative z-10 mx-auto w-full max-w-xl px-6 pt-28 pb-20"
+             x-cloak
              x-data="{
                 step: {{ $errors->any() ? 2 : 1 }},
                 email: '{{ old('email', $prefill['email'] ?? '') }}',
