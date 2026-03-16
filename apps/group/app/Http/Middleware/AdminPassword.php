@@ -10,7 +10,7 @@ class AdminPassword
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->session()->get('admin_authenticated')) {
+        if (! $request->user() || ! $request->user()->isAdmin()) {
             return redirect()->route('admin.login');
         }
 

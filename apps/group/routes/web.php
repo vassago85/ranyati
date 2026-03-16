@@ -3,7 +3,9 @@
 use App\Mail\NewMotivationEnquiry;
 use App\Models\MotivationEnquiry;
 use App\Models\Setting;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -105,22 +107,37 @@ Route::post('/enquire', function (Request $request) {
 
 // ── Admin ──────────────────────────────────────────────────────
 
-Route::get('/admin/login', fn () => view('admin.login'))->name('admin.login');
+Route::get('/admin/login', function () {
+    if (Auth::check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return view('admin.login');
+})->name('admin.login');
 
 Route::post('/admin/login', function (Request $request) {
-    $request->validate(['password' => 'required']);
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-    if ($request->password !== config('app.admin_password')) {
-        return back()->withErrors(['password' => 'Incorrect password.']);
+    if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        return back()->withInput($request->only('email'))->withErrors(['email' => 'Invalid credentials.']);
     }
 
-    $request->session()->put('admin_authenticated', true);
+    if (! $request->user()->isAdmin()) {
+        Auth::logout();
+        return back()->withErrors(['email' => 'You do not have admin access.']);
+    }
+
+    $request->session()->regenerate();
 
     return redirect()->route('admin.dashboard');
 })->name('admin.login.submit');
 
 Route::post('/admin/logout', function (Request $request) {
-    $request->session()->forget('admin_authenticated');
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
     return redirect()->route('admin.login');
 })->name('admin.logout');
@@ -231,4 +248,53 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             return back()->with('error', 'Failed to send test email: ' . $e->getMessage());
         }
     })->name('settings.test');
+
+    // ── User Management ────────────────────────────────────────
+
+    Route::get('/users', function () {
+        return view('admin.users', [
+            'users' => User::orderByRaw("CASE role WHEN 'developer' THEN 1 WHEN 'owner' THEN 2 WHEN 'admin' THEN 3 ELSE 4 END")->get(),
+        ]);
+    })->name('users');
+
+    Route::post('/users', function (Request $request) {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:developer,owner,admin',
+        ]);
+
+        User::create($request->only('name', 'email', 'password', 'role'));
+
+        return back()->with('success', 'User created successfully.');
+    })->name('users.store');
+
+    Route::post('/users/{user}/update', function (Request $request, User $user) {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'role' => 'required|in:developer,owner,admin',
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        $data = $request->only('name', 'email', 'role');
+        if ($request->filled('password')) {
+            $data['password'] = $request->password;
+        }
+
+        $user->update($data);
+
+        return back()->with('success', 'User updated.');
+    })->name('users.update');
+
+    Route::delete('/users/{user}', function (User $user) {
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'You cannot delete yourself.');
+        }
+
+        $user->delete();
+
+        return back()->with('success', 'User deleted.');
+    })->name('users.delete');
 });
