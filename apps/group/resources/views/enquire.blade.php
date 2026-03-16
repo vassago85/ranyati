@@ -30,7 +30,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "ContactPage",
         "name": "Request a Motivation",
         "description": "Submit an enquiry for a professional firearm motivation from Ranyati Group.",

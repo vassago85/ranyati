@@ -21,11 +21,15 @@ services:
       - DB_USERNAME=${DB_USERNAME:-ranyati}
       - DB_PASSWORD=${DB_PASSWORD}
       - SESSION_DRIVER=database
+      - CACHE_STORE=database
+      - QUEUE_CONNECTION=database
+      - LOG_CHANNEL=stack
+      - LOG_LEVEL=error
       - MAIL_MAILER=${MAIL_MAILER:-mailgun}
       - MAIL_FROM_ADDRESS=${MAIL_FROM_ADDRESS:-noreply@ranyati.co.za}
       - MAIL_FROM_NAME=Ranyati Group
-      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN}
-      - MAILGUN_SECRET=${MAILGUN_SECRET}
+      - MAILGUN_DOMAIN=${MAILGUN_DOMAIN:-}
+      - MAILGUN_SECRET=${MAILGUN_SECRET:-}
       - MAILGUN_ENDPOINT=${MAILGUN_ENDPOINT:-api.eu.mailgun.net}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}

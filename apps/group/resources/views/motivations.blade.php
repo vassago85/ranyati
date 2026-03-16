@@ -23,7 +23,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "ProfessionalService",
         "name": "Ranyati Motivations",
         "description": "Professional comprehensive motivations for firearm licence applications, renewals, and compliance support in South Africa.",

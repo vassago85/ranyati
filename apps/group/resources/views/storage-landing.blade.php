@@ -23,7 +23,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
+        "@@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": "Ranyati Storage",
         "description": "Professional secure firearm storage, safe custody, and estate administration services. FCA-compliant purpose-built facilities.",
