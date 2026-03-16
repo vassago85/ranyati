@@ -51,28 +51,64 @@
     }
     </script>
     <style>
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .hero-gradient {
-            background: linear-gradient(135deg, #061e3c 0%, #0B4EA2 50%, #083A7A 100%);
+        body { font-family: 'Inter', system-ui, sans-serif; background: #020810; }
+
+        .hero-section {
+            background:
+                radial-gradient(ellipse 90% 70% at 50% 30%, rgba(11,78,162,0.45) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(11,78,162,0.2) 0%, transparent 50%),
+                radial-gradient(ellipse 50% 35% at 20% 60%, rgba(6,30,60,0.4) 0%, transparent 50%),
+                linear-gradient(180deg, #0a3a78 0%, #072e60 30%, #051d3d 60%, #030f1e 85%, #020810 100%);
         }
-        .hero-pattern {
-            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
-            background-size: 40px 40px;
+
+        .emblem-ring {
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 50%;
+            position: absolute;
         }
-        .card-hover {
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
+
+        .card-service {
+            background: linear-gradient(180deg, rgba(12,35,65,0.7) 0%, rgba(8,22,42,0.8) 100%);
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.15, 1);
         }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 40px -12px rgba(11,78,162,0.15);
+        .card-service:hover {
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-6px);
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.5), 0 0 1px 0 rgba(255,255,255,0.1);
         }
-        @keyframes fade-up {
-            from { opacity: 0; transform: translateY(20px); }
+
+        .btn-cta {
+            background: linear-gradient(135deg, #F58220 0%, #d46f16 100%);
+            box-shadow: 0 2px 12px -2px rgba(245,130,32,0.4), 0 0 0 1px rgba(245,130,32,0.15);
+            transition: all 0.25s ease;
+        }
+        .btn-cta:hover {
+            box-shadow: 0 6px 24px -4px rgba(245,130,32,0.5), 0 0 0 1px rgba(245,130,32,0.25);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(255,255,255,0.18);
+            transition: all 0.25s ease;
+        }
+        .btn-outline:hover {
+            border-color: rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.05);
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .animate-fade-up { animation: fade-up 0.6s ease-out forwards; }
-        .animate-fade-up-delay { animation: fade-up 0.6s ease-out 0.15s forwards; opacity: 0; }
-        .animate-fade-up-delay-2 { animation: fade-up 0.6s ease-out 0.3s forwards; opacity: 0; }
+        .anim   { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .anim-1 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards; opacity: 0; }
+        .anim-2 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards; opacity: 0; }
+        .anim-3 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards; opacity: 0; }
+        .anim-4 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s forwards; opacity: 0; }
+        .anim-5 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards; opacity: 0; }
 
         .header-pills, .header-contact { display: none; }
         .header-logo { width: 100%; }
@@ -94,26 +130,26 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-white text-zinc-900 antialiased">
+<body class="min-h-screen antialiased text-white">
 
     {{-- Header --}}
-    <header style="position: fixed; top: 0; left: 0; right: 0; z-index: 50; background: rgba(6,30,60,0.95); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <header style="position: absolute; top: 0; left: 0; right: 0; z-index: 50;">
         <div style="max-width: 80rem; margin: 0 auto; padding: 0 1.5rem;">
-            <div style="display: flex; align-items: center; padding: 14px 0;">
+            <div style="display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
                 <div class="header-logo" style="flex-shrink: 0;">
                     <a href="https://ranyati.co.za">
                         <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 26px; width: auto; object-fit: contain;" />
                     </a>
                 </div>
                 <div class="header-pills" style="width: 50%; align-items: center; justify-content: center; gap: 12px;">
-                    <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(245,130,32,0.15); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.2); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(245,130,32,0.25)'" onmouseout="this.style.background='rgba(245,130,32,0.15)'">
-                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.85;" />
+                    <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(245,130,32,0.2)'" onmouseout="this.style.background='rgba(245,130,32,0.1)'">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
                     </a>
-                    <a href="https://nrapa.ranyati.co.za" title="NRAPA" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(56,189,248,0.15); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.2); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(56,189,248,0.25)'" onmouseout="this.style.background='rgba(56,189,248,0.15)'">
-                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.85;" />
+                    <a href="https://nrapa.ranyati.co.za" title="NRAPA" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.1)'">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
                     </a>
-                    <a href="https://storage.ranyati.co.za" title="Storage" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(52,211,153,0.15); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.2); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(52,211,153,0.25)'" onmouseout="this.style.background='rgba(52,211,153,0.15)'">
-                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.85;" />
+                    <a href="https://storage.ranyati.co.za" title="Storage" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(52,211,153,0.15); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.25); transition: background 0.2s; overflow: hidden;">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.9;" />
                     </a>
                 </div>
                 <div class="header-contact" style="width: 25%; flex-direction: column; align-items: flex-end; gap: 0;">
@@ -132,132 +168,145 @@
     </header>
 
     {{-- Hero --}}
-    <section class="hero-gradient relative overflow-hidden pt-32 pb-28 sm:pt-40 sm:pb-36">
-        <div class="hero-pattern absolute inset-0"></div>
-        <div class="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">
-            <div class="animate-fade-up">
-                <span class="inline-block rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#F58220]">
-                    A Division of Ranyati Group
-                </span>
+    <section class="hero-section relative min-h-[85vh] flex flex-col items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+            <div class="emblem-ring w-[400px] h-[400px] sm:w-[550px] sm:h-[550px]" style="border-color: rgba(255,255,255,0.03);"></div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+            <div class="emblem-ring w-[600px] h-[600px] sm:w-[800px] sm:h-[800px]" style="border-color: rgba(255,255,255,0.02);"></div>
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none" aria-hidden="true">
+            <div class="emblem-ring w-[900px] h-[900px] sm:w-[1100px] sm:h-[1100px]" style="border-color: rgba(255,255,255,0.015);"></div>
+        </div>
+
+        <div class="relative z-10 mx-auto max-w-3xl px-6 text-center lg:px-8 pt-28 pb-20 sm:pb-24">
+            <div class="anim" style="display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.03); padding: 3px 20px;">
+                <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Ranyati Storage" style="height: 56px; width: auto; object-fit: contain;" />
             </div>
-            <h1 class="mt-6 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl animate-fade-up-delay" style="text-wrap: balance">
-                Secure Firearm<br>Storage
+
+            <h1 class="mt-10 text-[2.5rem] font-black leading-[1.05] tracking-[-0.03em] text-white sm:text-[3.25rem] lg:text-[4rem] anim-1">
+                Secure Firearm<br class="hidden sm:block"> Storage
             </h1>
-            <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-zinc-300 animate-fade-up-delay-2">
+            <p class="mt-4 text-[13px] font-semibold uppercase tracking-[0.25em] text-emerald-400/70 anim-1">
+                A Division of Ranyati Group
+            </p>
+
+            <p class="mx-auto mt-7 max-w-lg text-[15px] leading-[1.8] text-white/45 anim-2">
                 Professional safe custody and storage infrastructure for responsible firearm owners. Fully compliant with the Firearms Control Act and backed by dedicated physical security.
             </p>
-            <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 animate-fade-up-delay-2">
-                <a href="mailto:info@firearmmotivations.co.za" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; border-radius: 12px; background: linear-gradient(135deg, #F58220 0%, #d46f16 100%); box-shadow: 0 2px 12px -2px rgba(245,130,32,0.4); font-size: 13px; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: 0.04em; transition: all 0.25s;">
+
+            <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 anim-3">
+                <a href="mailto:info@firearmmotivations.co.za" class="btn-cta rounded-xl px-8 py-3.5 text-[13px] font-bold text-white tracking-wide">
                     Get in Touch
                 </a>
-                <a href="#services" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); text-decoration: none; letter-spacing: 0.04em; transition: all 0.25s;">
+                <a href="#services" class="btn-outline rounded-xl px-8 py-3.5 text-[13px] font-semibold text-white/50 hover:text-white tracking-wide">
                     Our Services
                 </a>
             </div>
-        </div>
-        <div class="absolute bottom-0 left-0 right-0">
-            <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full" preserveAspectRatio="none">
-                <path d="M0 80L1440 80L1440 0C1440 0 1080 60 720 60C360 60 0 0 0 0L0 80Z" fill="white"/>
-            </svg>
+
+            <div class="mt-14 anim-4">
+                <div class="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-2 rounded-2xl border border-white/[0.04] bg-white/[0.02] px-6 py-3 backdrop-blur-sm">
+                    <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
+                        <svg class="size-3.5 text-emerald-400/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+                        FCA Compliant
+                    </div>
+                    <span class="hidden sm:block h-3 w-px bg-white/[0.06]"></span>
+                    <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
+                        <svg class="size-3.5 text-emerald-400/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z" clip-rule="evenodd"/></svg>
+                        Purpose-Built Facilities
+                    </div>
+                    <span class="hidden sm:block h-3 w-px bg-white/[0.06]"></span>
+                    <div class="flex items-center gap-2 px-2 text-[11.5px] font-medium tracking-wide text-white/30">
+                        <svg class="size-3.5 text-emerald-400/50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.403 12.652a3 3 0 0 0 0-5.304 3 3 0 0 0-3.75-3.751 3 3 0 0 0-5.305 0 3 3 0 0 0-3.751 3.75 3 3 0 0 0 0 5.305 3 3 0 0 0 3.75 3.751 3 3 0 0 0 5.305 0 3 3 0 0 0 3.751-3.75Zm-2.546-4.46a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd"/></svg>
+                        Documented Chain of Custody
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 
     {{-- Services --}}
-    <section id="services" class="bg-white py-24">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="text-center">
-                <span class="inline-block rounded-full bg-[#0B4EA2]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#0B4EA2]">
-                    Our Services
-                </span>
-                <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl" style="text-wrap: balance">
-                    Storage &amp; custody solutions
-                </h2>
-                <p class="mx-auto mt-4 max-w-xl text-base text-zinc-500">
-                    Whether you need temporary custody during travel, estate administration storage, or long-term safekeeping &mdash; we have you covered.
+    <section id="services" class="relative bg-[#020810] pb-28 sm:pb-36">
+        <div class="mx-auto max-w-6xl px-6 lg:px-8">
+            <div class="text-center mb-16 anim-5">
+                <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-emerald-400/50">Our Services</p>
+                <h2 class="mt-3 text-[1.75rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.25rem]">Storage &amp; custody solutions</h2>
+                <p class="mx-auto mt-4 max-w-xl text-[14px] leading-[1.7] text-white/35">
+                    Whether you need temporary custody during travel, estate administration storage, or long-term safekeeping — we have you covered.
                 </p>
             </div>
 
-            <div class="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#0B4EA2]/10 group-hover:bg-[#0B4EA2]/15 transition">
-                        <svg class="size-6 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z"/>
-                        </svg>
+            <div class="grid gap-6 sm:grid-cols-3">
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
+                        <svg class="size-6 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z"/></svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Safe Custody</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Secure, compliant storage for your firearms in purpose-built facilities that exceed regulatory requirements.</p>
+                    <h3 class="mt-6 text-[15px] font-bold text-white">Safe Custody</h3>
+                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Secure, compliant storage for your firearms in purpose-built facilities that exceed regulatory requirements.</p>
                 </div>
 
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#F58220]/10 group-hover:bg-[#F58220]/15 transition">
-                        <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
-                        </svg>
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
+                        <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Estate Administration</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Professional handling of firearms in deceased estates, including secure storage during the administration process, transfers, and surrenders.</p>
+                    <h3 class="mt-6 text-[15px] font-bold text-white">Estate Administration</h3>
+                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Professional handling of firearms in deceased estates, including secure storage during the administration process, transfers, and surrenders.</p>
                 </div>
 
-                <div class="card-hover group rounded-2xl border border-zinc-200/80 bg-white p-7">
-                    <div class="flex size-12 items-center justify-center rounded-xl bg-[#0B4EA2]/10 group-hover:bg-[#0B4EA2]/15 transition">
-                        <svg class="size-6 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/>
-                        </svg>
+                <div class="card-service rounded-2xl p-8">
+                    <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
+                        <svg class="size-6 text-emerald-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"/></svg>
                     </div>
-                    <h3 class="mt-5 text-base font-bold text-zinc-900">Long-Term Safekeeping</h3>
-                    <p class="mt-2 text-sm leading-relaxed text-zinc-500">Extended storage solutions for firearms you need kept safe during travel, relocation, or while awaiting licence outcomes.</p>
+                    <h3 class="mt-6 text-[15px] font-bold text-white">Long-Term Safekeeping</h3>
+                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Extended storage solutions for firearms you need kept safe during travel, relocation, or while awaiting licence outcomes.</p>
                 </div>
             </div>
         </div>
     </section>
 
     {{-- Why Us --}}
-    <section id="why" class="bg-zinc-50 py-24 border-y border-zinc-100">
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <div class="text-center">
-                <span class="inline-block rounded-full bg-[#F58220]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#F58220]">
-                    Why Ranyati Storage
-                </span>
-                <h2 class="mt-4 text-3xl font-extrabold tracking-tight text-zinc-900 sm:text-4xl" style="text-wrap: balance">
-                    Security you can trust
-                </h2>
+    <section class="relative bg-[#020810] border-t border-white/[0.04] pb-28 sm:pb-36">
+        <div class="mx-auto max-w-3xl px-6 lg:px-8 pt-24">
+            <div class="text-center mb-16">
+                <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-[#F58220]/60">Why Ranyati Storage</p>
+                <h2 class="mt-3 text-[1.75rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.25rem]">Security you can trust</h2>
             </div>
 
-            <div class="mt-16 mx-auto max-w-3xl grid gap-6 sm:grid-cols-2">
+            <div class="grid gap-8 sm:grid-cols-2">
                 <div class="flex gap-4">
-                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#0B4EA2]/10">
-                        <svg class="size-5 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
+                        <svg class="size-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900">FCA Compliant</h3>
-                        <p class="mt-1 text-sm text-zinc-500">All storage meets or exceeds Firearms Control Act requirements.</p>
+                        <h3 class="text-[14px] font-bold text-white">FCA Compliant</h3>
+                        <p class="mt-1 text-[13px] leading-[1.7] text-white/35">All storage meets or exceeds Firearms Control Act requirements.</p>
                     </div>
                 </div>
                 <div class="flex gap-4">
-                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#0B4EA2]/10">
-                        <svg class="size-5 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
+                        <svg class="size-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900">Purpose-Built Facilities</h3>
-                        <p class="mt-1 text-sm text-zinc-500">Dedicated physical infrastructure designed specifically for firearm storage.</p>
+                        <h3 class="text-[14px] font-bold text-white">Purpose-Built Facilities</h3>
+                        <p class="mt-1 text-[13px] leading-[1.7] text-white/35">Dedicated physical infrastructure designed specifically for firearm storage.</p>
                     </div>
                 </div>
                 <div class="flex gap-4">
-                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#0B4EA2]/10">
-                        <svg class="size-5 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
+                        <svg class="size-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900">Documented Chain of Custody</h3>
-                        <p class="mt-1 text-sm text-zinc-500">Full audit trail from intake to release, meeting all legal requirements.</p>
+                        <h3 class="text-[14px] font-bold text-white">Documented Chain of Custody</h3>
+                        <p class="mt-1 text-[13px] leading-[1.7] text-white/35">Full audit trail from intake to release, meeting all legal requirements.</p>
                     </div>
                 </div>
                 <div class="flex gap-4">
-                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#0B4EA2]/10">
-                        <svg class="size-5 text-[#0B4EA2]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
+                    <div class="flex size-10 shrink-0 items-center justify-center rounded-full" style="background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15);">
+                        <svg class="size-5 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-zinc-900">Integrated with Ranyati Group</h3>
-                        <p class="mt-1 text-sm text-zinc-500">Seamless coordination with our motivations and NRAPA membership services.</p>
+                        <h3 class="text-[14px] font-bold text-white">Integrated with Ranyati Group</h3>
+                        <p class="mt-1 text-[13px] leading-[1.7] text-white/35">Seamless coordination with our motivations and NRAPA membership services.</p>
                     </div>
                 </div>
             </div>
@@ -265,24 +314,20 @@
     </section>
 
     {{-- CTA --}}
-    <section class="hero-gradient relative overflow-hidden">
-        <div class="absolute top-0 left-0 right-0">
-            <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full" preserveAspectRatio="none">
-                <path d="M0 0L1440 0L1440 60C1440 60 1080 10 720 10C360 10 0 60 0 60L0 0Z" fill="#fafafa"/>
-            </svg>
-        </div>
-        <div class="hero-pattern absolute inset-0"></div>
-        <div class="relative mx-auto max-w-4xl px-6 pt-28 pb-20 text-center">
-            <h2 class="text-3xl font-extrabold text-white sm:text-4xl" style="text-wrap: balance">
-                Your firearms, safely stored
-            </h2>
-            <p class="mx-auto mt-4 max-w-xl text-base text-zinc-300">
-                Whether it's temporary custody, estate administration, or long-term storage &mdash; your firearms are in safe hands with Ranyati Storage.
-            </p>
-            <div class="mt-8">
-                <a href="mailto:info@firearmmotivations.co.za" style="display: inline-flex; align-items: center; justify-content: center; padding: 16px 40px; border-radius: 12px; background: linear-gradient(135deg, #F58220 0%, #d46f16 100%); box-shadow: 0 2px 12px -2px rgba(245,130,32,0.4); font-size: 14px; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: 0.04em; transition: all 0.25s;">
-                    Get in Touch
-                </a>
+    <section class="relative bg-[#020810] border-t border-white/[0.04] pb-28 sm:pb-36">
+        <div class="mx-auto max-w-3xl px-6 lg:px-8 pt-24 text-center">
+            <div style="background: linear-gradient(180deg, rgba(52,211,153,0.06) 0%, rgba(52,211,153,0.02) 100%); border: 1px solid rgba(52,211,153,0.1); border-radius: 20px; padding: 48px 32px;">
+                <h2 class="text-[1.5rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2rem]">
+                    Your firearms, safely stored
+                </h2>
+                <p class="mx-auto mt-4 max-w-md text-[14px] leading-[1.7] text-white/40">
+                    Whether it's temporary custody, estate administration, or long-term storage — your firearms are in safe hands with Ranyati Storage.
+                </p>
+                <div class="mt-8">
+                    <a href="mailto:info@firearmmotivations.co.za" class="btn-cta inline-flex rounded-xl px-10 py-4 text-[14px] font-bold text-white tracking-wide">
+                        Get in Touch
+                    </a>
+                </div>
             </div>
         </div>
     </section>
