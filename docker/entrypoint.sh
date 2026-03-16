@@ -3,6 +3,9 @@ set -e
 
 echo "Starting Ranyati Group..."
 
+# Remove the baked-in .env so Laravel reads from Docker environment variables
+rm -f /var/www/html/.env
+
 mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/framework/cache
 mkdir -p /var/www/html/storage/framework/sessions
