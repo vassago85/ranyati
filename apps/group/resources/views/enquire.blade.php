@@ -3,8 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JV2NSWMYTQ"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JV2NSWMYTQ');</script>
     <title>Enquire — Ranyati Motivations</title>
     <meta name="description" content="Submit an enquiry for a professional firearm motivation. A division of Ranyati Group.">
+    <link rel="canonical" href="https://motivations.ranyati.co.za/enquire">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Ranyati Motivations">
+    <meta property="og:title" content="Request a Motivation — Ranyati Motivations">
+    <meta property="og:description" content="Submit an enquiry for a professional firearm motivation from Ranyati Group.">
+    <meta property="og:url" content="https://motivations.ranyati.co.za/enquire">
+    <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Request a Motivation — Ranyati Motivations">
+    <meta name="twitter:description" content="Submit an enquiry for a professional firearm motivation from Ranyati Group.">
+    <meta name="twitter:image" content="{{ asset('ranyati-group-logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
@@ -15,6 +28,20 @@
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     @endif
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        "name": "Request a Motivation",
+        "description": "Submit an enquiry for a professional firearm motivation from Ranyati Group.",
+        "url": "https://motivations.ranyati.co.za/enquire",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Ranyati Motivations",
+            "url": "https://motivations.ranyati.co.za"
+        }
+    }
+    </script>
     <style>
         [x-cloak] { display: none !important; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #020810; }
