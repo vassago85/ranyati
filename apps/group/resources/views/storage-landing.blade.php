@@ -106,14 +106,14 @@
                     </a>
                 </div>
                 <div class="header-pills" style="width: 50%; align-items: center; justify-content: center; gap: 12px;">
-                    <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(245,130,32,0.2)'" onmouseout="this.style.background='rgba(245,130,32,0.1)'">
-                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(245,130,32,0.15); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.2); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(245,130,32,0.25)'" onmouseout="this.style.background='rgba(245,130,32,0.15)'">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.85;" />
                     </a>
-                    <a href="https://nrapa.ranyati.co.za" title="NRAPA" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.1)'">
-                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    <a href="https://nrapa.ranyati.co.za" title="NRAPA" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(56,189,248,0.15); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.2); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(56,189,248,0.25)'" onmouseout="this.style.background='rgba(56,189,248,0.15)'">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.85;" />
                     </a>
-                    <a href="https://storage.ranyati.co.za" title="Storage" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(52,211,153,0.2)'" onmouseout="this.style.background='rgba(52,211,153,0.1)'">
-                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    <a href="https://storage.ranyati.co.za" title="Storage" style="display: inline-flex; align-items: center; justify-content: center; width: 144px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(52,211,153,0.15); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.2); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(52,211,153,0.25)'" onmouseout="this.style.background='rgba(52,211,153,0.15)'">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 132px; width: auto; height: auto; object-fit: contain; opacity: 0.85;" />
                     </a>
                 </div>
                 <div class="header-contact" style="width: 25%; flex-direction: column; align-items: flex-end; gap: 0;">
@@ -146,6 +146,14 @@
             <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-zinc-300 animate-fade-up-delay-2">
                 Professional safe custody and storage infrastructure for responsible firearm owners. Fully compliant with the Firearms Control Act and backed by dedicated physical security.
             </p>
+            <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 animate-fade-up-delay-2">
+                <a href="mailto:info@firearmmotivations.co.za" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; border-radius: 12px; background: linear-gradient(135deg, #F58220 0%, #d46f16 100%); box-shadow: 0 2px 12px -2px rgba(245,130,32,0.4); font-size: 13px; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: 0.04em; transition: all 0.25s;">
+                    Get in Touch
+                </a>
+                <a href="#services" style="display: inline-flex; align-items: center; justify-content: center; padding: 14px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.5); text-decoration: none; letter-spacing: 0.04em; transition: all 0.25s;">
+                    Our Services
+                </a>
+            </div>
         </div>
         <div class="absolute bottom-0 left-0 right-0">
             <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full" preserveAspectRatio="none">
@@ -271,6 +279,11 @@
             <p class="mx-auto mt-4 max-w-xl text-base text-zinc-300">
                 Whether it's temporary custody, estate administration, or long-term storage &mdash; your firearms are in safe hands with Ranyati Storage.
             </p>
+            <div class="mt-8">
+                <a href="mailto:info@firearmmotivations.co.za" style="display: inline-flex; align-items: center; justify-content: center; padding: 16px 40px; border-radius: 12px; background: linear-gradient(135deg, #F58220 0%, #d46f16 100%); box-shadow: 0 2px 12px -2px rgba(245,130,32,0.4); font-size: 14px; font-weight: 700; color: #fff; text-decoration: none; letter-spacing: 0.04em; transition: all 0.25s;">
+                    Get in Touch
+                </a>
+            </div>
         </div>
     </section>
 
