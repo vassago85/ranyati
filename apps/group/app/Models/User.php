@@ -61,4 +61,34 @@ class User extends Authenticatable
     {
         return self::ROLES[$this->role] ?? ucfirst($this->role);
     }
+
+    const ROLE_RANK = [
+        self::ROLE_DEVELOPER => 3,
+        self::ROLE_OWNER => 2,
+        self::ROLE_ADMIN => 1,
+    ];
+
+    public function roleRank(): int
+    {
+        return self::ROLE_RANK[$this->role] ?? 0;
+    }
+
+    public function canManageUsers(): bool
+    {
+        return $this->roleRank() >= 2;
+    }
+
+    public function canManage(User $target): bool
+    {
+        return $this->roleRank() > $target->roleRank();
+    }
+
+    public function assignableRoles(): array
+    {
+        return match ($this->role) {
+            self::ROLE_DEVELOPER => [self::ROLE_DEVELOPER, self::ROLE_OWNER, self::ROLE_ADMIN],
+            self::ROLE_OWNER => [self::ROLE_OWNER, self::ROLE_ADMIN],
+            default => [],
+        };
+    }
 }

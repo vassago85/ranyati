@@ -249,20 +249,27 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         }
     })->name('settings.test');
 
-    // ── User Management ────────────────────────────────────────
+    // ── User Management (developer & owner only) ───────────────
 
     Route::get('/users', function () {
+        abort_unless(auth()->user()->canManageUsers(), 403);
+
         return view('admin.users', [
             'users' => User::orderByRaw("CASE role WHEN 'developer' THEN 1 WHEN 'owner' THEN 2 WHEN 'admin' THEN 3 ELSE 4 END")->get(),
         ]);
     })->name('users');
 
     Route::post('/users', function (Request $request) {
+        $actor = $request->user();
+        abort_unless($actor->canManageUsers(), 403);
+
+        $allowed = implode(',', $actor->assignableRoles());
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
-            'role' => 'required|in:developer,owner,admin',
+            'role' => "required|in:{$allowed}",
         ]);
 
         User::create($request->only('name', 'email', 'password', 'role'));
@@ -271,10 +278,19 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     })->name('users.store');
 
     Route::post('/users/{user}/update', function (Request $request, User $user) {
+        $actor = $request->user();
+        abort_unless($actor->canManageUsers(), 403);
+
+        if (! $actor->canManage($user) && $actor->id !== $user->id) {
+            return back()->with('error', 'You cannot edit a user with equal or higher rank.');
+        }
+
+        $allowed = implode(',', $actor->assignableRoles());
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:developer,owner,admin',
+            'role' => "required|in:{$allowed}",
             'password' => 'nullable|string|min:8',
         ]);
 
@@ -289,8 +305,15 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     })->name('users.update');
 
     Route::delete('/users/{user}', function (User $user) {
-        if ($user->id === auth()->id()) {
+        $actor = auth()->user();
+        abort_unless($actor->canManageUsers(), 403);
+
+        if ($user->id === $actor->id) {
             return back()->with('error', 'You cannot delete yourself.');
+        }
+
+        if (! $actor->canManage($user)) {
+            return back()->with('error', 'You cannot delete a user with equal or higher rank.');
         }
 
         $user->delete();

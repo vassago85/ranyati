@@ -46,8 +46,10 @@
                                 <td style="white-space:nowrap;">{{ $user->created_at->format('d M Y') }}</td>
                                 <td style="text-align:right;">
                                     <div style="display:flex;gap:6px;justify-content:flex-end;">
-                                        <button type="button" class="btn btn-secondary btn-sm" onclick="editUser({{ $user->id }}, '{{ e($user->name) }}', '{{ e($user->email) }}', '{{ $user->role }}')">Edit</button>
-                                        @if($user->id !== auth()->id())
+                                        @if(auth()->user()->canManage($user) || $user->id === auth()->id())
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="editUser({{ $user->id }}, '{{ e($user->name) }}', '{{ e($user->email) }}', '{{ $user->role }}')">Edit</button>
+                                        @endif
+                                        @if(auth()->user()->canManage($user) && $user->id !== auth()->id())
                                             <form method="POST" action="{{ route('admin.users.delete', $user) }}" style="display:inline;" onsubmit="return confirm('Delete {{ e($user->name) }}?')">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
@@ -88,9 +90,9 @@
                         <div class="form-group">
                             <label for="role" class="form-label">Role</label>
                             <select id="role" name="role" class="form-input">
-                                <option value="admin">Admin</option>
-                                <option value="owner">Owner</option>
-                                <option value="developer">Developer</option>
+                                @foreach(auth()->user()->assignableRoles() as $role)
+                                    <option value="{{ $role }}">{{ \App\Models\User::ROLES[$role] }}</option>
+                                @endforeach
                             </select>
                         </div>
 
