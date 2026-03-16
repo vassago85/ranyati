@@ -166,11 +166,11 @@
 
             {{-- CTAs --}}
             <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 anim-3">
-                <a href="#services" class="btn-cta rounded-xl px-8 py-3.5 text-[13px] font-bold text-white tracking-wide">
-                    Our Services
+                <a href="/enquire" class="btn-cta rounded-xl px-8 py-3.5 text-[13px] font-bold text-white tracking-wide">
+                    Enquire Now
                 </a>
-                <a href="mailto:info@firearmmotivations.co.za" class="btn-outline rounded-xl px-8 py-3.5 text-[13px] font-semibold text-white/50 hover:text-white tracking-wide">
-                    Get in Touch
+                <a href="#services" class="btn-outline rounded-xl px-8 py-3.5 text-[13px] font-semibold text-white/50 hover:text-white tracking-wide">
+                    Our Services
                 </a>
             </div>
 
@@ -302,6 +302,23 @@
                     <div>
                         <h3 class="text-base font-bold text-white">Submission &amp; Follow-up</h3>
                         <p class="mt-1 text-[14px] leading-[1.75] text-white/40">We guide you through the submission process and provide ongoing support until your application is finalised.</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Final CTA --}}
+            <div class="mt-28 text-center">
+                <div style="background: linear-gradient(180deg, rgba(245,130,32,0.06) 0%, rgba(245,130,32,0.02) 100%); border: 1px solid rgba(245,130,32,0.1); border-radius: 20px; padding: 48px 32px;">
+                    <h2 class="text-[1.5rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2rem]">
+                        Ready to Get Started?
+                    </h2>
+                    <p class="mx-auto mt-4 max-w-md text-[14px] leading-[1.7] text-white/40">
+                        Submit an enquiry and our team will contact you to discuss your firearm motivation requirements.
+                    </p>
+                    <div class="mt-8">
+                        <a href="/enquire" class="btn-cta inline-flex rounded-xl px-10 py-4 text-[14px] font-bold text-white tracking-wide">
+                            Enquire Now
+                        </a>
                     </div>
                 </div>
             </div>
