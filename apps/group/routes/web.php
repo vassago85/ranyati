@@ -73,7 +73,7 @@ Route::post('/enquire', function (Request $request) {
         'message' => 'nullable|string|max:2000',
         'source' => 'nullable|string|max:100',
         'otp' => 'required|string|size:6',
-        'cf-turnstile-response' => 'required|string',
+        'cf-turnstile-response' => 'nullable|string',
     ]);
 
     $email = strtolower(trim($validated['email']));
