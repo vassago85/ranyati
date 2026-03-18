@@ -56,6 +56,61 @@ Route::get('/resources/{slug?}', function (?string $slug = null) {
     return view($view);
 })->where('slug', '[a-z0-9-]+');
 
+Route::get('/sitemap.xml', function () {
+    $host = request()->getHost();
+
+    if (str_starts_with($host, 'motivations.')) {
+        $base = 'https://motivations.ranyati.co.za';
+        $pages = [
+            '' => '1.0', '/enquire' => '0.8',
+            '/resources' => '0.9', '/resources/about' => '0.8',
+            '/resources/firearm-licence-process' => '0.8', '/resources/firearms-control-act' => '0.8',
+            '/resources/services' => '0.8', '/resources/faq' => '0.7',
+            '/resources/documents-required' => '0.7',
+        ];
+    } elseif (str_starts_with($host, 'storage.')) {
+        $base = 'https://storage.ranyati.co.za';
+        $pages = [
+            '' => '1.0',
+            '/resources' => '0.9', '/resources/about' => '0.8',
+            '/resources/safe-custody' => '0.8', '/resources/fca-requirements' => '0.8',
+            '/resources/faq' => '0.7',
+        ];
+    } else {
+        $base = 'https://ranyati.co.za';
+        $pages = ['' => '1.0'];
+    }
+
+    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    foreach ($pages as $path => $priority) {
+        $xml .= '<url>';
+        $xml .= '<loc>' . $base . $path . '</loc>';
+        $xml .= '<changefreq>monthly</changefreq>';
+        $xml .= '<priority>' . $priority . '</priority>';
+        $xml .= '</url>';
+    }
+    $xml .= '</urlset>';
+
+    return response($xml, 200, ['Content-Type' => 'application/xml']);
+});
+
+Route::get('/robots.txt', function () {
+    $host = request()->getHost();
+
+    if (str_starts_with($host, 'motivations.')) {
+        $sitemap = 'https://motivations.ranyati.co.za/sitemap.xml';
+    } elseif (str_starts_with($host, 'storage.')) {
+        $sitemap = 'https://storage.ranyati.co.za/sitemap.xml';
+    } else {
+        $sitemap = 'https://ranyati.co.za/sitemap.xml';
+    }
+
+    $txt = "User-agent: *\nAllow: /\n\nSitemap: {$sitemap}\n";
+
+    return response($txt, 200, ['Content-Type' => 'text/plain']);
+});
+
 Route::get('/enquire', fn (Request $request) => view('enquire', [
     'prefill' => $request->only(['name', 'email', 'type', 'purpose', 'membership']),
     'turnstileSiteKey' => Setting::get('turnstile_site_key', ''),
