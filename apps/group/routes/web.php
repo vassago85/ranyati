@@ -29,6 +29,33 @@ Route::get('/', function () {
 Route::get('/motivations', fn () => view('motivations'));
 Route::get('/storage', fn () => view('storage-landing'));
 
+Route::get('/resources/{slug?}', function (?string $slug = null) {
+    $host = request()->getHost();
+    $isStorage = str_starts_with($host, 'storage.');
+
+    $map = $isStorage ? [
+        '' => 'resources.storage.index',
+        'about' => 'resources.storage.about',
+        'safe-custody' => 'resources.storage.safe-custody',
+        'fca-requirements' => 'resources.storage.fca-requirements',
+        'faq' => 'resources.storage.faq',
+    ] : [
+        '' => 'resources.motivations.index',
+        'about' => 'resources.motivations.about',
+        'firearm-licence-process' => 'resources.motivations.firearm-licence-process',
+        'firearms-control-act' => 'resources.motivations.firearms-control-act',
+        'services' => 'resources.motivations.services',
+        'faq' => 'resources.motivations.faq',
+        'documents-required' => 'resources.motivations.documents-required',
+    ];
+
+    $view = $map[$slug ?? ''] ?? null;
+
+    abort_unless($view, 404);
+
+    return view($view);
+})->where('slug', '[a-z0-9-]+');
+
 Route::get('/enquire', fn (Request $request) => view('enquire', [
     'prefill' => $request->only(['name', 'email', 'type', 'purpose', 'membership']),
     'turnstileSiteKey' => Setting::get('turnstile_site_key', ''),
