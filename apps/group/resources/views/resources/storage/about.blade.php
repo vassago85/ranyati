@@ -4,21 +4,28 @@
 @section('description', 'Ranyati Storage provides FCA-compliant secure firearm storage and safe custody services. A division of Ranyati Group with purpose-built facilities and documented chain of custody.')
 
 @section('site_name', 'Ranyati Storage')
+@section('css_vars')
+<style>
+    :root {
+        --accent: #34d399;
+        --hero-glow: rgba(52,211,153,0.2);
+        --hero-top: #0a2e1f;
+        --nav-active-bg: rgba(52,211,153,0.15);
+        --nav-active-color: #34d399;
+        --link-color: #34d399;
+        --check-bg: rgba(52,211,153,0.12);
+        --check-border: rgba(52,211,153,0.2);
+        --check-color: #34d399;
+        --cta-from: rgba(52,211,153,0.06);
+        --cta-to: rgba(52,211,153,0.02);
+        --cta-border: rgba(52,211,153,0.1);
+        --btn-bg: linear-gradient(135deg, #34d399 0%, #059669 100%);
+        --btn-shadow: rgba(52,211,153,0.4);
+    }
+</style>
+@endsection
 @section('home_url', '/')
 @section('logo_asset', 'logo-ranyati_storage-white_text.png')
-@section('hero_glow', 'rgba(52,211,153,0.2)')
-@section('hero_top', '#0a2e1f')
-@section('nav_active_bg', 'rgba(52,211,153,0.15)')
-@section('nav_active_color', '#34d399')
-@section('link_color', '#34d399')
-@section('check_bg', 'rgba(52,211,153,0.12)')
-@section('check_border', 'rgba(52,211,153,0.2)')
-@section('check_color', '#34d399')
-@section('cta_from', 'rgba(52,211,153,0.06)')
-@section('cta_to', 'rgba(52,211,153,0.02)')
-@section('cta_border', 'rgba(52,211,153,0.1)')
-@section('btn_bg', 'linear-gradient(135deg, #34d399 0%, #059669 100%)')
-@section('btn_shadow', 'rgba(52,211,153,0.4)')
 @section('contact_email', 'info@ranyati.co.za')
 @section('cta_heading', 'Need Secure Firearm Storage?')
 @section('cta_text', 'Contact our team to arrange safe custody for your firearms. FCA compliant, purpose-built facilities.')

@@ -24,6 +24,22 @@
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        :root {
+            --accent: #F58220;
+            --hero-glow: rgba(11,78,162,0.35);
+            --hero-top: #0a3a78;
+            --nav-active-bg: rgba(245,130,32,0.15);
+            --nav-active-color: #F58220;
+            --link-color: #F58220;
+            --check-bg: rgba(245,130,32,0.12);
+            --check-border: rgba(245,130,32,0.2);
+            --check-color: #F58220;
+            --cta-from: rgba(245,130,32,0.06);
+            --cta-to: rgba(245,130,32,0.02);
+            --cta-border: rgba(245,130,32,0.1);
+            --btn-bg: linear-gradient(135deg, #F58220 0%, #d46f16 100%);
+            --btn-shadow: rgba(245,130,32,0.4);
+        }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', system-ui, sans-serif; background: #020810; color: rgba(255,255,255,0.7); }
         a { text-decoration: none; }
@@ -45,8 +61,8 @@
         .res-hero {
             padding: 120px 24px 48px; text-align: center;
             background:
-                radial-gradient(ellipse 90% 70% at 50% 30%, @yield('hero_glow', 'rgba(11,78,162,0.35)') 0%, transparent 60%),
-                linear-gradient(180deg, @yield('hero_top', '#0a3a78') 0%, #051d3d 60%, #020810 100%);
+                radial-gradient(ellipse 90% 70% at 50% 30%, var(--hero-glow) 0%, transparent 60%),
+                linear-gradient(180deg, var(--hero-top) 0%, #051d3d 60%, #020810 100%);
         }
         .res-hero h1 { font-size: 2rem; font-weight: 900; color: #fff; letter-spacing: -0.02em; }
         .res-hero p { margin-top: 8px; font-size: 14px; color: rgba(255,255,255,0.4); }
@@ -71,8 +87,8 @@
         }
         .res-sidebar-nav a:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); }
         .res-sidebar-nav a.active {
-            background: @yield('nav_active_bg', 'rgba(245,130,32,0.15)');
-            color: @yield('nav_active_color', '#F58220');
+            background: var(--nav-active-bg);
+            color: var(--nav-active-color);
         }
 
         .res-content { max-width: 52rem; margin: 0 auto; padding: 48px 24px 80px; }
@@ -90,7 +106,7 @@
         }
         .prose li { margin-bottom: 6px; }
         .prose strong { color: rgba(255,255,255,0.8); }
-        .prose a { color: @yield('link_color', '#F58220'); }
+        .prose a { color: var(--link-color); }
         .prose a:hover { text-decoration: underline; }
 
         .prose .info-card {
@@ -108,12 +124,12 @@
         .prose .checklist li::before {
             content: ''; position: absolute; left: 0; top: 7px;
             width: 16px; height: 16px; border-radius: 4px;
-            background: @yield('check_bg', 'rgba(245,130,32,0.12)');
-            border: 1px solid @yield('check_border', 'rgba(245,130,32,0.2)');
+            background: var(--check-bg);
+            border: 1px solid var(--check-border);
         }
         .prose .checklist li::after {
-            content: '✓'; position: absolute; left: 3px; top: 5px;
-            font-size: 11px; font-weight: 700; color: @yield('check_color', '#F58220');
+            content: '\2713'; position: absolute; left: 3px; top: 5px;
+            font-size: 11px; font-weight: 700; color: var(--check-color);
         }
 
         .res-cta {
@@ -121,19 +137,19 @@
         }
         .res-cta-inner {
             padding: 48px 32px; border-radius: 20px; text-align: center;
-            background: linear-gradient(180deg, @yield('cta_from', 'rgba(245,130,32,0.06)') 0%, @yield('cta_to', 'rgba(245,130,32,0.02)') 100%);
-            border: 1px solid @yield('cta_border', 'rgba(245,130,32,0.1)');
+            background: linear-gradient(180deg, var(--cta-from) 0%, var(--cta-to) 100%);
+            border: 1px solid var(--cta-border);
         }
         .res-cta-inner h3 { font-size: 1.5rem; font-weight: 900; color: #fff; }
         .res-cta-inner p { margin-top: 12px; font-size: 14px; color: rgba(255,255,255,0.4); max-width: 28rem; margin-left: auto; margin-right: auto; }
         .res-cta-btn {
             display: inline-flex; margin-top: 24px; padding: 14px 36px;
             border-radius: 12px; border: none; font-size: 14px; font-weight: 700; color: #fff;
-            background: @yield('btn_bg', 'linear-gradient(135deg, #F58220 0%, #d46f16 100%)');
-            box-shadow: 0 2px 12px -2px @yield('btn_shadow', 'rgba(245,130,32,0.4)');
+            background: var(--btn-bg);
+            box-shadow: 0 2px 12px -2px var(--btn-shadow);
             cursor: pointer; transition: all 0.25s;
         }
-        .res-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px -4px @yield('btn_shadow', 'rgba(245,130,32,0.5)'); }
+        .res-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px -4px var(--btn-shadow); }
 
         .res-footer {
             background: #020810; border-top: 1px solid rgba(255,255,255,0.04);
@@ -152,6 +168,7 @@
             .footer-right { align-items: flex-end; }
         }
     </style>
+    @yield('css_vars')
 </head>
 <body>
 
@@ -159,7 +176,11 @@
     <header class="res-header">
         <div class="res-header-inner">
             <a href="@yield('home_url', '/')" class="res-header-logo">
-                <img src="{{ asset(@yield('logo_asset', 'logo-ranyatigroup-white_text.png')) }}" alt="@yield('site_name', 'Ranyati Group')" />
+                @hasSection('logo_asset')
+                    <img src="{{ asset($__env->yieldContent('logo_asset')) }}" alt="@yield('site_name', 'Ranyati Group')" />
+                @else
+                    <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="@yield('site_name', 'Ranyati Group')" />
+                @endif
             </a>
             <nav class="res-header-nav">
                 <a href="@yield('home_url', '/')">Home</a>
