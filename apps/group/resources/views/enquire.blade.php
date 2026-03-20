@@ -204,9 +204,9 @@
         <div class="relative z-10 mx-auto w-full max-w-xl px-6 pt-28 pb-20"
              x-cloak
              x-data="{
-                step: {{ $errors->any() ? 2 : 1 }},
-                email: '{{ old('email', $prefill['email'] ?? '') }}',
-                emailVerified: {{ $errors->any() ? 'true' : 'false' }},
+                step: @js($errors->any() ? 2 : 1),
+                email: @js(old('email', $prefill['email'] ?? '')),
+                emailVerified: @js($errors->any()),
                 otpCode: '',
                 otpDigits: ['', '', '', '', '', ''],
                 sending: false,
@@ -251,6 +251,13 @@
                         this.cooldown--;
                         if (this.cooldown <= 0) clearInterval(this.cooldownTimer);
                     }, 1000);
+                },
+
+                otpButtonLabel() {
+                    if (this.sending) return 'Sending...';
+                    if (!this.otpSent) return 'Send Code';
+                    if (this.cooldown > 0) return 'Resend (' + this.cooldown + 's)';
+                    return 'Resend';
                 },
 
                 handleOtpInput(index, event) {
@@ -354,10 +361,7 @@
                     <div style="display:flex;gap:8px;">
                         <input type="email" id="verify-email" x-model="email" class="form-input" placeholder="john@example.com" required :disabled="otpSent" :style="otpSent ? 'opacity:0.6' : ''">
                         <button type="button" @click="sendOtp()" :disabled="sending || !email || cooldown > 0" class="btn-cta" style="white-space:nowrap;padding:12px 20px;border-radius:12px;border:none;font-size:13px;font-weight:700;color:#fff;cursor:pointer;">
-                            <span x-show="!sending && !otpSent">Send Code</span>
-                            <span x-show="!sending && otpSent && cooldown > 0" x-text="'Resend (' + cooldown + 's)'"></span>
-                            <span x-show="!sending && otpSent && cooldown <= 0">Resend</span>
-                            <span x-show="sending">Sending...</span>
+                            <span x-text="otpButtonLabel()"></span>
                         </button>
                     </div>
                 </div>
