@@ -26,8 +26,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/motivations', fn () => view('motivations'));
-Route::get('/storage', fn () => view('storage-landing'));
+Route::get('/motivations', function () {
+    if (str_starts_with(request()->getHost(), 'motivations.')) {
+        return redirect('/', 301);
+    }
+    return view('motivations');
+});
+
+Route::get('/storage', function () {
+    if (str_starts_with(request()->getHost(), 'storage.')) {
+        return redirect('/', 301);
+    }
+    return view('storage-landing');
+});
 
 Route::get('/resources/{slug?}', function (?string $slug = null) {
     $host = request()->getHost();
@@ -58,36 +69,46 @@ Route::get('/resources/{slug?}', function (?string $slug = null) {
 
 Route::get('/sitemap.xml', function () {
     $host = request()->getHost();
+    $today = date('Y-m-d');
 
     if (str_starts_with($host, 'motivations.')) {
         $base = 'https://motivations.ranyati.co.za';
         $pages = [
-            '' => '1.0', '/enquire' => '0.8',
-            '/resources' => '0.9', '/resources/about' => '0.8',
-            '/resources/firearm-licence-process' => '0.8', '/resources/firearms-control-act' => '0.8',
-            '/resources/services' => '0.8', '/resources/faq' => '0.7',
-            '/resources/documents-required' => '0.7',
+            ''                                    => ['priority' => '1.0', 'changefreq' => 'monthly',  'lastmod' => $today],
+            '/enquire'                            => ['priority' => '0.9', 'changefreq' => 'monthly',  'lastmod' => $today],
+            '/resources'                          => ['priority' => '0.9', 'changefreq' => 'weekly',   'lastmod' => $today],
+            '/resources/about'                    => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
+            '/resources/firearm-licence-process'  => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
+            '/resources/firearms-control-act'     => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
+            '/resources/services'                 => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
+            '/resources/faq'                      => ['priority' => '0.8', 'changefreq' => 'weekly',   'lastmod' => $today],
+            '/resources/documents-required'       => ['priority' => '0.7', 'changefreq' => 'monthly',  'lastmod' => $today],
         ];
     } elseif (str_starts_with($host, 'storage.')) {
         $base = 'https://storage.ranyati.co.za';
         $pages = [
-            '' => '1.0',
-            '/resources' => '0.9', '/resources/about' => '0.8',
-            '/resources/safe-custody' => '0.8', '/resources/fca-requirements' => '0.8',
-            '/resources/faq' => '0.7',
+            ''                           => ['priority' => '1.0', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/resources'                 => ['priority' => '0.9', 'changefreq' => 'weekly',  'lastmod' => $today],
+            '/resources/about'           => ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/resources/safe-custody'    => ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/resources/fca-requirements'=> ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/resources/faq'             => ['priority' => '0.8', 'changefreq' => 'weekly',  'lastmod' => $today],
         ];
     } else {
         $base = 'https://ranyati.co.za';
-        $pages = ['' => '1.0'];
+        $pages = [
+            '' => ['priority' => '1.0', 'changefreq' => 'monthly', 'lastmod' => $today],
+        ];
     }
 
     $xml = '<?xml version="1.0" encoding="UTF-8"?>';
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($pages as $path => $priority) {
+    foreach ($pages as $path => $meta) {
         $xml .= '<url>';
         $xml .= '<loc>' . $base . $path . '</loc>';
-        $xml .= '<changefreq>monthly</changefreq>';
-        $xml .= '<priority>' . $priority . '</priority>';
+        $xml .= '<lastmod>' . $meta['lastmod'] . '</lastmod>';
+        $xml .= '<changefreq>' . $meta['changefreq'] . '</changefreq>';
+        $xml .= '<priority>' . $meta['priority'] . '</priority>';
         $xml .= '</url>';
     }
     $xml .= '</urlset>';
@@ -145,6 +166,9 @@ Route::post('/enquire/send-otp', function (Request $request) {
 })->name('enquire.send-otp');
 
 Route::post('/enquire', function (Request $request) {
+    $nrapaBypass = $request->input('source') === 'nrapa_endorsement'
+        && $request->input('otp') === 'nrapa-verified';
+
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
@@ -154,15 +178,17 @@ Route::post('/enquire', function (Request $request) {
         'membership_number' => 'nullable|string|max:100',
         'message' => 'nullable|string|max:2000',
         'source' => 'nullable|string|max:100',
-        'otp' => 'required|string|size:6',
+        'otp' => $nrapaBypass ? 'required|string' : 'required|string|size:6',
         'cf-turnstile-response' => 'nullable|string',
     ]);
 
-    $email = strtolower(trim($validated['email']));
-    $cachedCode = Cache::get("otp:{$email}");
+    if (! $nrapaBypass) {
+        $email = strtolower(trim($validated['email']));
+        $cachedCode = Cache::get("otp:{$email}");
 
-    if (! $cachedCode || $cachedCode !== $validated['otp']) {
-        return back()->withInput()->withErrors(['otp' => 'Invalid or expired verification code.']);
+        if (! $cachedCode || $cachedCode !== $validated['otp']) {
+            return back()->withInput()->withErrors(['otp' => 'Invalid or expired verification code.']);
+        }
     }
 
     $turnstileSecret = Setting::get('turnstile_secret_key', '');
@@ -178,7 +204,9 @@ Route::post('/enquire', function (Request $request) {
         }
     }
 
-    Cache::forget("otp:{$email}");
+    if (! $nrapaBypass) {
+        Cache::forget("otp:{$email}");
+    }
 
     $enquiry = MotivationEnquiry::create(collect($validated)->except(['otp', 'cf-turnstile-response'])->toArray());
 

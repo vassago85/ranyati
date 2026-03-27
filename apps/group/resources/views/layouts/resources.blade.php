@@ -7,12 +7,12 @@
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JV2NSWMYTQ');</script>
     <title>@yield('title') — @yield('site_name', 'Ranyati Group')</title>
     <meta name="description" content="@yield('description')">
-    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="canonical" href="{{ url(request()->path()) }}">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="@yield('site_name', 'Ranyati Group')">
     <meta property="og:title" content="@yield('title') — @yield('site_name', 'Ranyati Group')">
     <meta property="og:description" content="@yield('description')">
-    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:url" content="{{ url(request()->path()) }}">
     <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="@yield('title') — @yield('site_name', 'Ranyati Group')">
@@ -169,6 +169,32 @@
         }
     </style>
     @yield('css_vars')
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "{{ rtrim(url($__env->yieldContent('home_url', '/')), '/') ?: url('/') }}"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Resources",
+                "item": "{{ rtrim(url($__env->yieldContent('home_url', '/')), '/') }}/resources"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "@yield('breadcrumb')"
+            }
+        ]
+    }
+    </script>
+    @stack('structured_data')
 </head>
 <body>
 
@@ -184,7 +210,7 @@
             </a>
             <nav class="res-header-nav">
                 <a href="@yield('home_url', '/')">Home</a>
-                <a href="@yield('home_url', '/')/resources" class="active">Resources</a>
+                <a href="{{ rtrim($__env->yieldContent('home_url', '/'), '/') }}/resources" class="active">Resources</a>
                 @yield('header_extra')
             </nav>
         </div>
@@ -203,7 +229,7 @@
         <nav class="res-breadcrumb">
             <a href="@yield('home_url', '/')">Home</a>
             <span>&rsaquo;</span>
-            <a href="@yield('home_url', '/')/resources">Resources</a>
+            <a href="{{ rtrim($__env->yieldContent('home_url', '/'), '/') }}/resources">Resources</a>
             <span>&rsaquo;</span>
             <span class="current">@yield('breadcrumb')</span>
         </nav>

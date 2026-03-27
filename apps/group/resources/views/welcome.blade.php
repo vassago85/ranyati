@@ -32,8 +32,15 @@
         "legalName": "Ranyati Firearm Motivations (Pty) Ltd",
         "url": "https://ranyati.co.za",
         "logo": "{{ asset('ranyati-group-logo.png') }}",
+        "image": "{{ asset('ranyati-group-logo.png') }}",
         "description": "Specialist firearm administration services since 2006. Comprehensive motivations, SAPS-accredited membership through NRAPA, and secure storage.",
         "foundingDate": "2006",
+        "knowsAbout": ["Firearms Control Act", "Firearm Licence Motivations", "SAPS Accredited Membership", "Firearm Storage", "Competency Certificates"],
+        "numberOfEmployees": {
+            "@type": "QuantitativeValue",
+            "minValue": 2,
+            "maxValue": 10
+        },
         "contactPoint": {
             "@type": "ContactPoint",
             "telephone": "+27-87-151-0987",
@@ -47,8 +54,38 @@
             "streetAddress": "241 Jean Avenue",
             "addressLocality": "Centurion",
             "addressRegion": "Gauteng",
+            "postalCode": "0157",
             "addressCountry": "ZA"
-        }
+        },
+        "department": [
+            {
+                "@type": "ProfessionalService",
+                "name": "Ranyati Motivations",
+                "url": "https://motivations.ranyati.co.za",
+                "description": "Professional firearm motivations for licence applications, renewals, and compliance support."
+            },
+            {
+                "@type": "Organization",
+                "name": "NRAPA",
+                "url": "https://nrapa.ranyati.co.za",
+                "description": "SAPS-accredited membership for dedicated sport shooters and hunters."
+            },
+            {
+                "@type": "LocalBusiness",
+                "name": "Ranyati Storage",
+                "url": "https://storage.ranyati.co.za",
+                "description": "FCA-compliant secure firearm storage and safe custody services."
+            }
+        ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Ranyati Group",
+        "url": "https://ranyati.co.za",
+        "description": "Specialist firearm administration services since 2006."
     }
     </script>
     <style>

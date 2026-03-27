@@ -36,10 +36,38 @@
         "description": "Submit an enquiry for a professional firearm motivation from Ranyati Group.",
         "url": "https://motivations.ranyati.co.za/enquire",
         "publisher": {
-            "@type": "Organization",
+            "@type": "ProfessionalService",
             "name": "Ranyati Motivations",
-            "url": "https://motivations.ranyati.co.za"
+            "url": "https://motivations.ranyati.co.za",
+            "telephone": "+27-87-151-0987",
+            "email": "info@firearmmotivations.co.za",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "241 Jean Avenue",
+                "addressLocality": "Centurion",
+                "addressRegion": "Gauteng",
+                "addressCountry": "ZA"
+            }
         }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://motivations.ranyati.co.za/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Enquire"
+            }
+        ]
     }
     </script>
     <style>
@@ -204,10 +232,10 @@
         <div class="relative z-10 mx-auto w-full max-w-xl px-6 pt-28 pb-20"
              x-cloak
              x-data="{
-                step: @js($errors->any() ? 2 : 1),
+                step: @js((!empty($prefill['email']) && !empty($prefill['membership'])) ? 2 : ($errors->any() ? 2 : 1)),
                 email: @js(old('email', $prefill['email'] ?? '')),
-                emailVerified: @js($errors->any()),
-                otpCode: '',
+                emailVerified: @js((!empty($prefill['email']) && !empty($prefill['membership'])) || $errors->any()),
+                otpCode: @js((!empty($prefill['email']) && !empty($prefill['membership'])) ? 'nrapa-verified' : ''),
                 otpDigits: ['', '', '', '', '', ''],
                 sending: false,
                 verifying: false,

@@ -52,6 +52,89 @@
     <a href="/resources/faq" style="font-size:13px;color:rgba(255,255,255,0.35);">FAQ</a>
 @endsection
 
+@push('structured_data')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "What is safe custody?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Safe custody is the temporary storage of a firearm by an authorised person or facility other than the licence holder. You remain the lawful owner and your licence stays valid, but the firearm is physically held in a compliant facility. This is often required when travelling overseas, during estate administration, or when you cannot safely store the firearm at home."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "When would I need to store my firearms?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Common situations include travel abroad, moving house, estate settling, court orders, licence renewal pending, or personal preference. If you cannot keep your firearm in compliant storage at home, or choose not to, placing it in safe custody ensures legal compliance and security."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How do I deposit a firearm?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Contact us to arrange a deposit. Bring your firearm licence, South African ID, and the firearm unloaded in a case. We complete the intake documentation, log the firearm in our register, and store it in our secure facility. You receive a receipt and reference number for retrieval."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How do I retrieve my firearm?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Contact us to schedule a collection. Bring your ID and firearm licence. We verify your identity, complete the release documentation, and return the firearm to you. Only the licence holder or an authorised person with a signed letter of authority may collect."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Are my firearms insured while in storage?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You should ensure your firearms are covered by appropriate insurance. Check whether your household or firearm policy extends to items stored off-premises. We can provide documentation of the deposit and storage conditions to support insurance requirements."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "What does FCA-compliant storage mean?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "FCA-compliant storage meets the requirements of the Firearms Control Act and its regulations. This includes SABS-approved safes, proper anchoring, key control, and for commercial facilities, a register of deposits and retrievals. Ranyati Storage facilities meet and exceed these requirements."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can I store ammunition as well?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes. We can store ammunition in compliance with the Act. Ammunition must be stored separately from firearms unless the safe is designed for both. Contact us to discuss your specific requirements."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "How much does storage cost?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Costs depend on the type and number of firearms, the duration of storage, and any additional services required. Contact us with your requirements for a tailored quote."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "Can someone else collect my firearm?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, if you provide a signed letter of authority and a certified copy of your ID. The authorised person must present their own ID when collecting. We verify both documents before releasing the firearm."
+            }
+        }
+    ]
+}
+</script>
+@endpush
+
 @section('content')
 <p>Below are answers to common questions about secure firearm storage, safe custody, and our services. If your question is not covered here, contact us for personalised advice.</p>
 

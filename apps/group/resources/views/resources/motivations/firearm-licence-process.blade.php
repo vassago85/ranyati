@@ -36,6 +36,49 @@
     <a href="/resources/documents-required" style="font-size:13px;color:rgba(255,255,255,0.35);">Documents Required</a>
 @endsection
 
+@push('structured_data')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to Get a Firearm Licence in South Africa",
+    "description": "Complete guide to the South African firearm licence process, covering competency certificates, SAPS forms, required documents, and estate firearms.",
+    "step": [
+        {
+            "@type": "HowToStep",
+            "position": 1,
+            "name": "Complete Firearm Training",
+            "text": "Pass the prescribed Knowledge of the Firearms Control Act test (Unit Standard 117705) and the relevant practical unit standards through a PFTC- or SASSETA-accredited training provider."
+        },
+        {
+            "@type": "HowToStep",
+            "position": 2,
+            "name": "Apply for a Competency Certificate (SAPS 517)",
+            "text": "Submit the SAPS 517 form with certified copies of your ID, training certificates, passport photographs, and two completed Annexure 86 reference forms. Submit in person at your nearest SAPS station."
+        },
+        {
+            "@type": "HowToStep",
+            "position": 3,
+            "name": "Prepare Your Motivation",
+            "text": "Draft a detailed written motivation explaining your genuine need for the firearm licence category you are applying for. The motivation must address the requirements of the Firearms Control Act and CFR policy."
+        },
+        {
+            "@type": "HowToStep",
+            "position": 4,
+            "name": "Apply for a Firearm Licence (SAPS 271)",
+            "text": "Submit the SAPS 271 form with your competency certificate, certified ID, proof of residence, photos of your safe installation, dealer stock return if applicable, and your completed motivation. Submit in person at your nearest SAPS station."
+        },
+        {
+            "@type": "HowToStep",
+            "position": 5,
+            "name": "Await Processing and Outcome",
+            "text": "The Central Firearms Register will process your application. Processing times vary from six months to over a year. Ensure your documentation is complete and correctly certified to avoid delays."
+        }
+    ]
+}
+</script>
+@endpush
+
 @section('content')
 <p>Obtaining a firearm licence in South Africa involves two main stages: the competency process and the licensing process. Both are governed by the Firearms Control Act 60 of 2000 and administered by the South African Police Service (SAPS). This guide outlines the steps, forms, and documents required.</p>
 

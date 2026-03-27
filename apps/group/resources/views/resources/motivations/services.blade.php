@@ -36,6 +36,70 @@
     <a href="/resources/documents-required" style="font-size:13px;color:rgba(255,255,255,0.35);">Documents Required</a>
 @endsection
 
+@push('structured_data')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "Ranyati Motivations",
+    "url": "https://motivations.ranyati.co.za",
+    "description": "Professional firearm administration services including SAPS form completion, competency applications, licence motivations, renewals, appeals, and estate administration.",
+    "telephone": "+27-87-151-0987",
+    "email": "info@firearmmotivations.co.za",
+    "areaServed": {
+        "@type": "Country",
+        "name": "South Africa"
+    },
+    "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Firearm Administration Services",
+        "itemListElement": [
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "SAPS Application Form Completion",
+                    "description": "SAPS 517 competency and SAPS 271 licence application form completion with document preparation."
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Firearm Licence Motivations",
+                    "description": "Professional motivations for self-defence, sport shooting, hunting, dedicated status, business, and collector licence categories."
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Licence Renewals",
+                    "description": "Renewal applications with updated motivations and documentation to meet current SAPS requirements."
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Appeals on Licence Refusals",
+                    "description": "Review of refusal notices, identification of appeal grounds, and preparation of appeal documentation."
+                }
+            },
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Service",
+                    "name": "Estate Firearm Administration",
+                    "description": "Assistance with estate firearm transfers, surrenders, and all required documentation for deceased estates."
+                }
+            }
+        ]
+    }
+}
+</script>
+@endpush
+
 @section('content')
 <p>Ranyati Motivations offers a full range of firearm administration services to help South African firearm owners navigate the Firearms Control Act. From initial competency applications to licence renewals, appeals, and estate administration, we handle the paperwork and motivation drafting so you can focus on what matters.</p>
 
