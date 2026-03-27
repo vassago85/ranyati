@@ -26,13 +26,13 @@
 @endsection
 @section('home_url', '/')
 @section('logo_asset', 'logo-ranyati_storage-white_text.png')
-@section('contact_email', 'info@ranyati.co.za')
+@section('contact_email', 'info@firearmstorage.co.za')
 @section('cta_heading', 'Need Secure Firearm Storage?')
 @section('cta_text', 'Contact our team to arrange safe custody for your firearms. FCA compliant, purpose-built facilities.')
-@section('cta_url', 'mailto:info@ranyati.co.za')
+@section('cta_url', 'mailto:info@firearmstorage.co.za')
 @section('cta_button', 'Get in Touch')
 @section('header_extra')
-    <a href="mailto:info@ranyati.co.za">Contact</a>
+    <a href="mailto:info@firearmstorage.co.za">Contact</a>
 @endsection
 
 @section('heading', 'FCA Storage Requirements')
