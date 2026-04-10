@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
 @section('title', 'Firearm Licence Motivation Services in South Africa')
-@section('description', 'Professional firearm licence motivations, renewals, appeals, and compliance support in South Africa. Based in Centurion, Pretoria, serving clients nationwide.')
+@section('description', 'Professional firearm licence motivations, renewals, appeals, and compliance support in South Africa. Based in Pretoria, serving clients nationwide.')
 
 @section('site_name', 'Ranyati Motivations')
 @section('home_url', '/')
@@ -46,13 +46,13 @@
     "@type": "ProfessionalService",
     "name": "Ranyati Motivations",
     "url": "https://motivations.ranyati.co.za",
-    "description": "Professional firearm licence motivation services, renewals, appeals, and compliance support in South Africa. Based in Centurion, Pretoria.",
+    "description": "Professional firearm licence motivation services, renewals, appeals, and compliance support in South Africa. Based in Pretoria.",
     "telephone": "+27-87-151-0987",
     "email": "info@firearmmotivations.co.za",
     "address": {
         "@type": "PostalAddress",
         "streetAddress": "241 Jean Avenue",
-        "addressLocality": "Centurion",
+        "addressLocality": "Pretoria",
         "addressRegion": "Gauteng",
         "postalCode": "0157",
         "addressCountry": "ZA"
@@ -125,7 +125,7 @@
 @endpush
 
 @section('content')
-<p>Ranyati Motivations provides professional firearm licence motivation services, renewal support, and compliance assistance to firearm owners across South Africa. Based in Centurion, Pretoria, Gauteng, we work with applicants throughout the country — preparing structured motivations and supporting documentation aligned with the Firearms Control Act and the requirements of the Central Firearms Register (CFR).</p>
+<p>Ranyati Motivations provides professional firearm licence motivation services, renewal support, and compliance assistance to firearm owners across South Africa. Based in Pretoria, Gauteng, we work with applicants throughout the country — preparing structured motivations and supporting documentation aligned with the Firearms Control Act and the requirements of the Central Firearms Register (CFR). We do not provide firearm training or competency courses.</p>
 
 <p>Whether you are applying for a new firearm licence, renewing an existing one, appealing a refusal, or dealing with estate firearms, our team handles the administrative and legal documentation so that your application is correctly prepared before submission.</p>
 
@@ -133,7 +133,7 @@
 
 <p>Ranyati Motivations has operated in the firearm administration space since 2006. Over that time, we have built a consistent track record of preparing structured, legally sound motivations for a wide range of licence categories. Our approach is compliance-first: every motivation is prepared with reference to the Firearms Control Act, SAPS procedures, and the specific expectations of the CFR.</p>
 
-<p>We specialise in documentation-driven applications — motivations that clearly address the legal criteria for each licence category, supported by the correct forms, certifications, and evidence. This structured approach reduces the risk of incomplete submissions and strengthens the application as a whole.</p>
+<p>We specialise in documentation-driven applications — motivations that clearly address the legal criteria for each licence category, supported by the correct forms, certified documents, and evidence. This structured approach reduces the risk of incomplete submissions and strengthens the application as a whole.</p>
 
 <div class="info-card">
     <h4>Why It Matters</h4>

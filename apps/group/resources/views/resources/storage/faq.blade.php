@@ -60,6 +60,14 @@
     "mainEntity": [
         {
             "@type": "Question",
+            "name": "Where is Ranyati Storage located?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Secure firearm storage is offered in Pretoria only. Contact us to discuss intake, documentation, and handover before visiting the facility."
+            }
+        },
+        {
+            "@type": "Question",
             "name": "What is safe custody?",
             "acceptedAnswer": {
                 "@type": "Answer",
@@ -136,7 +144,7 @@
 @endpush
 
 @section('content')
-<p>Below are answers to common questions about secure firearm storage, safe custody, and our services. If your question is not covered here, contact us for personalised advice.</p>
+<p>Below are answers to common questions about secure firearm storage, safe custody, and our services. <strong>Physical storage is available in Pretoria only.</strong> If your question is not covered here, contact us for personalised advice.</p>
 
 <h3>What is safe custody?</h3>
 <p>Safe custody is the temporary storage of a firearm by an authorised person or facility other than the licence holder. You remain the lawful owner and your licence stays valid, but the firearm is physically held in a compliant facility. This is often required when travelling overseas, during estate administration, or when you cannot safely store the firearm at home.</p>

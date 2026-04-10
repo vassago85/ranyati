@@ -71,7 +71,7 @@
             "name": "What documents do I need?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "For competency: certified ID, training certificates, passport photos, and two references completing Annexure 86. For a licence: certified ID, competency certificate, proof of residence, photos of your safe, dealer stock return if applicable, and your motivation. Requirements vary by category."
+                "text": "For competency: certified ID, certificates from an accredited firearm training provider, passport photos, and two references completing Annexure 86. For a licence: certified ID, competency certificate, proof of residence, photos of your safe, dealer stock return if applicable, and your motivation. Requirements vary by category."
             }
         },
         {
@@ -156,7 +156,7 @@
 <p>Competency applications typically take several months. Licence applications can take six months to over a year, depending on the CFR's workload and the completeness of your submission. Delays often occur when documents are incomplete or incorrectly certified. We recommend starting early and ensuring all paperwork is correct from the outset.</p>
 
 <h3>What documents do I need?</h3>
-<p>For competency: certified ID, training certificates, passport photos, and two references completing Annexure 86. For a licence: certified ID, competency certificate, proof of residence, photos of your safe, dealer stock return if applicable, and your motivation. Requirements vary by category. See our <a href="/resources/documents-required">Documents Required</a> page for a full checklist.</p>
+<p>For competency: certified ID, certificates from an accredited firearm training provider, passport photos, and two references completing Annexure 86. For a licence: certified ID, competency certificate, proof of residence, photos of your safe, dealer stock return if applicable, and your motivation. Requirements vary by category. See our <a href="/resources/documents-required">Documents Required</a> page for a full checklist.</p>
 
 <h3>Can you help with licence renewals?</h3>
 <p>Yes. We assist with renewal applications for all licence categories. Renewals require updated documentation and, in many cases, a refreshed motivation. We ensure your renewal application meets current CFR requirements and is submitted before your licence expires.</p>

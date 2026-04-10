@@ -1,11 +1,11 @@
 @extends('layouts.seo-apex')
 
 @section('title', 'Firearm Services | Motivations, NRAPA Membership & Storage | Ranyati Group')
-@section('description', 'Explore Ranyati Group services: professional firearm licence motivations, SAPS-accredited NRAPA membership for dedicated status, and secure firearm storage across South Africa.')
+@section('description', 'Explore Ranyati Group services: professional firearm licence motivations, SAPS-accredited NRAPA membership for dedicated status, and secure firearm storage in Pretoria.')
 @section('heading', 'Our services')
 
 @section('content')
-    <p class="lead">Ranyati Group brings together motivations, accredited association membership, and storage under one parent brand. Choose the service that matches your current step in the licensing or compliance journey.</p>
+    <p class="lead">Ranyati Group brings together motivations, accredited association membership (NRAPA), and secure storage in Pretoria under one parent brand. Ranyati does not provide firearm training or competency courses. Choose the service that matches your current step in the licensing or compliance journey.</p>
 
     <h2>Firearm licence motivations</h2>
     <p><a href="https://motivations.ranyati.co.za">Ranyati Motivations</a> assists with professional motivation documents for new applications, renewals, and purpose-specific licences. Content is tailored to your stated lawful purpose and the information you provide, with support for common paths such as self-defence, sport shooting, and hunting.</p>
@@ -16,7 +16,7 @@
     <p>Read more on the portal: <a href="https://nrapa.ranyati.co.za/info/about">About NRAPA</a> and <a href="https://nrapa.ranyati.co.za/info/dedicated-procedure">Dedicated procedure</a>.</p>
 
     <h2>Secure firearm storage</h2>
-    <p><a href="https://storage.ranyati.co.za">Ranyati Storage</a> provides FCA-aware secure storage and safe custody options, including guidance for temporary and longer-term arrangements. Contact the storage team to discuss Pretoria-area services and national enquiries.</p>
+    <p><a href="https://storage.ranyati.co.za">Ranyati Storage</a> provides FCA-aware secure storage and safe custody in Pretoria only, including guidance for temporary and longer-term arrangements. Contact the storage team to discuss intake and documentation.</p>
     <p>Overview resources: <a href="https://storage.ranyati.co.za/resources/safe-custody">Safe custody guide</a> and <a href="https://storage.ranyati.co.za/firearm-storage-pretoria">Firearm storage in Pretoria</a>.</p>
 
     <h2>Contact the right division</h2>

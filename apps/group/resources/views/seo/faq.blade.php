@@ -1,7 +1,7 @@
 @extends('layouts.seo-apex')
 
 @section('title', 'FAQ | Ranyati Group — Motivations, NRAPA & Storage')
-@section('description', 'Frequently asked questions about Ranyati Group: which division to use for motivations, NRAPA membership, dedicated status, and firearm storage in South Africa.')
+@section('description', 'Frequently asked questions about Ranyati Group: which division to use for motivations, NRAPA membership, dedicated status, and firearm storage in Pretoria.')
 
 @section('heading', 'Frequently asked questions')
 
@@ -29,7 +29,7 @@
             [
                 '@type' => 'Question',
                 'name' => 'How do I contact the storage division?',
-                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Visit storage.ranyati.co.za for storage-specific guides, or use the group phone +27 87 151 0987 and email info@firearmmotivations.co.za for initial enquiries.'],
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Visit storage.ranyati.co.za for storage-specific guides. Physical storage is in Pretoria only. Use the group phone +27 87 151 0987 and email info@firearmmotivations.co.za for enquiries.'],
             ],
             [
                 '@type' => 'Question',

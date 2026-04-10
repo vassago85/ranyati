@@ -25,8 +25,8 @@
         <li><a href="https://nrapa.ranyati.co.za/info/faq">NRAPA FAQ</a></li>
     </ul>
 
-    <h2>Storage</h2>
-    <p>Hosted on <a href="https://storage.ranyati.co.za/resources">storage.ranyati.co.za</a>:</p>
+    <h2>Storage (Pretoria)</h2>
+    <p>Secure custody is available <strong>in Pretoria only</strong>. Guides on <a href="https://storage.ranyati.co.za/resources">storage.ranyati.co.za</a>:</p>
     <ul>
         <li><a href="https://storage.ranyati.co.za/resources/fca-requirements">FCA requirements</a></li>
         <li><a href="https://storage.ranyati.co.za/resources/safe-custody">Safe custody</a></li>

@@ -1,6 +1,6 @@
 @extends('layouts.resources')
 
-@section('title', 'Secure Firearm Storage FAQ | Ranyati Storage South Africa')
+@section('title', 'Secure Firearm Storage FAQ | Ranyati Storage Pretoria')
 @section('description', 'Frequently asked questions about secure firearm storage, safe custody, and Ranyati Storage within the Ranyati Group ecosystem.')
 @section('breadcrumb_mode', 'flat')
 
@@ -68,7 +68,7 @@
             [
                 '@type' => 'Question',
                 'name' => 'Do you service areas outside Pretoria?',
-                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Enquiries are welcomed nationwide, but intake logistics may vary. Contact us with your location and timeframe.'],
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Physical storage is available in Pretoria only. You may contact us with general questions, but custody and intake take place at our Pretoria facility.'],
             ],
         ],
     ];
@@ -83,8 +83,8 @@
     <h2>Is storage linked to Motivations or NRAPA?</h2>
     <p>Yes—many clients use <a href="https://motivations.ranyati.co.za">Motivations</a> for paperwork and <a href="https://nrapa.ranyati.co.za">NRAPA</a> for membership while storage covers physical custody.</p>
 
-    <h2>Areas served</h2>
-    <p><a href="/firearm-storage-pretoria">Pretoria / Gauteng</a> is a focus; other arrangements depend on capacity—call <a href="tel:+27871510987">+27 87 151 0987</a>.</p>
+    <h2>Where storage is available</h2>
+    <p>Secure firearm storage is offered <strong>in Pretoria only</strong>. See <a href="/firearm-storage-pretoria">firearm storage in Pretoria</a> or call <a href="tel:+27871510987">+27 87 151 0987</a>.</p>
 
     <p>More: <a href="/resources/faq">Resources FAQ</a> · <a href="https://ranyati.co.za">ranyati.co.za</a></p>
 @endsection

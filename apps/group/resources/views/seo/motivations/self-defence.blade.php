@@ -47,7 +47,7 @@
     <p>A self-defence motivation must reflect your personal circumstances and lawful purpose under the Firearms Control Act (Act 60 of 2000). SAPS assesses whether the motivation is genuine and whether the applicant is competent and stable. Our role is to help you articulate a clear, coherent narrative supported by the facts you supply—not to guarantee an outcome.</p>
 
     <h2>What SAPS typically expects</h2>
-    <p>Expect questions about your living situation, security context, training, safe storage, and why a specific type of firearm is appropriate. Generic or copied text weakens an application; your motivation should read as authentic and specific to you.</p>
+    <p>Expect questions about your living situation, security context, safe storage plans, and why a specific type of firearm is appropriate. Generic or copied text weakens an application; your motivation should read as authentic and specific to you.</p>
 
     <h2>How we assist</h2>
     <ul class="checklist">

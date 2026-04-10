@@ -52,7 +52,7 @@
         "address": {
             "@type": "PostalAddress",
             "streetAddress": "241 Jean Avenue",
-            "addressLocality": "Centurion",
+            "addressLocality": "Pretoria",
             "addressRegion": "Gauteng",
             "postalCode": "0157",
             "addressCountry": "ZA"
@@ -263,7 +263,7 @@
 
             {{-- Supporting paragraph --}}
             <p class="mx-auto mt-7 max-w-lg text-[15px] leading-[1.8] text-white/45 anim-2">
-                Specialist firearm administration and accredited membership services across South Africa, with secure storage facilities in Pretoria.
+                Specialist firearm administration and accredited membership services across South Africa. Secure firearm storage is available in Pretoria only.
             </p>
 
             {{-- CTAs --}}

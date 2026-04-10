@@ -70,7 +70,7 @@
 @endpush
 
 @section('content')
-    <p>Ranyati Storage supports lawful firearm owners in Pretoria and surrounding Gauteng areas who need compliant safe custody—whether during travel, estate matters, or longer-term arrangements. Facilities and processes are designed around Firearms Control Act expectations and clear handover documentation.</p>
+    <p>Ranyati Storage offers compliant safe custody <strong>at our Pretoria facility</strong>. Clients may travel from elsewhere in Gauteng or beyond to use this location; there is no separate nationwide storage network. Typical needs include travel, estate matters, or longer-term arrangements, with processes designed around Firearms Control Act expectations and clear handover documentation.</p>
 
     <h2>Who typically uses Pretoria-area storage?</h2>
     <ul>

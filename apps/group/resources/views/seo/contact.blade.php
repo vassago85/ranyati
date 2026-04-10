@@ -1,7 +1,7 @@
 @extends('layouts.seo-apex')
 
-@section('title', 'Contact Ranyati Group | Centurion, South Africa')
-@section('description', 'Contact Ranyati Group for firearm administration support. Phone +27 87 151 0987, email info@firearmmotivations.co.za, registered address 241 Jean Avenue, Centurion, 0157.')
+@section('title', 'Contact Ranyati Group | Pretoria, South Africa')
+@section('description', 'Contact Ranyati Group for firearm administration support. Phone +27 87 151 0987, email info@firearmmotivations.co.za. Based in Pretoria, Gauteng.')
 @section('heading', 'Contact us')
 
 @section('content')
@@ -9,7 +9,7 @@
 
     <h2>Registered details</h2>
     <p><strong>Trading name:</strong> Ranyati Firearm Motivations (Pty) Ltd (Ranyati Group)<br>
-        <strong>Address:</strong> 241 Jean Avenue, Centurion, Gauteng, 0157, South Africa</p>
+        <strong>Registered address:</strong> 241 Jean Avenue, Centurion, 0157, Gauteng, South Africa (Pretoria metropolitan area)</p>
 
     <h2>Phone &amp; email</h2>
     <p><strong>Phone:</strong> <a href="tel:+27871510987">+27 87 151 0987</a><br>

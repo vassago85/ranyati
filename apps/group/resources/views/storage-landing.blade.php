@@ -6,12 +6,12 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JV2NSWMYTQ"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JV2NSWMYTQ');</script>
     <title>Ranyati Storage — Secure Firearm Storage</title>
-    <meta name="description" content="Professional secure firearm storage, safe custody, and estate administration services. A division of Ranyati Group.">
+    <meta name="description" content="Professional secure firearm storage and safe custody in Pretoria. A division of Ranyati Group.">
     <link rel="canonical" href="https://storage.ranyati.co.za/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Ranyati Storage">
     <meta property="og:title" content="Ranyati Storage — Secure Firearm Storage">
-    <meta property="og:description" content="Professional secure firearm storage, safe custody, and estate administration services in South Africa.">
+    <meta property="og:description" content="Professional secure firearm storage and safe custody in Pretoria, Gauteng.">
     <meta property="og:url" content="https://storage.ranyati.co.za/">
     <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
     <meta name="twitter:card" content="summary">
@@ -28,7 +28,7 @@
         "@@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": "Ranyati Storage",
-        "description": "Professional secure firearm storage, safe custody, and estate administration services. FCA-compliant purpose-built facilities.",
+        "description": "Professional secure firearm storage and safe custody in Pretoria. FCA-compliant purpose-built facilities.",
         "url": "https://storage.ranyati.co.za",
         "telephone": "+27-87-151-0987",
         "email": "info@firearmmotivations.co.za",
@@ -44,8 +44,8 @@
             "addressCountry": "ZA"
         },
         "areaServed": {
-            "@type": "Country",
-            "name": "South Africa"
+            "@type": "City",
+            "name": "Pretoria"
         },
         "serviceType": ["Firearm Storage", "Safe Custody", "Estate Administration"]
     }

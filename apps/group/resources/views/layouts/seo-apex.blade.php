@@ -31,7 +31,7 @@
             'legalName' => 'Ranyati Firearm Motivations (Pty) Ltd',
             'url' => 'https://ranyati.co.za',
             'logo' => url(asset('ranyati-group-logo.png')),
-            'description' => 'Specialist firearm administration services since 2006. Motivations, SAPS-accredited membership through NRAPA, and secure firearm storage in South Africa.',
+            'description' => 'Specialist firearm administration services since 2006. Motivations, SAPS-accredited membership through NRAPA, and secure firearm storage in Pretoria.',
             'foundingDate' => '2006',
             'contactPoint' => [
                 '@type' => 'ContactPoint',
@@ -44,7 +44,7 @@
             'address' => [
                 '@type' => 'PostalAddress',
                 'streetAddress' => '241 Jean Avenue',
-                'addressLocality' => 'Centurion',
+                'addressLocality' => 'Pretoria',
                 'addressRegion' => 'Gauteng',
                 'postalCode' => '0157',
                 'addressCountry' => 'ZA',

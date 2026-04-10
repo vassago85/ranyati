@@ -41,17 +41,17 @@
 
 <div class="info-card">
     <h4>Key Highlights</h4>
-    <p>Established in 2006. Over 15,000 successful applications. Proud corporate member of the Professional Firearm Trainers Council (PFTC). Based in Centurion, Gauteng, serving clients across South Africa.</p>
+    <p>Established in 2006. Over 15,000 successful applications. Based in Pretoria, Gauteng, serving clients across South Africa. Ranyati does not provide firearm training or competency courses—those must be completed through an accredited firearm training provider.</p>
 </div>
 
 <h2>Our Purpose and Expertise</h2>
 <p>Our purpose is to offer a one-stop service for the administration of the Firearms Control Act. We make compliance simpler for the general public by handling the paperwork, motivation drafting, and procedural requirements that can overwhelm applicants. Our team understands the legislation inside and out, and we stay current with amendments and SAPS requirements.</p>
 
-<h3>Industry Credentials</h3>
-<p>We are proud corporate members of the Professional Firearm Trainers Council (PFTC), reflecting our commitment to industry standards and best practice. Our team members are avid hunters and sport shooters who compete at national and international level. This practical experience informs our understanding of the sport shooting and hunting communities and the documentation required for these licence categories.</p>
+<h3>Experience and focus</h3>
+<p>Our work is limited to firearm administration, licensing documentation, and compliance support—we are not a training provider and do not issue competency certificates. Team members are involved in hunting and sport shooting as private participants; that context informs how we prepare motivations and supporting paperwork for these licence categories.</p>
 
 <h3>Part of Ranyati Group</h3>
-<p>Ranyati Motivations now operates as a division of Ranyati Group, allowing us to draw on broader resources while maintaining our specialist focus on firearm administration. We remain based in Centurion, Gauteng, and continue to serve clients throughout South Africa, whether in person or via remote support.</p>
+<p>Ranyati Motivations now operates as a division of Ranyati Group, allowing us to draw on broader resources while maintaining our specialist focus on firearm administration. We are based in Pretoria, Gauteng, and continue to serve clients throughout South Africa, whether in person or via remote support.</p>
 
 <h2>Our Commitment</h2>
 <p>We are committed to helping lawful firearm owners obtain and maintain their licences efficiently. Whether you require a motivation for self-defence, sport shooting, hunting, or business purposes, our experienced team can guide you through the process and prepare the documentation needed for a successful application.</p>

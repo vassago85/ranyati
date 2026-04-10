@@ -53,7 +53,7 @@
 @endsection
 
 @section('content')
-<p>Ranyati Storage is a division of Ranyati Group, providing FCA-compliant secure firearm storage and safe custody services across South Africa. Our purpose-built facilities are designed specifically for the safe keeping of firearms, exceeding the minimum requirements set out in the Firearms Control Act.</p>
+<p>Ranyati Storage is a division of Ranyati Group, providing FCA-compliant secure firearm storage and safe custody <strong>in Pretoria</strong>. Our purpose-built facilities are designed specifically for the safe keeping of firearms, exceeding the minimum requirements set out in the Firearms Control Act. We do not offer nationwide storage locations.</p>
 
 <p>As part of Ranyati Group, we draw on decades of experience in firearm administration. Our storage division works alongside Ranyati Motivations and NRAPA to offer a complete ecosystem of services for responsible firearm owners. Whether you need temporary custody during overseas travel, secure storage during estate administration, or long-term safekeeping while awaiting licence outcomes, Ranyati Storage provides a trusted solution.</p>
 
@@ -66,6 +66,6 @@
 <h2>Integrated Services</h2>
 <p>Ranyati Storage is integrated with our Motivations and NRAPA divisions. If you are applying for a firearm licence or managing membership through NRAPA, we can coordinate storage arrangements as part of your broader firearm administration needs. Our team understands the full lifecycle of firearm ownership and can advise on the most appropriate storage solution for your situation.</p>
 
-<h2>Serving South Africa</h2>
-<p>We serve clients throughout South Africa. While our primary facilities are located in Gauteng, we work with clients from all provinces. Contact us to discuss your requirements and arrange collection or delivery where applicable. Our team will guide you through the deposit process and ensure all documentation is in order.</p>
+<h2>Location</h2>
+<p>Physical storage and intake are available <strong>in Pretoria only</strong>. Clients may travel from elsewhere to use the facility; contact us to discuss requirements, documentation, and handover procedures before you visit.</p>
 @endsection

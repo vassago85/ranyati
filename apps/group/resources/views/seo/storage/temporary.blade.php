@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Temporary Firearm Storage South Africa | Ranyati Storage')
-@section('description', 'Short-term secure firearm storage for travel, moves, or transitions. Ranyati Storage under Ranyati Group—FCA-aligned safe custody.')
+@section('title', 'Temporary Firearm Storage Pretoria | Ranyati Storage')
+@section('description', 'Short-term secure firearm storage in Pretoria for travel, moves, or transitions. Ranyati Storage under Ranyati Group—FCA-aligned safe custody.')
 @section('breadcrumb_mode', 'flat')
 
 @section('css_vars')
@@ -54,15 +54,15 @@
     '@context' => 'https://schema.org',
     '@type' => 'Service',
     'name' => 'Temporary firearm storage',
-    'description' => 'Short-term secure storage for lawfully held firearms in South Africa.',
+    'description' => 'Short-term secure storage for lawfully held firearms in Pretoria.',
     'provider' => ['@type' => 'Organization', 'name' => 'Ranyati Storage', 'url' => 'https://storage.ranyati.co.za'],
-    'areaServed' => ['@type' => 'Country', 'name' => 'South Africa'],
+    'areaServed' => ['@type' => 'City', 'name' => 'Pretoria'],
     'url' => 'https://storage.ranyati.co.za/temporary-firearm-storage',
 ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
 @endpush
 
 @section('content')
-    <p>Temporary storage helps when life events interrupt your ability to keep firearms at home—provided you remain the lawful licence holder and transfers follow SAPS rules. Typical scenarios include domestic relocation, extended work abroad, or interim arrangements during renovations.</p>
+    <p>Temporary storage in Pretoria helps when life events interrupt your ability to keep firearms at home—provided you remain the lawful licence holder and transfers follow SAPS rules. Typical scenarios include domestic relocation, extended work abroad, or interim arrangements during renovations.</p>
 
     <h2>Planning release</h2>
     <p>Agree upfront how and when firearms return to you or move to another lawful destination. Sudden requests without ID checks undermine everyone’s compliance posture.</p>

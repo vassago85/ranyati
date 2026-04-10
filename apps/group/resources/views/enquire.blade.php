@@ -44,7 +44,7 @@
             "address": {
                 "@type": "PostalAddress",
                 "streetAddress": "241 Jean Avenue",
-                "addressLocality": "Centurion",
+                "addressLocality": "Pretoria",
                 "addressRegion": "Gauteng",
                 "addressCountry": "ZA"
             }
