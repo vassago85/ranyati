@@ -58,7 +58,7 @@
             [
                 '@type' => 'Question',
                 'name' => 'Can Ranyati Storage hold firearms if my licence lapsed?',
-                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Generally no lawful commercial storage should circumvent SAPS control. You must discuss your status honestly; we advise working with SAPS to regularise possession before or during custody arrangements.'],
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => 'Yes, we can accept firearms for safe custody when a licence has expired or lapsed. Bring your South African ID and any available licensing history (old licence card, SAPS correspondence, or proof of prior licensing). Safe custody keeps the firearm secure while you work through next steps such as relicensing, transfer to dealer stock, or surrender to SAPS. Contact us to discuss your situation.'],
             ],
             [
                 '@type' => 'Question',
@@ -78,7 +78,7 @@
 
 @section('content')
     <h2>Can you store firearms if my licence lapsed?</h2>
-    <p>Unlawful possession must be resolved with SAPS. We do not assist in evading regulatory control; discuss your facts upfront so we can point you to appropriate steps.</p>
+    <p>Yes. We accept firearms for safe custody even when the licence has expired or lapsed. Bring your South African ID and whatever licensing history you have — old licence card, SAPS correspondence, or any documentation that links the firearm to you. Safe custody keeps the firearm secure while you work through next steps such as relicensing, transfer to dealer stock, or surrender to SAPS. Contact us to discuss your situation before visiting.</p>
 
     <h2>Is storage linked to Motivations or NRAPA?</h2>
     <p>Yes—many clients use <a href="https://motivations.ranyati.co.za">Motivations</a> for paperwork and <a href="https://nrapa.ranyati.co.za">NRAPA</a> for membership while storage covers physical custody.</p>

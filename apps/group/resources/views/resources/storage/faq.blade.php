@@ -87,7 +87,7 @@
             "name": "How do I deposit a firearm?",
             "acceptedAnswer": {
                 "@type": "Answer",
-                "text": "Contact us to arrange a deposit. Bring your firearm licence, South African ID, and the firearm unloaded in a case. We complete the intake documentation, log the firearm in our register, and store it in our secure facility. You receive a receipt and reference number for retrieval."
+                "text": "Contact us to arrange a deposit. Bring your South African ID, the firearm unloaded in a case, and your firearm licence if it is still valid. If the licence has expired or lapsed, bring whatever licensing history you have (old licence card, correspondence from SAPS, or any documentation that links the firearm to you). We complete the intake documentation, log the firearm in our register, and store it in our secure facility. You receive a receipt and reference number for retrieval."
             }
         },
         {
@@ -137,6 +137,14 @@
                 "@type": "Answer",
                 "text": "Yes, if you provide a signed letter of authority and a certified copy of your ID. The authorised person must present their own ID when collecting. We verify both documents before releasing the firearm."
             }
+        },
+        {
+            "@type": "Question",
+            "name": "What about firearms with expired or lapsed licences?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "We accept firearms for safe custody even when the licence has expired or lapsed. Bring your South African ID and whatever licensing documentation you have. This helps establish the history of the firearm for future steps such as relicensing, transfer to dealer stock, or surrender to SAPS."
+            }
         }
     ]
 }
@@ -153,7 +161,7 @@
 <p>Common situations include travel abroad, moving house, estate settling, court orders, licence renewal pending, or personal preference. If you cannot keep your firearm in compliant storage at home, or choose not to, placing it in safe custody ensures legal compliance and security.</p>
 
 <h3>How do I deposit a firearm?</h3>
-<p>Contact us to arrange a deposit. Bring your firearm licence, South African ID, and the firearm unloaded in a case. We complete the intake documentation, log the firearm in our register, and store it in our secure facility. You receive a receipt and reference number for retrieval.</p>
+<p>Contact us to arrange a deposit. Bring your South African ID, the firearm unloaded in a case, and your firearm licence if it is still valid. If the licence has expired or lapsed, bring whatever licensing history you have — old licence card, correspondence from SAPS, or any documentation linking the firearm to you. We complete the intake documentation, log the firearm in our register, and store it in our secure facility. You receive a receipt and reference number for retrieval.</p>
 
 <h3>How do I retrieve my firearm?</h3>
 <p>Contact us to schedule a collection. Bring your ID and firearm licence. We verify your identity, complete the release documentation, and return the firearm to you. Only the licence holder or an authorised person with a signed letter of authority may collect.</p>
@@ -171,7 +179,10 @@
 <p>Costs depend on the type and number of firearms, the duration of storage, and any additional services required. Contact us with your requirements for a tailored quote.</p>
 
 <h3>Do I need to bring any documents?</h3>
-<p>When depositing, bring your valid firearm licence and South African ID. For retrieval, the same identification is required. If someone else will collect on your behalf, provide a signed letter of authority and a certified copy of your ID.</p>
+<p>When depositing, bring your South African ID and your firearm licence if it is still valid. If the licence has expired or lapsed, bring any available licensing history (old licence card, SAPS correspondence, proof of prior licensing) so we can document the firearm properly. For retrieval, the same identification is required. If someone else will collect on your behalf, provide a signed letter of authority and a certified copy of your ID.</p>
+
+<h3>What about firearms with expired or lapsed licences?</h3>
+<p>We accept firearms for safe custody even when the licence has expired or lapsed. In these cases we require your South African ID and whatever licensing documentation you have — this helps establish the history of the firearm for any future steps such as relicensing, transfer to dealer stock, or surrender to SAPS. Contact us to discuss your specific situation before visiting.</p>
 
 <h3>Can someone else collect my firearm?</h3>
 <p>Yes, if you provide a signed letter of authority and a certified copy of your ID. The authorised person must present their own ID when collecting. We verify both documents before releasing the firearm.</p>
