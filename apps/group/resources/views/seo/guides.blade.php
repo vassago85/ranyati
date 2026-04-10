@@ -5,7 +5,7 @@
 @section('heading', 'Guides & resources')
 
 @section('content')
-    <p class="lead">These hub pages sit on the division sites where topic-specific guides are maintained. Use them as a starting point for firearm licence motivations, dedicated status through NRAPA, and compliant storage.</p>
+    <p class="lead">These hub pages sit on the division sites where topic-specific guides are maintained. Motivations and NRAPA support clients <strong>nationwide</strong>; secure storage is <strong>in Pretoria only</strong>.</p>
 
     <h2>Motivations</h2>
     <p>Hosted on <a href="https://motivations.ranyati.co.za/resources">motivations.ranyati.co.za/resources</a>:</p>

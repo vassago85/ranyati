@@ -31,7 +31,7 @@
             'legalName' => 'Ranyati Firearm Motivations (Pty) Ltd',
             'url' => 'https://ranyati.co.za',
             'logo' => url(asset('ranyati-group-logo.png')),
-            'description' => 'Specialist firearm administration services since 2006. Motivations, SAPS-accredited membership through NRAPA, and secure firearm storage in Pretoria.',
+            'description' => 'Specialist firearm administration since 2006. Motivations and NRAPA support clients across South Africa; secure firearm storage in Pretoria only.',
             'foundingDate' => '2006',
             'contactPoint' => [
                 '@type' => 'ContactPoint',

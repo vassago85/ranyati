@@ -1,7 +1,7 @@
 @extends('layouts.seo-apex')
 
 @section('title', 'Contact Ranyati Group | Pretoria, South Africa')
-@section('description', 'Contact Ranyati Group for firearm administration support. Phone +27 87 151 0987, email info@firearmmotivations.co.za. Based in Pretoria, Gauteng.')
+@section('description', 'Contact Ranyati Group for nationwide motivations and NRAPA-related support. Phone +27 87 151 0987. Based in Pretoria; storage only in Pretoria.')
 @section('heading', 'Contact us')
 
 @section('content')

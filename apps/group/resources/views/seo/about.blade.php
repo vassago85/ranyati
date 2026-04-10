@@ -1,7 +1,7 @@
 @extends('layouts.seo-apex')
 
 @section('title', 'About Ranyati Group | Firearm Administration Since 2006')
-@section('description', 'Ranyati Group has supported South African firearm owners since 2006 with motivations, SAPS-accredited membership through NRAPA, and secure firearm storage in Pretoria—one trusted ecosystem for compliance and administration.')
+@section('description', 'Ranyati Group since 2006: nationwide motivations and NRAPA membership support; secure firearm storage in Pretoria only.')
 @section('heading', 'About Ranyati Group')
 
 @section('content')
@@ -13,8 +13,8 @@
     <h2>The Ranyati ecosystem</h2>
     <p>Three focused divisions operate under the parent brand, each with a distinct role:</p>
     <ul>
-        <li><a href="https://motivations.ranyati.co.za">Ranyati Motivations</a> — comprehensive firearm licence motivations, renewals, and related documentation for South African applicants.</li>
-        <li><a href="https://nrapa.ranyati.co.za">NRAPA</a> — the National Rifle and Pistol Association of South Africa, a SAPS-accredited association for dedicated sport shooter and dedicated hunter status and member administration.</li>
+        <li><a href="https://motivations.ranyati.co.za">Ranyati Motivations</a> — comprehensive firearm licence motivations, renewals, and related documentation for applicants <strong>across South Africa</strong>.</li>
+        <li><a href="https://nrapa.ranyati.co.za">NRAPA</a> — the National Rifle and Pistol Association of South Africa, a SAPS-accredited association for dedicated sport shooter and dedicated hunter status and member administration <strong>nationwide</strong>.</li>
         <li><a href="https://storage.ranyati.co.za">Ranyati Storage</a> — secure firearm storage and safe custody in Pretoria, aligned with FCA expectations.</li>
     </ul>
 

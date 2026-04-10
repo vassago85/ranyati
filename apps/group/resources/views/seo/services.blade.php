@@ -1,18 +1,18 @@
 @extends('layouts.seo-apex')
 
 @section('title', 'Firearm Services | Motivations, NRAPA Membership & Storage | Ranyati Group')
-@section('description', 'Explore Ranyati Group services: professional firearm licence motivations, SAPS-accredited NRAPA membership for dedicated status, and secure firearm storage in Pretoria.')
+@section('description', 'Ranyati Motivations and NRAPA assist clients across South Africa. Secure firearm storage is available in Pretoria only.')
 @section('heading', 'Our services')
 
 @section('content')
-    <p class="lead">Ranyati Group brings together motivations, accredited association membership (NRAPA), and secure storage in Pretoria under one parent brand. Ranyati does not provide firearm training or competency courses. Choose the service that matches your current step in the licensing or compliance journey.</p>
+    <p class="lead">Ranyati Group brings together motivations, accredited association membership (NRAPA), and secure storage under one parent brand. <strong>Ranyati Motivations and NRAPA support clients nationwide</strong> (based in Pretoria). <strong>Physical firearm storage is available in Pretoria only.</strong> Ranyati does not provide firearm training or competency courses.</p>
 
     <h2>Firearm licence motivations</h2>
-    <p><a href="https://motivations.ranyati.co.za">Ranyati Motivations</a> assists with professional motivation documents for new applications, renewals, and purpose-specific licences. Content is tailored to your stated lawful purpose and the information you provide, with support for common paths such as self-defence, sport shooting, and hunting.</p>
+    <p><a href="https://motivations.ranyati.co.za">Ranyati Motivations</a> assists with professional motivation documents for new applications, renewals, and purpose-specific licences—<strong>throughout South Africa</strong>. Content is tailored to your stated lawful purpose and the information you provide, with support for common paths such as self-defence, sport shooting, and hunting.</p>
     <p>For process context, see our <a href="https://motivations.ranyati.co.za/resources/firearm-licence-process">firearm licence process guide</a> on the Motivations site.</p>
 
     <h2>Dedicated sport shooter &amp; dedicated hunter (NRAPA)</h2>
-    <p><a href="https://nrapa.ranyati.co.za">NRAPA</a> is a SAPS-accredited association offering membership, dedicated status administration, endorsements, and digital member tools. If you need dedicated sport shooter or dedicated hunter status as part of your licensing strategy, NRAPA is the association branch of the group.</p>
+    <p><a href="https://nrapa.ranyati.co.za">NRAPA</a> is a SAPS-accredited association offering membership, dedicated status administration, endorsements, and digital member tools to <strong>members across South Africa</strong>. If you need dedicated sport shooter or dedicated hunter status as part of your licensing strategy, NRAPA is the association branch of the group.</p>
     <p>Read more on the portal: <a href="https://nrapa.ranyati.co.za/info/about">About NRAPA</a> and <a href="https://nrapa.ranyati.co.za/info/dedicated-procedure">Dedicated procedure</a>.</p>
 
     <h2>Secure firearm storage</h2>

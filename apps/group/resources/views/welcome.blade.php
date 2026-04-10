@@ -7,17 +7,17 @@
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JV2NSWMYTQ"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JV2NSWMYTQ');</script>
     <title>Ranyati Group — Firearm Administration Specialists Since 2006</title>
-    <meta name="description" content="Ranyati Group provides comprehensive firearm motivations, SAPS-accredited membership through NRAPA, and secure firearm storage solutions in South Africa.">
+    <meta name="description" content="Ranyati Group: nationwide firearm licence motivations and NRAPA membership support (based in Pretoria). Secure firearm storage is available in Pretoria only.">
     <link rel="canonical" href="https://ranyati.co.za/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Ranyati Group">
     <meta property="og:title" content="Ranyati Group — Firearm Administration Specialists Since 2006">
-    <meta property="og:description" content="Comprehensive firearm motivations, SAPS-accredited membership through NRAPA, and secure firearm storage solutions in South Africa.">
+    <meta property="og:description" content="Nationwide motivations and NRAPA membership support. Secure firearm storage in Pretoria only.">
     <meta property="og:url" content="https://ranyati.co.za/">
     <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Ranyati Group — Firearm Administration Specialists">
-    <meta name="twitter:description" content="Specialist firearm administration, SAPS-accredited membership, motivations, and secure storage since 2006.">
+    <meta name="twitter:description" content="Nationwide motivations and NRAPA support; Pretoria-only storage. Specialist firearm administration since 2006.">
     <meta name="twitter:image" content="{{ asset('ranyati-group-logo.png') }}">
     <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
@@ -33,7 +33,7 @@
         "url": "https://ranyati.co.za",
         "logo": "{{ asset('ranyati-group-logo.png') }}",
         "image": "{{ asset('ranyati-group-logo.png') }}",
-        "description": "Specialist firearm administration services since 2006. Comprehensive motivations, SAPS-accredited membership through NRAPA, and secure storage.",
+        "description": "Specialist firearm administration since 2006. Ranyati Motivations and NRAPA assist clients across South Africa. Secure firearm storage is offered in Pretoria only.",
         "foundingDate": "2006",
         "knowsAbout": ["Firearms Control Act", "Firearm Licence Motivations", "SAPS Accredited Membership", "Firearm Storage", "Competency Certificates"],
         "numberOfEmployees": {
@@ -62,19 +62,19 @@
                 "@type": "ProfessionalService",
                 "name": "Ranyati Motivations",
                 "url": "https://motivations.ranyati.co.za",
-                "description": "Professional firearm motivations for licence applications, renewals, and compliance support."
+                "description": "Professional firearm motivations, renewals, and compliance documentation for clients across South Africa."
             },
             {
                 "@type": "Organization",
                 "name": "NRAPA",
                 "url": "https://nrapa.ranyati.co.za",
-                "description": "SAPS-accredited membership for dedicated sport shooters and hunters."
+                "description": "SAPS-accredited association for dedicated sport shooters and hunters—membership and administration for members nationwide."
             },
             {
                 "@type": "LocalBusiness",
                 "name": "Ranyati Storage",
                 "url": "https://storage.ranyati.co.za",
-                "description": "FCA-compliant secure firearm storage and safe custody services."
+                "description": "FCA-compliant secure firearm storage and safe custody in Pretoria only."
             }
         ]
     }

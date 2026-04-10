@@ -28,7 +28,7 @@
         "@@context": "https://schema.org",
         "@type": "ProfessionalService",
         "name": "Ranyati Motivations",
-        "description": "Professional comprehensive motivations for firearm licence applications, renewals, and compliance support in South Africa.",
+        "description": "Professional firearm licence motivations, renewals, and compliance documentation for clients across South Africa (based in Pretoria).",
         "url": "https://motivations.ranyati.co.za",
         "telephone": "+27-87-151-0987",
         "email": "info@firearmmotivations.co.za",
