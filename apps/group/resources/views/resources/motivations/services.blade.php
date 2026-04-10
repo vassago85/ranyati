@@ -125,7 +125,7 @@
 @endpush
 
 @section('content')
-<p>Ranyati Motivations provides professional firearm licence motivation services, renewal support, and compliance assistance to firearm owners across South Africa. Based in Pretoria, Gauteng, we work with applicants throughout the country — preparing structured motivations and supporting documentation aligned with the Firearms Control Act and the requirements of the Central Firearms Register (CFR). We do not provide firearm training or competency courses.</p>
+<p>Ranyati Motivations provides professional firearm licence motivation services, renewal support, and compliance assistance to firearm owners across South Africa. Based in Pretoria, Gauteng, we work with applicants throughout the country — preparing structured motivations and supporting documentation aligned with the Firearms Control Act and the requirements of the Central Firearms Register (CFR).</p>
 
 <p>Whether you are applying for a new firearm licence, renewing an existing one, appealing a refusal, or dealing with estate firearms, our team handles the administrative and legal documentation so that your application is correctly prepared before submission.</p>
 

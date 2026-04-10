@@ -41,7 +41,7 @@
 @endpush
 
 @section('content')
-    <p>Sport shooting motivations often reference your discipline (e.g. practical shooting, precision rifle, gong shooting), club affiliation, competition participation, and how the firearm type matches sanctioned activities. Ranyati does not provide shooting instruction or firearm training—we prepare documentation only. Where dedicated sport shooter status is required, SAPS-accredited association membership—such as through <a href="https://nrapa.ranyati.co.za">NRAPA</a>—may form part of your broader compliance picture.</p>
+    <p>Sport shooting motivations often reference your discipline (e.g. practical shooting, precision rifle, gong shooting), club affiliation, competition participation, and how the firearm type matches sanctioned activities. Where dedicated sport shooter status is required, SAPS-accredited association membership—such as through <a href="https://nrapa.ranyati.co.za">NRAPA</a>—may form part of your broader compliance picture.</p>
 
     <h2>Dedicated status vs general sport use</h2>
     <p>Some licences turn on dedicated status and ongoing activity requirements; others may reflect introductory or club-based sport use. We align the motivation language with the pathway you are actually following and the evidence you can provide.</p>

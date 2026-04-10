@@ -5,7 +5,7 @@
 @section('heading', 'About Ranyati Group')
 
 @section('content')
-    <p class="lead">Ranyati Group (trading as Ranyati Firearm Motivations (Pty) Ltd) is a specialist firearm administration organisation based in Pretoria, Gauteng, serving clients across South Africa. We do not provide firearm training or competency courses. We help lawful firearm owners navigate the Firearms Control Act through structured documentation, accredited association membership (NRAPA), and compliant storage services in Pretoria only.</p>
+    <p class="lead">Ranyati Group (trading as Ranyati Firearm Motivations (Pty) Ltd) is a specialist firearm administration organisation based in Pretoria, Gauteng, serving clients across South Africa. We help lawful firearm owners navigate the Firearms Control Act through structured documentation, accredited association membership (NRAPA), and compliant storage services in Pretoria only.</p>
 
     <h2>What we do</h2>
     <p>Our work sits at the intersection of administrative support and regulatory compliance. We do not replace SAPS or legal advice; we prepare clear, professional submissions and maintain the records and processes that many applicants find difficult to manage alone.</p>

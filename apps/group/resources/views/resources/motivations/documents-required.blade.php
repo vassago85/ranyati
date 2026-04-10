@@ -40,13 +40,11 @@
 @section('content')
 <p>Having the correct documents ready before you submit your application avoids delays and rejections. Use the checklists below to ensure you have everything required for your specific application type. All documents must be certified where indicated, and certifications must not be older than three months.</p>
 
-<p>Ranyati Motivations does not provide firearm training. Certificates listed below must come from an accredited firearm training provider.</p>
-
 <h2>For Competency Certificate (SAPS 517)</h2>
 <p>The competency application is the first step. Gather these documents before visiting your SAPS station.</p>
 <ul class="checklist">
     <li>3× certified copies of your ID</li>
-    <li>2× certified copies of certificates from your accredited firearm training provider (Unit Standards 117705, 119649, 119651, 119650, 119652 as applicable)</li>
+    <li>2× certified copies of competency certificates (Unit Standards 117705, 119649, 119651, 119650, 119652 as applicable)</li>
     <li>2× passport photographs (neutral background)</li>
     <li>2× completed Annexure 86 reference forms (references must have known you for at least two years; no family or cohabiting partners)</li>
     <li>Completed SAPS 517 form</li>

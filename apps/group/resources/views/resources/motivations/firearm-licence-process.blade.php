@@ -48,13 +48,13 @@
             "@type": "HowToStep",
             "position": 1,
             "name": "Complete SAPS competency requirements",
-            "text": "Pass the prescribed Knowledge of the Firearms Control Act test (Unit Standard 117705) and the relevant practical unit standards through an accredited firearm training provider. Ranyati Motivations does not provide this training."
+            "text": "Pass the prescribed Knowledge of the Firearms Control Act test (Unit Standard 117705) and the relevant practical unit standards through an accredited training provider."
         },
         {
             "@type": "HowToStep",
             "position": 2,
             "name": "Apply for a Competency Certificate (SAPS 517)",
-            "text": "Submit the SAPS 517 form with certified copies of your ID, certificates from your accredited firearm training provider, passport photographs, and two completed Annexure 86 reference forms. Submit in person at your nearest SAPS station."
+            "text": "Submit the SAPS 517 form with certified copies of your ID, competency certificates, passport photographs, and two completed Annexure 86 reference forms. Submit in person at your nearest SAPS station."
         },
         {
             "@type": "HowToStep",
@@ -82,7 +82,6 @@
 @section('content')
 <p>Obtaining a firearm licence in South Africa involves two main stages: the competency process and the licensing process. Both are governed by the Firearms Control Act 60 of 2000 and administered by the South African Police Service (SAPS). This guide outlines the steps, forms, and documents required.</p>
 
-<p><strong>Note:</strong> Ranyati Motivations does not provide firearm training or competency courses. Competency tests must be completed through an accredited firearm training provider; we assist with motivations and application documentation only.</p>
 
 <h2>Overview of Licensing Requirements</h2>
 <p>The Firearms Control Act requires applicants to hold a valid competency certificate before applying for a firearm licence. Each firearm requires a separate licence, and you must demonstrate that you are a fit and proper person. Applications must be submitted in person at your nearest SAPS station; confirm operating days and times before visiting.</p>
@@ -91,13 +90,13 @@
 <p>The competency certificate confirms that you have the knowledge and practical skills to possess a firearm. You complete this process first, before applying for any firearm licence.</p>
 
 <h3>Forms and Tests</h3>
-<p>Submit the SAPS 517 form (Application for a Competency Certificate). You must pass prescribed tests: the Knowledge of the Firearms Control Act (Unit Standard 117705) and the relevant practical unit standards (119649, 119651, 119650, 119652 depending on firearm type). Those assessments are conducted by accredited firearm training providers—not by Ranyati Motivations.</p>
+<p>Submit the SAPS 517 form (Application for a Competency Certificate). You must pass prescribed tests: the Knowledge of the Firearms Control Act (Unit Standard 117705) and the relevant practical unit standards (119649, 119651, 119650, 119652 depending on firearm type) at an accredited training provider.</p>
 
 <h3>References and Documents</h3>
 <p>You need two references who complete Annexure 86. Each reference must have known you for at least two years and cannot be a family member or cohabiting partner. Documents typically required include:</p>
 <ul class="checklist">
     <li>3× certified copies of your ID</li>
-    <li>2× certified copies of certificates from your accredited firearm training provider</li>
+    <li>2× certified copies of competency certificates</li>
     <li>2× passport photographs</li>
 </ul>
 

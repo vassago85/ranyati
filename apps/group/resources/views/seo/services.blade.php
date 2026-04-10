@@ -5,7 +5,7 @@
 @section('heading', 'Our services')
 
 @section('content')
-    <p class="lead">Ranyati Group brings together motivations, accredited association membership (NRAPA), and secure storage under one parent brand. <strong>Ranyati Motivations and NRAPA support clients nationwide</strong> (based in Pretoria). <strong>Physical firearm storage is available in Pretoria only.</strong> Ranyati does not provide firearm training or competency courses.</p>
+    <p class="lead">Ranyati Group brings together motivations, accredited association membership (NRAPA), and secure storage under one parent brand. <strong>Ranyati Motivations and NRAPA support clients nationwide</strong> (based in Pretoria). <strong>Physical firearm storage is available in Pretoria only.</strong></p>
 
     <h2>Firearm licence motivations</h2>
     <p><a href="https://motivations.ranyati.co.za">Ranyati Motivations</a> assists with professional motivation documents for new applications, renewals, and purpose-specific licences—<strong>throughout South Africa</strong>. Content is tailored to your stated lawful purpose and the information you provide, with support for common paths such as self-defence, sport shooting, and hunting.</p>
