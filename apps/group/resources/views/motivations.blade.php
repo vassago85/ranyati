@@ -360,13 +360,15 @@
                     </p>
                 </div>
                 <div class="footer-center" style="display: flex; flex-direction: column;">
-                    <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">Resources</h4>
+                    <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">Guides</h4>
                     <div class="footer-pills" style="display: flex; flex-direction: column; gap: 6px; margin-top: 16px;">
-                        <a href="/resources/about" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">About Us</a>
-                        <a href="/resources/firearm-licence-process" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Licence Process</a>
-                        <a href="/resources/firearms-control-act" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Firearms Control Act</a>
-                        <a href="/resources/services" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Our Services</a>
-                        <a href="/resources/faq" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">FAQ</a>
+                        <a href="/firearm-licence-motivation-self-defence" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Self-defence Motivation</a>
+                        <a href="/firearm-licence-motivation-sport-shooting" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Sport Shooting Motivation</a>
+                        <a href="/firearm-licence-motivation-hunting" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Hunting Motivation</a>
+                        <a href="/firearm-licence-renewal-south-africa" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Licence Renewal</a>
+                        <a href="/firearm-licence-appeal-south-africa" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Licence Appeal</a>
+                        <a href="/faq" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">FAQ</a>
+                        <a href="/resources" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">All Resources</a>
                     </div>
                 </div>
                 <div class="footer-right" style="display: flex; flex-direction: column;">
@@ -388,7 +390,10 @@
                 <nav aria-label="Guides" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin-bottom:12px;">
                     <a href="https://ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">Ranyati Group</a>
                     <a href="/firearm-licence-motivation-self-defence" style="font-size:12px;color:rgba(255,255,255,0.4);">Self-defence motivation</a>
+                    <a href="/firearm-licence-motivation-sport-shooting" style="font-size:12px;color:rgba(255,255,255,0.4);">Sport shooting motivation</a>
+                    <a href="/firearm-licence-motivation-hunting" style="font-size:12px;color:rgba(255,255,255,0.4);">Hunting motivation</a>
                     <a href="/firearm-licence-renewal-south-africa" style="font-size:12px;color:rgba(255,255,255,0.4);">Licence renewal</a>
+                    <a href="/firearm-licence-appeal-south-africa" style="font-size:12px;color:rgba(255,255,255,0.4);">Licence appeal</a>
                     <a href="/faq" style="font-size:12px;color:rgba(255,255,255,0.4);">Motivations FAQ</a>
                     <a href="https://nrapa.ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">NRAPA membership</a>
                     <a href="https://storage.ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">Firearm storage</a>

@@ -371,6 +371,8 @@
                 <nav aria-label="Guides" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin-bottom:12px;">
                     <a href="https://ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">Ranyati Group</a>
                     <a href="/firearm-storage-pretoria" style="font-size:12px;color:rgba(255,255,255,0.4);">Firearm storage Pretoria</a>
+                    <a href="/long-term-firearm-storage-south-africa" style="font-size:12px;color:rgba(255,255,255,0.4);">Long-term storage</a>
+                    <a href="/temporary-firearm-storage" style="font-size:12px;color:rgba(255,255,255,0.4);">Temporary storage</a>
                     <a href="/secure-firearm-storage-faq" style="font-size:12px;color:rgba(255,255,255,0.4);">Storage FAQ</a>
                     <a href="https://motivations.ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">Licence motivations</a>
                     <a href="https://nrapa.ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">NRAPA</a>
