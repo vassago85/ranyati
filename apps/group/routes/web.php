@@ -76,6 +76,12 @@ Route::get('/sitemap.xml', function () {
         $pages = [
             ''                                    => ['priority' => '1.0', 'changefreq' => 'monthly',  'lastmod' => $today],
             '/enquire'                            => ['priority' => '0.9', 'changefreq' => 'monthly',  'lastmod' => $today],
+            '/faq'                                => ['priority' => '0.85', 'changefreq' => 'weekly',  'lastmod' => $today],
+            '/firearm-licence-motivation-self-defence' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/firearm-licence-motivation-sport-shooting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/firearm-licence-motivation-hunting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/firearm-licence-renewal-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/firearm-licence-appeal-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/resources'                          => ['priority' => '0.9', 'changefreq' => 'weekly',   'lastmod' => $today],
             '/resources/about'                    => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
             '/resources/firearm-licence-process'  => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
@@ -88,6 +94,10 @@ Route::get('/sitemap.xml', function () {
         $base = 'https://storage.ranyati.co.za';
         $pages = [
             ''                           => ['priority' => '1.0', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/firearm-storage-pretoria'  => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/long-term-firearm-storage-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/temporary-firearm-storage' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/secure-firearm-storage-faq' => ['priority' => '0.85', 'changefreq' => 'weekly', 'lastmod' => $today],
             '/resources'                 => ['priority' => '0.9', 'changefreq' => 'weekly',  'lastmod' => $today],
             '/resources/about'           => ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/resources/safe-custody'    => ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
@@ -98,6 +108,11 @@ Route::get('/sitemap.xml', function () {
         $base = 'https://ranyati.co.za';
         $pages = [
             '' => ['priority' => '1.0', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/about' => ['priority' => '0.9', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/services' => ['priority' => '0.9', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/contact' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/faq' => ['priority' => '0.85', 'changefreq' => 'weekly', 'lastmod' => $today],
+            '/guides' => ['priority' => '0.85', 'changefreq' => 'weekly', 'lastmod' => $today],
         ];
     }
 
@@ -127,9 +142,105 @@ Route::get('/robots.txt', function () {
         $sitemap = 'https://ranyati.co.za/sitemap.xml';
     }
 
-    $txt = "User-agent: *\nAllow: /\n\nSitemap: {$sitemap}\n";
+    $txt = "User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: {$sitemap}\n";
 
     return response($txt, 200, ['Content-Type' => 'text/plain']);
+});
+
+// ── SEO support pages (host-aware; same path may resolve differently per hostname) ──
+
+$apexOnly = function (): void {
+    $h = request()->getHost();
+    abort_if(str_starts_with($h, 'motivations.') || str_starts_with($h, 'storage.'), 404);
+};
+
+$motivationsOnly = function (): void {
+    abort_unless(str_starts_with(request()->getHost(), 'motivations.'), 404);
+};
+
+$storageOnly = function (): void {
+    abort_unless(str_starts_with(request()->getHost(), 'storage.'), 404);
+};
+
+Route::get('/about', function () use ($apexOnly) {
+    $apexOnly();
+
+    return view('seo.about');
+});
+
+Route::get('/services', function () use ($apexOnly) {
+    $apexOnly();
+
+    return view('seo.services');
+});
+
+Route::get('/contact', function () use ($apexOnly) {
+    $apexOnly();
+
+    return view('seo.contact');
+});
+
+Route::get('/guides', function () use ($apexOnly) {
+    $apexOnly();
+
+    return view('seo.guides');
+});
+
+Route::get('/faq', function () {
+    $host = request()->getHost();
+    if (str_starts_with($host, 'motivations.')) {
+        return view('seo.motivations.faq');
+    }
+    abort_if(str_starts_with($host, 'storage.'), 404);
+
+    return view('seo.faq');
+});
+
+Route::get('/firearm-licence-motivation-self-defence', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    return view('seo.motivations.self-defence');
+});
+Route::get('/firearm-licence-motivation-sport-shooting', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    return view('seo.motivations.sport-shooting');
+});
+Route::get('/firearm-licence-motivation-hunting', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    return view('seo.motivations.hunting');
+});
+Route::get('/firearm-licence-renewal-south-africa', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    return view('seo.motivations.renewal');
+});
+Route::get('/firearm-licence-appeal-south-africa', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    return view('seo.motivations.appeal');
+});
+
+Route::get('/firearm-storage-pretoria', function () use ($storageOnly) {
+    $storageOnly();
+
+    return view('seo.storage.pretoria');
+});
+Route::get('/long-term-firearm-storage-south-africa', function () use ($storageOnly) {
+    $storageOnly();
+
+    return view('seo.storage.long-term');
+});
+Route::get('/temporary-firearm-storage', function () use ($storageOnly) {
+    $storageOnly();
+
+    return view('seo.storage.temporary');
+});
+Route::get('/secure-firearm-storage-faq', function () use ($storageOnly) {
+    $storageOnly();
+
+    return view('seo.storage.faq');
 });
 
 Route::get('/enquire', fn (Request $request) => view('enquire', [

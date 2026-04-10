@@ -20,20 +20,27 @@
 @section('breadcrumb', 'All Resources')
 
 @section('sidebar_nav')
+    <a href="/firearm-licence-motivation-self-defence" class="{{ request()->is('firearm-licence-motivation-self-defence') ? 'active' : '' }}">Self-defence</a>
+    <a href="/firearm-licence-motivation-sport-shooting" class="{{ request()->is('firearm-licence-motivation-sport-shooting') ? 'active' : '' }}">Sport shooting</a>
+    <a href="/firearm-licence-motivation-hunting" class="{{ request()->is('firearm-licence-motivation-hunting') ? 'active' : '' }}">Hunting</a>
+    <a href="/firearm-licence-renewal-south-africa" class="{{ request()->is('firearm-licence-renewal-south-africa') ? 'active' : '' }}">Renewal</a>
+    <a href="/faq" class="{{ request()->is('faq') ? 'active' : '' }}">Site FAQ</a>
     <a href="/resources/about" class="{{ request()->is('resources/about') ? 'active' : '' }}">About Us</a>
     <a href="/resources/firearm-licence-process" class="{{ request()->is('resources/firearm-licence-process') ? 'active' : '' }}">Licence Process</a>
     <a href="/resources/firearms-control-act" class="{{ request()->is('resources/firearms-control-act') ? 'active' : '' }}">Firearms Control Act</a>
     <a href="/resources/services" class="{{ request()->is('resources/services') ? 'active' : '' }}">Our Services</a>
-    <a href="/resources/faq" class="{{ request()->is('resources/faq') ? 'active' : '' }}">FAQ</a>
+    <a href="/resources/faq" class="{{ request()->is('resources/faq') ? 'active' : '' }}">Resources FAQ</a>
     <a href="/resources/documents-required" class="{{ request()->is('resources/documents-required') ? 'active' : '' }}">Documents Required</a>
 @endsection
 
 @section('footer_links')
     <a href="/resources/about" style="font-size:13px;color:rgba(255,255,255,0.35);">About Us</a>
     <a href="/resources/firearm-licence-process" style="font-size:13px;color:rgba(255,255,255,0.35);">Licence Process</a>
-    <a href="/resources/firearms-control-act" style="font-size:13px;color:rgba(255,255,255,0.35);">Firearms Control Act</a>
+    <a href="/firearm-licence-renewal-south-africa" style="font-size:13px;color:rgba(255,255,255,0.35);">Renewal (SA)</a>
+    <a href="/firearm-licence-motivation-self-defence" style="font-size:13px;color:rgba(255,255,255,0.35);">Self-defence motivation</a>
+    <a href="/faq" style="font-size:13px;color:rgba(255,255,255,0.35);">Motivations FAQ</a>
     <a href="/resources/services" style="font-size:13px;color:rgba(255,255,255,0.35);">Our Services</a>
-    <a href="/resources/faq" style="font-size:13px;color:rgba(255,255,255,0.35);">FAQ</a>
+    <a href="/resources/faq" style="font-size:13px;color:rgba(255,255,255,0.35);">Resources FAQ</a>
     <a href="/resources/documents-required" style="font-size:13px;color:rgba(255,255,255,0.35);">Documents Required</a>
 @endsection
 

@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: /admin
-
-Sitemap: https://ranyati.co.za/sitemap.xml

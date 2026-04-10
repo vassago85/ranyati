@@ -7,12 +7,12 @@
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JV2NSWMYTQ');</script>
     <title>@yield('title') — @yield('site_name', 'Ranyati Group')</title>
     <meta name="description" content="@yield('description')">
-    <link rel="canonical" href="{{ url(request()->path()) }}">
+    <link rel="canonical" href="@hasSection('canonical'){{ trim($__env->yieldContent('canonical')) }}@else{{ url(request()->path()) }}@endif">
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="@yield('site_name', 'Ranyati Group')">
     <meta property="og:title" content="@yield('title') — @yield('site_name', 'Ranyati Group')">
     <meta property="og:description" content="@yield('description')">
-    <meta property="og:url" content="{{ url(request()->path()) }}">
+    <meta property="og:url" content="@hasSection('canonical'){{ trim($__env->yieldContent('canonical')) }}@else{{ url(request()->path()) }}@endif">
     <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="@yield('title') — @yield('site_name', 'Ranyati Group')">
@@ -169,31 +169,31 @@
         }
     </style>
     @yield('css_vars')
-    <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Home",
-                "item": "{{ rtrim(url($__env->yieldContent('home_url', '/')), '/') ?: url('/') }}"
-            },
-            {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "Resources",
-                "item": "{{ rtrim(url($__env->yieldContent('home_url', '/')), '/') }}/resources"
-            },
-            {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "@yield('breadcrumb')"
-            }
-        ]
-    }
-    </script>
+    @php
+        $resHome = rtrim(url($__env->yieldContent('home_url', '/')), '/') ?: url('/');
+        $resBreadcrumbMode = trim($__env->yieldContent('breadcrumb_mode')) ?: 'resources';
+        $resBreadcrumbItems = $resBreadcrumbMode === 'flat'
+            ? [
+                ['position' => 1, 'name' => 'Home', 'item' => $resHome],
+                ['position' => 2, 'name' => trim($__env->yieldContent('breadcrumb')), 'item' => url()->current()],
+            ]
+            : [
+                ['position' => 1, 'name' => 'Home', 'item' => $resHome],
+                ['position' => 2, 'name' => 'Resources', 'item' => $resHome.'/resources'],
+                ['position' => 3, 'name' => trim($__env->yieldContent('breadcrumb')), 'item' => url()->current()],
+            ];
+        $resBreadcrumbJson = array_map(fn ($row) => [
+            '@type' => 'ListItem',
+            'position' => $row['position'],
+            'name' => $row['name'],
+            'item' => $row['item'],
+        ], $resBreadcrumbItems);
+    @endphp
+    <script type="application/ld+json">{!! json_encode([
+        '@context' => 'https://schema.org',
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => $resBreadcrumbJson,
+    ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
     @stack('structured_data')
 </head>
 <body>
@@ -210,7 +210,7 @@
             </a>
             <nav class="res-header-nav">
                 <a href="@yield('home_url', '/')">Home</a>
-                <a href="{{ rtrim($__env->yieldContent('home_url', '/'), '/') }}/resources" class="active">Resources</a>
+                <a href="{{ rtrim($__env->yieldContent('home_url', '/'), '/') }}/resources" @if(trim($__env->yieldContent('breadcrumb_mode')) !== 'flat') class="active" @endif>Resources</a>
                 @yield('header_extra')
             </nav>
         </div>
@@ -226,12 +226,17 @@
 
     {{-- Content --}}
     <div class="res-content">
-        <nav class="res-breadcrumb">
+        <nav class="res-breadcrumb" aria-label="Breadcrumb">
             <a href="@yield('home_url', '/')">Home</a>
-            <span>&rsaquo;</span>
-            <a href="{{ rtrim($__env->yieldContent('home_url', '/'), '/') }}/resources">Resources</a>
-            <span>&rsaquo;</span>
-            <span class="current">@yield('breadcrumb')</span>
+            @if(trim($__env->yieldContent('breadcrumb_mode')) === 'flat')
+                <span>&rsaquo;</span>
+                <span class="current">@yield('breadcrumb')</span>
+            @else
+                <span>&rsaquo;</span>
+                <a href="{{ rtrim($__env->yieldContent('home_url', '/'), '/') }}/resources">Resources</a>
+                <span>&rsaquo;</span>
+                <span class="current">@yield('breadcrumb')</span>
+            @endif
         </nav>
 
         <div class="res-sidebar-nav">

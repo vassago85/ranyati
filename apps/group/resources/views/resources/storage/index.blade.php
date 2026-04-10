@@ -40,17 +40,23 @@
 @section('breadcrumb', 'All Resources')
 
 @section('sidebar_nav')
+    <a href="/firearm-storage-pretoria" class="{{ request()->is('firearm-storage-pretoria') ? 'active' : '' }}">Pretoria</a>
+    <a href="/long-term-firearm-storage-south-africa" class="{{ request()->is('long-term-firearm-storage-south-africa') ? 'active' : '' }}">Long-term</a>
+    <a href="/temporary-firearm-storage" class="{{ request()->is('temporary-firearm-storage') ? 'active' : '' }}">Temporary</a>
+    <a href="/secure-firearm-storage-faq" class="{{ request()->is('secure-firearm-storage-faq') ? 'active' : '' }}">Storage FAQ</a>
     <a href="/resources/about" class="{{ request()->is('resources/about') ? 'active' : '' }}">About Storage</a>
     <a href="/resources/safe-custody" class="{{ request()->is('resources/safe-custody') ? 'active' : '' }}">Safe Custody Guide</a>
     <a href="/resources/fca-requirements" class="{{ request()->is('resources/fca-requirements') ? 'active' : '' }}">FCA Requirements</a>
-    <a href="/resources/faq" class="{{ request()->is('resources/faq') ? 'active' : '' }}">FAQ</a>
+    <a href="/resources/faq" class="{{ request()->is('resources/faq') ? 'active' : '' }}">Resources FAQ</a>
 @endsection
 
 @section('footer_links')
+    <a href="/firearm-storage-pretoria" style="font-size:13px;color:rgba(255,255,255,0.35);">Pretoria storage</a>
+    <a href="/secure-firearm-storage-faq" style="font-size:13px;color:rgba(255,255,255,0.35);">Storage FAQ</a>
     <a href="/resources/about" style="font-size:13px;color:rgba(255,255,255,0.35);">About Storage</a>
     <a href="/resources/safe-custody" style="font-size:13px;color:rgba(255,255,255,0.35);">Safe Custody Guide</a>
     <a href="/resources/fca-requirements" style="font-size:13px;color:rgba(255,255,255,0.35);">FCA Requirements</a>
-    <a href="/resources/faq" style="font-size:13px;color:rgba(255,255,255,0.35);">FAQ</a>
+    <a href="/resources/faq" style="font-size:13px;color:rgba(255,255,255,0.35);">Resources FAQ</a>
 @endsection
 
 @section('content')

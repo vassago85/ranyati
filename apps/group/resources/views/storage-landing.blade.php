@@ -367,6 +367,15 @@
                     </div>
                 </div>
             </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.04); padding: 20px 0 12px;">
+                <nav aria-label="Guides" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin-bottom:12px;">
+                    <a href="https://ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">Ranyati Group</a>
+                    <a href="/firearm-storage-pretoria" style="font-size:12px;color:rgba(255,255,255,0.4);">Firearm storage Pretoria</a>
+                    <a href="/secure-firearm-storage-faq" style="font-size:12px;color:rgba(255,255,255,0.4);">Storage FAQ</a>
+                    <a href="https://motivations.ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">Licence motivations</a>
+                    <a href="https://nrapa.ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">NRAPA</a>
+                </nav>
+            </div>
             <div style="border-top: 1px solid rgba(255,255,255,0.04); padding: 24px 0;">
                 <p style="text-align: center; font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.15);">
                     &copy; {{ date('Y') }} Ranyati Firearm Motivations (Pty) Ltd. All rights reserved.

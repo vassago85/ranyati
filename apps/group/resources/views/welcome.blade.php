@@ -399,6 +399,15 @@
                     </div>
                 </div>
             </div>
+            <div style="border-top: 1px solid rgba(255,255,255,0.04); padding: 20px 0 12px;">
+                <nav aria-label="Site pages" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 18px;margin-bottom:16px;">
+                    <a href="/about" style="font-size:12px;color:rgba(255,255,255,0.4);">About Ranyati Group</a>
+                    <a href="/services" style="font-size:12px;color:rgba(255,255,255,0.4);">Services overview</a>
+                    <a href="/guides" style="font-size:12px;color:rgba(255,255,255,0.4);">Guides hub</a>
+                    <a href="/faq" style="font-size:12px;color:rgba(255,255,255,0.4);">FAQ</a>
+                    <a href="/contact" style="font-size:12px;color:rgba(255,255,255,0.4);">Contact</a>
+                </nav>
+            </div>
             <div style="border-top: 1px solid rgba(255,255,255,0.04); padding: 24px 0;">
                 <p style="text-align: center; font-size: 10px; letter-spacing: 0.1em; color: rgba(255,255,255,0.15);">
                     &copy; {{ date('Y') }} Ranyati Firearm Motivations (Pty) Ltd. All rights reserved.
