@@ -23,8 +23,8 @@ RUN apk add --no-cache \
     oniguruma-dev \
     icu-dev
 
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) \
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+RUN install-php-extensions \
     pdo_mysql \
     mbstring \
     exif \
