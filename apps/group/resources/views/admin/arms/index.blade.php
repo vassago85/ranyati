@@ -63,15 +63,27 @@
                             </td>
                             <td style="font-weight: 600; color: #fff;">{{ $listing->make }} {{ $listing->model }}</td>
                             <td>{{ $listing->calibre }}</td>
-                            <td style="font-weight: 600; color: #fff;">R{{ number_format($listing->price, 0) }}</td>
                             <td>
-                                @if($listing->status === 'active')
-                                    <span class="badge badge-green">Active</span>
-                                @elseif($listing->status === 'reduced')
-                                    <span class="badge badge-orange">Reduced</span>
+                                @if($listing->original_price && $listing->original_price > $listing->price)
+                                    <div style="font-size: 11px; color: rgba(255,255,255,0.25); text-decoration: line-through;">R{{ number_format($listing->original_price, 0) }}</div>
+                                    <div style="font-weight: 700; color: #ef4444;">R{{ number_format($listing->price, 0) }}</div>
                                 @else
-                                    <span class="badge badge-zinc">Archived</span>
+                                    <div style="font-weight: 600; color: #fff;">R{{ number_format($listing->price, 0) }}</div>
                                 @endif
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                                    @if($listing->status === 'active')
+                                        <span class="badge badge-green">Active</span>
+                                    @elseif($listing->status === 'reduced')
+                                        <span class="badge badge-orange">Reduced</span>
+                                    @else
+                                        <span class="badge badge-zinc">Archived</span>
+                                    @endif
+                                    @if($listing->original_price && $listing->original_price > $listing->price)
+                                        <span class="badge" style="background: rgba(239,68,68,0.15); color: #ef4444;">Price Reduced</span>
+                                    @endif
+                                </div>
                             </td>
                             <td>{{ $listing->featured_at?->format('d M Y') ?? '—' }}</td>
                             <td>{{ $listing->enquiries()->count() }}</td>
