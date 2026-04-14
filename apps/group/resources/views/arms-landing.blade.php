@@ -264,13 +264,13 @@
                                 </h3>
 
                                 @if($listing->accessories)
-                                    <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.3);">
-                                        <span style="color: rgba(255,255,255,0.5); font-weight: 600;">Includes:</span> {{ $listing->accessories }}
+                                    <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.5);">
+                                        <span style="color: rgba(255,255,255,0.65); font-weight: 600;">Includes:</span> {{ $listing->accessories }}
                                     </p>
                                 @endif
 
                                 @if($listing->description)
-                                    <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.25);">
+                                    <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.45);">
                                         {{ Str::limit($listing->description, 120) }}
                                     </p>
                                 @endif
