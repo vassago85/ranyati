@@ -10,7 +10,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $email = env('ADMIN_EMAIL', 'paul@charsley.co.za');
-        $password = env('ADMIN_PASSWORD', 'changeme');
+        $password = env('ADMIN_PASSWORD', 'ChangeMe2026!');
 
         User::updateOrCreate(
             ['email' => $email],

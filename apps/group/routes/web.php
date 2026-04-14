@@ -1,6 +1,9 @@
 <?php
 
+use App\Mail\NewArmsEnquiry;
 use App\Mail\NewMotivationEnquiry;
+use App\Models\ArmsEnquiry;
+use App\Models\ArmsListing;
 use App\Models\MotivationEnquiry;
 use App\Models\Setting;
 use App\Models\User;
@@ -11,6 +14,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 Route::get('/', function () {
     $host = request()->getHost();
@@ -21,6 +25,12 @@ Route::get('/', function () {
 
     if (str_starts_with($host, 'storage.')) {
         return view('storage-landing');
+    }
+
+    if (str_starts_with($host, 'arms.')) {
+        return view('arms-landing', [
+            'listings' => ArmsListing::prioritised()->get(),
+        ]);
     }
 
     return view('welcome');
@@ -104,6 +114,11 @@ Route::get('/sitemap.xml', function () {
             '/resources/fca-requirements'=> ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/resources/faq'             => ['priority' => '0.8', 'changefreq' => 'weekly',  'lastmod' => $today],
         ];
+    } elseif (str_starts_with($host, 'arms.')) {
+        $base = 'https://arms.ranyati.co.za';
+        $pages = [
+            '' => ['priority' => '1.0', 'changefreq' => 'daily', 'lastmod' => $today],
+        ];
     } else {
         $base = 'https://ranyati.co.za';
         $pages = [
@@ -138,6 +153,8 @@ Route::get('/robots.txt', function () {
         $sitemap = 'https://motivations.ranyati.co.za/sitemap.xml';
     } elseif (str_starts_with($host, 'storage.')) {
         $sitemap = 'https://storage.ranyati.co.za/sitemap.xml';
+    } elseif (str_starts_with($host, 'arms.')) {
+        $sitemap = 'https://arms.ranyati.co.za/sitemap.xml';
     } else {
         $sitemap = 'https://ranyati.co.za/sitemap.xml';
     }
@@ -151,7 +168,7 @@ Route::get('/robots.txt', function () {
 
 $apexOnly = function (): void {
     $h = request()->getHost();
-    abort_if(str_starts_with($h, 'motivations.') || str_starts_with($h, 'storage.'), 404);
+    abort_if(str_starts_with($h, 'motivations.') || str_starts_with($h, 'storage.') || str_starts_with($h, 'arms.'), 404);
 };
 
 $motivationsOnly = function (): void {
@@ -161,6 +178,35 @@ $motivationsOnly = function (): void {
 $storageOnly = function (): void {
     abort_unless(str_starts_with(request()->getHost(), 'storage.'), 404);
 };
+
+$armsOnly = function (): void {
+    abort_unless(str_starts_with(request()->getHost(), 'arms.'), 404);
+};
+
+// ── Arms public routes ──────────────────────────────────────────
+
+Route::post('/listing/{listing}/enquire', function (Request $request, ArmsListing $listing) use ($armsOnly) {
+    $armsOnly();
+
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'nullable|string|max:50',
+        'message' => 'nullable|string|max:2000',
+    ]);
+
+    $validated['arms_listing_id'] = $listing->id;
+
+    $enquiry = ArmsEnquiry::create($validated);
+
+    try {
+        Mail::send(new NewArmsEnquiry($enquiry));
+    } catch (\Throwable $e) {
+        // Enquiry is saved regardless of mail failure
+    }
+
+    return response()->json(['success' => true, 'message' => 'Thank you! Your enquiry has been sent.']);
+})->name('arms.enquire');
 
 Route::get('/about', function () use ($apexOnly) {
     $apexOnly();
@@ -469,6 +515,119 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             return back()->with('error', 'Failed to send test email: ' . $e->getMessage());
         }
     })->name('settings.test');
+
+    // ── Arms Listings Management ────────────────────────────────
+
+    Route::get('/arms', function () {
+        return view('admin.arms.index', [
+            'listings' => ArmsListing::latest('featured_at')->paginate(25),
+        ]);
+    })->name('arms');
+
+    Route::get('/arms/create', function () {
+        return view('admin.arms.form', ['listing' => null]);
+    })->name('arms.create');
+
+    Route::post('/arms', function (Request $request) {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'make' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'calibre' => 'required|string|max:255',
+            'accessories' => 'nullable|string|max:2000',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:5000',
+            'images' => 'nullable|array|max:4',
+            'images.*' => 'image|max:5120',
+        ]);
+
+        $imagePaths = [];
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $imagePaths[] = $image->store('arms', 'public');
+            }
+        }
+
+        ArmsListing::create([
+            ...\Illuminate\Support\Arr::except($validated, ['images']),
+            'images' => $imagePaths,
+            'status' => 'active',
+            'featured_at' => now(),
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()->route('admin.arms')->with('success', 'Listing created.');
+    })->name('arms.store');
+
+    Route::get('/arms/{listing}/edit', function (ArmsListing $listing) {
+        return view('admin.arms.form', compact('listing'));
+    })->name('arms.edit');
+
+    Route::put('/arms/{listing}', function (Request $request, ArmsListing $listing) {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'make' => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'calibre' => 'required|string|max:255',
+            'accessories' => 'nullable|string|max:2000',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string|max:5000',
+            'images' => 'nullable|array|max:4',
+            'images.*' => 'image|max:5120',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'integer',
+        ]);
+
+        $currentImages = $listing->images ?? [];
+
+        $removeIndexes = $request->input('remove_images', []);
+        if (! empty($removeIndexes)) {
+            foreach ($removeIndexes as $idx) {
+                if (isset($currentImages[$idx])) {
+                    Storage::disk('public')->delete($currentImages[$idx]);
+                    unset($currentImages[$idx]);
+                }
+            }
+            $currentImages = array_values($currentImages);
+        }
+
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                if (count($currentImages) >= 4) break;
+                $currentImages[] = $image->store('arms', 'public');
+            }
+        }
+
+        $listing->update([
+            ...\Illuminate\Support\Arr::except($validated, ['images', 'remove_images']),
+            'images' => $currentImages,
+        ]);
+
+        return redirect()->route('admin.arms')->with('success', 'Listing updated.');
+    })->name('arms.update');
+
+    Route::delete('/arms/{listing}', function (ArmsListing $listing) {
+        if ($listing->images) {
+            foreach ($listing->images as $path) {
+                Storage::disk('public')->delete($path);
+            }
+        }
+        $listing->delete();
+
+        return redirect()->route('admin.arms')->with('success', 'Listing deleted.');
+    })->name('arms.delete');
+
+    Route::post('/arms/{listing}/feature', function (ArmsListing $listing) {
+        $listing->feature();
+
+        return back()->with('success', 'Listing re-featured.');
+    })->name('arms.feature');
+
+    Route::post('/arms/{listing}/archive', function (ArmsListing $listing) {
+        $listing->archive();
+
+        return back()->with('success', 'Listing archived.');
+    })->name('arms.archive');
 
     // ── User Management (developer & owner only) ───────────────
 
