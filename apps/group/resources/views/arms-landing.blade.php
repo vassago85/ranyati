@@ -464,7 +464,7 @@
             </button>
 
             {{-- Main image --}}
-            <img :src="lightbox.images[lightbox.idx]" alt="" style="max-width: min(700px, 80vw); max-height: 60vh; object-fit: contain; border-radius: 8px;" @click.stop>
+            <img :src="lightbox.images[lightbox.idx]" alt="" style="max-width: min(550px, 70vw); max-height: 50vh; width: auto; height: auto; object-fit: contain; border-radius: 8px;" @click.stop>
 
             {{-- Thumbnail strip --}}
             <div x-show="lightbox.images.length > 1" style="display: flex; gap: 8px; margin-top: 16px; padding: 0 16px;" @click.stop>
