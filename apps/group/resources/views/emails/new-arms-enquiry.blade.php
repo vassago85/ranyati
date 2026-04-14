@@ -23,7 +23,12 @@
         <div class="listing-box">
             <strong>{{ $listing->make }} {{ $listing->model }}</strong><br>
             Calibre: {{ $listing->calibre }}<br>
-            Asking price: R{{ number_format($listing->price, 2) }}
+            @if($listing->original_price && $listing->original_price > $listing->price)
+                Original price: <span style="text-decoration: line-through;">R{{ number_format($listing->original_price, 2) }}</span><br>
+                <strong style="color: #C45A3C;">Reduced price: R{{ number_format($listing->price, 2) }}</strong>
+            @else
+                Asking price: R{{ number_format($listing->price, 2) }}
+            @endif
             @if($listing->accessories)
                 <br>Accessories: {{ $listing->accessories }}
             @endif

@@ -33,15 +33,22 @@
                 @csrf
                 @if($listing) @method('PUT') @endif
 
+                <div class="form-group">
+                    <label class="form-label">Title</label>
+                    <input type="text" name="title" class="form-input" value="{{ old('title', $listing?->title) }}" placeholder="e.g. Glock 19 Gen 5 — Excellent Condition" required>
+                    <div class="form-hint">A short descriptive title for the listing</div>
+                </div>
+
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div class="form-group">
-                        <label class="form-label">Title</label>
-                        <input type="text" name="title" class="form-input" value="{{ old('title', $listing?->title) }}" placeholder="e.g. Glock 19 Gen 5 — Excellent Condition" required>
-                        <div class="form-hint">A short descriptive title for the listing</div>
+                        <label class="form-label">Selling Price (ZAR)</label>
+                        <input type="number" name="price" class="form-input" value="{{ old('price', $listing?->price) }}" placeholder="15000" step="0.01" min="0" required>
+                        <div class="form-hint">Current asking price shown on the listing</div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Price (ZAR)</label>
-                        <input type="number" name="price" class="form-input" value="{{ old('price', $listing?->price) }}" placeholder="15000" step="0.01" min="0" required>
+                        <label class="form-label">Original Price (ZAR)</label>
+                        <input type="number" name="original_price" class="form-input" value="{{ old('original_price', $listing?->original_price) }}" placeholder="Leave blank if not reduced" step="0.01" min="0">
+                        <div class="form-hint">Set this when reducing — the original price will show struck through</div>
                     </div>
                 </div>
 

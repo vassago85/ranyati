@@ -236,6 +236,9 @@
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($listings as $listing)
                         <div class="card-listing rounded-2xl flex flex-col" x-data="{ hovered: false }" @mouseenter="hovered = true" @mouseleave="hovered = false">
+                            @if($listing->original_price && $listing->original_price > $listing->price)
+                                <div style="position: absolute; top: 16px; left: 16px; z-index: 10; background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 4px;">Reduced</div>
+                            @endif
                             {{-- Image --}}
                             <div style="padding: 12px 12px 0;">
                                 @if($listing->images && count($listing->images) > 0)
@@ -278,9 +281,18 @@
                                 <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between;">
                                     <div>
                                         <span style="font-size: 11px; color: rgba(255,255,255,0.25); font-weight: 500;">Asking Price</span>
-                                        <div style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.02em;">
-                                            R{{ number_format($listing->price, 0) }}
-                                        </div>
+                                        @if($listing->original_price && $listing->original_price > $listing->price)
+                                            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.25); text-decoration: line-through; letter-spacing: -0.01em;">
+                                                R{{ number_format($listing->original_price, 0) }}
+                                            </div>
+                                            <div style="font-size: 20px; font-weight: 800; color: #ef4444; letter-spacing: -0.02em;">
+                                                R{{ number_format($listing->price, 0) }}
+                                            </div>
+                                        @else
+                                            <div style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.02em;">
+                                                R{{ number_format($listing->price, 0) }}
+                                            </div>
+                                        @endif
                                     </div>
                                     <button
                                         @click="openEnquiry({{ $listing->id }}, '{{ addslashes($listing->make) }} {{ addslashes($listing->model) }}', '{{ addslashes($listing->calibre) }}', 'R{{ number_format($listing->price, 0) }}')"
@@ -303,7 +315,7 @@
         </div>
     </section>
 
-    {{-- Enquiry Modal --}}
+    {{-- Enquiry Modal (3-step OTP flow) --}}
     <template x-if="showModal">
         <div class="modal-backdrop" @click.self="closeModal()" @keydown.escape.window="closeModal()">
             <div class="modal-box" @click.stop>
@@ -324,32 +336,87 @@
                     </div>
                 </div>
 
-                <form @submit.prevent="submitEnquiry()">
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Full Name *</label>
-                        <input type="text" x-model="form.name" class="form-input" placeholder="Your full name" required>
-                    </div>
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Email *</label>
-                        <input type="email" x-model="form.email" class="form-input" placeholder="your@email.com" required>
-                    </div>
-                    <div style="margin-bottom: 16px;">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Phone</label>
-                        <input type="tel" x-model="form.phone" class="form-input" placeholder="+27 ...">
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Message</label>
-                        <textarea x-model="form.message" class="form-input" rows="3" placeholder="Any questions or details..." style="resize: vertical;"></textarea>
-                    </div>
+                {{-- Step indicator --}}
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 24px;">
+                    <div style="flex: 1; height: 3px; border-radius: 2px;" :style="step >= 1 ? 'background: rgba(196,90,60,0.6)' : 'background: rgba(255,255,255,0.06)'"></div>
+                    <div style="flex: 1; height: 3px; border-radius: 2px;" :style="step >= 2 ? 'background: rgba(196,90,60,0.6)' : 'background: rgba(255,255,255,0.06)'"></div>
+                    <div style="flex: 1; height: 3px; border-radius: 2px;" :style="step >= 3 ? 'background: rgba(196,90,60,0.6)' : 'background: rgba(255,255,255,0.06)'"></div>
+                </div>
 
-                    <div x-show="formError" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #ef4444;" x-text="formError"></div>
-                    <div x-show="formSuccess" style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #34d399;" x-text="formSuccess"></div>
+                {{-- Error / Success messages --}}
+                <div x-show="formError" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #ef4444;" x-text="formError"></div>
+                <div x-show="formSuccess" style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #34d399;" x-text="formSuccess"></div>
 
-                    <button type="submit" class="btn-cta rounded-lg text-[13px] font-bold text-white tracking-wide" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;" :disabled="formLoading">
-                        <span x-show="!formLoading">Send Enquiry</span>
-                        <span x-show="formLoading">Sending...</span>
-                    </button>
-                </form>
+                {{-- Step 1: Email --}}
+                <div x-show="step === 1">
+                    <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 16px;">
+                        We'll send a verification code to your email to confirm your identity.
+                    </p>
+                    <form @submit.prevent="sendOtp()">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Email Address *</label>
+                            <input type="email" x-model="form.email" class="form-input" placeholder="your@email.com" required>
+                        </div>
+                        <button type="submit" class="btn-cta rounded-lg text-[13px] font-bold text-white tracking-wide" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;" :disabled="formLoading">
+                            <span x-show="!formLoading">Send Verification Code</span>
+                            <span x-show="formLoading">Sending...</span>
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Step 2: OTP Verification --}}
+                <div x-show="step === 2">
+                    <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 4px;">
+                        A 6-digit code has been sent to:
+                    </p>
+                    <p style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 16px;" x-text="form.email"></p>
+                    <form @submit.prevent="verifyOtp()">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Verification Code *</label>
+                            <input type="text" x-model="form.otp" class="form-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" required style="text-align: center; font-size: 20px; font-weight: 700; letter-spacing: 6px;">
+                        </div>
+                        <button type="submit" class="btn-cta rounded-lg text-[13px] font-bold text-white tracking-wide" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;" :disabled="formLoading">
+                            <span x-show="!formLoading">Verify Code</span>
+                            <span x-show="formLoading">Verifying...</span>
+                        </button>
+                    </form>
+                    <div style="margin-top: 12px; text-align: center;">
+                        <button @click="step = 1; formError = ''" style="font-size: 12px; color: rgba(255,255,255,0.3); background: none; border: none; cursor: pointer; text-decoration: underline;">
+                            Use a different email
+                        </button>
+                        <span style="color: rgba(255,255,255,0.1); margin: 0 6px;">&middot;</span>
+                        <button @click="resendOtp()" :disabled="resendCooldown > 0" style="font-size: 12px; color: rgba(196,90,60,0.6); background: none; border: none; cursor: pointer; text-decoration: underline;" :style="resendCooldown > 0 ? 'opacity:0.3;cursor:not-allowed;' : ''">
+                            <span x-show="resendCooldown <= 0">Resend code</span>
+                            <span x-show="resendCooldown > 0" x-text="'Resend in ' + resendCooldown + 's'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                {{-- Step 3: Details --}}
+                <div x-show="step === 3">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 12px; background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.15); border-radius: 8px;">
+                        <svg style="width: 16px; height: 16px; color: #34d399; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                        <span style="font-size: 12px; color: rgba(52,211,153,0.8);">Email verified: <strong x-text="form.email" style="color: #34d399;"></strong></span>
+                    </div>
+                    <form @submit.prevent="submitEnquiry()">
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Full Name *</label>
+                            <input type="text" x-model="form.name" class="form-input" placeholder="Your full name" required>
+                        </div>
+                        <div style="margin-bottom: 16px;">
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Phone</label>
+                            <input type="tel" x-model="form.phone" class="form-input" placeholder="+27 ...">
+                        </div>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Comments</label>
+                            <textarea x-model="form.message" class="form-input" rows="3" placeholder="Any questions or details..." style="resize: vertical;"></textarea>
+                        </div>
+                        <button type="submit" class="btn-cta rounded-lg text-[13px] font-bold text-white tracking-wide" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;" :disabled="formLoading">
+                            <span x-show="!formLoading">Send Enquiry</span>
+                            <span x-show="formLoading">Sending...</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </template>
@@ -392,22 +459,82 @@
     function armsApp() {
         return {
             showModal: false,
+            step: 1,
             modalListing: { id: null, name: '', calibre: '', price: '', label: '' },
-            form: { name: '', email: '', phone: '', message: '' },
+            form: { name: '', email: '', phone: '', message: '', otp: '' },
             formLoading: false,
             formError: '',
             formSuccess: '',
+            resendCooldown: 0,
+            _resendTimer: null,
 
             openEnquiry(id, name, calibre, price) {
                 this.modalListing = { id, name, calibre, price, label: name + ' — ' + calibre };
-                this.form = { name: '', email: '', phone: '', message: '' };
+                this.form = { name: '', email: '', phone: '', message: '', otp: '' };
                 this.formError = '';
                 this.formSuccess = '';
+                this.step = 1;
+                this.resendCooldown = 0;
                 this.showModal = true;
             },
 
             closeModal() {
                 this.showModal = false;
+                if (this._resendTimer) { clearInterval(this._resendTimer); this._resendTimer = null; }
+            },
+
+            _startResendCooldown() {
+                this.resendCooldown = 60;
+                if (this._resendTimer) clearInterval(this._resendTimer);
+                this._resendTimer = setInterval(() => {
+                    this.resendCooldown--;
+                    if (this.resendCooldown <= 0) { clearInterval(this._resendTimer); this._resendTimer = null; }
+                }, 1000);
+            },
+
+            async sendOtp() {
+                this.formError = '';
+                if (!this.form.email) { this.formError = 'Please enter your email.'; return; }
+                this.formLoading = true;
+
+                try {
+                    const res = await fetch('/arms/send-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({ email: this.form.email }),
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        this.formError = data.error || data.message || 'Failed to send code.';
+                    } else {
+                        this.step = 2;
+                        this.form.otp = '';
+                        this._startResendCooldown();
+                    }
+                } catch (e) {
+                    this.formError = 'Network error. Please try again.';
+                } finally {
+                    this.formLoading = false;
+                }
+            },
+
+            async resendOtp() {
+                if (this.resendCooldown > 0) return;
+                await this.sendOtp();
+            },
+
+            verifyOtp() {
+                this.formError = '';
+                if (!this.form.otp || this.form.otp.length !== 6) {
+                    this.formError = 'Please enter the 6-digit code.';
+                    return;
+                }
+                this.step = 3;
             },
 
             async submitEnquiry() {
@@ -423,21 +550,32 @@
                             'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         },
-                        body: JSON.stringify(this.form),
+                        body: JSON.stringify({
+                            name: this.form.name,
+                            email: this.form.email,
+                            phone: this.form.phone,
+                            message: this.form.message,
+                            otp: this.form.otp,
+                        }),
                     });
 
                     const data = await res.json();
 
                     if (!res.ok) {
-                        const errors = data.errors;
-                        if (errors) {
-                            this.formError = Object.values(errors).flat().join(' ');
+                        if (data.error) {
+                            this.formError = data.error;
+                            if (data.error.toLowerCase().includes('verification code')) {
+                                this.step = 2;
+                                this.form.otp = '';
+                            }
+                        } else if (data.errors) {
+                            this.formError = Object.values(data.errors).flat().join(' ');
                         } else {
                             this.formError = data.message || 'Something went wrong.';
                         }
                     } else {
                         this.formSuccess = data.message || 'Enquiry sent successfully!';
-                        this.form = { name: '', email: '', phone: '', message: '' };
+                        this.form = { name: '', email: '', phone: '', message: '', otp: '' };
                         setTimeout(() => this.closeModal(), 2500);
                     }
                 } catch (e) {

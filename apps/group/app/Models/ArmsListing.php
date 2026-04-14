@@ -16,6 +16,7 @@ class ArmsListing extends Model
         'calibre',
         'accessories',
         'price',
+        'original_price',
         'description',
         'images',
         'status',
@@ -29,6 +30,7 @@ class ArmsListing extends Model
         return [
             'images' => 'array',
             'price' => 'decimal:2',
+            'original_price' => 'decimal:2',
             'featured_at' => 'datetime',
             'archived_at' => 'datetime',
         ];

@@ -185,6 +185,36 @@ $armsOnly = function (): void {
 
 // ── Arms public routes ──────────────────────────────────────────
 
+Route::post('/arms/send-otp', function (Request $request) use ($armsOnly) {
+    $armsOnly();
+
+    $request->validate(['email' => 'required|email|max:255']);
+
+    $email = strtolower(trim($request->email));
+    $rateLimitKey = 'arms-otp-send:' . $email;
+
+    if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
+        return response()->json([
+            'error' => 'Too many attempts. Please wait ' . RateLimiter::availableIn($rateLimitKey) . ' seconds.',
+        ], 429);
+    }
+
+    RateLimiter::hit($rateLimitKey, 120);
+
+    $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+    Cache::put("arms-otp:{$email}", $code, now()->addMinutes(10));
+
+    try {
+        Mail::send('emails.arms-otp-verification', ['code' => $code], function ($message) use ($email) {
+            $message->to($email)->subject('Your Verification Code — Ranyati Arms');
+        });
+    } catch (\Throwable $e) {
+        return response()->json(['error' => 'Failed to send verification email. Please try again.'], 500);
+    }
+
+    return response()->json(['message' => 'Verification code sent.']);
+})->name('arms.send-otp');
+
 Route::post('/listing/{listing}/enquire', function (Request $request, ArmsListing $listing) use ($armsOnly) {
     $armsOnly();
 
@@ -193,16 +223,29 @@ Route::post('/listing/{listing}/enquire', function (Request $request, ArmsListin
         'email' => 'required|email|max:255',
         'phone' => 'nullable|string|max:50',
         'message' => 'nullable|string|max:2000',
+        'otp' => 'required|string|size:6',
     ]);
 
-    $validated['arms_listing_id'] = $listing->id;
+    $email = strtolower(trim($validated['email']));
+    $cachedCode = Cache::get("arms-otp:{$email}");
 
-    $enquiry = ArmsEnquiry::create($validated);
+    if (! $cachedCode || $cachedCode !== $validated['otp']) {
+        return response()->json(['error' => 'Invalid or expired verification code.'], 422);
+    }
+
+    Cache::forget("arms-otp:{$email}");
+
+    $enquiry = ArmsEnquiry::create([
+        'arms_listing_id' => $listing->id,
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'phone' => $validated['phone'] ?? null,
+        'message' => $validated['message'] ?? null,
+    ]);
 
     try {
         Mail::send(new NewArmsEnquiry($enquiry));
     } catch (\Throwable $e) {
-        // Enquiry is saved regardless of mail failure
     }
 
     return response()->json(['success' => true, 'message' => 'Thank you! Your enquiry has been sent.']);
@@ -536,6 +579,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'calibre' => 'required|string|max:255',
             'accessories' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0',
+            'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
             'images' => 'nullable|array|max:4',
             'images.*' => 'image|max:5120',
@@ -571,6 +615,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'calibre' => 'required|string|max:255',
             'accessories' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0',
+            'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
             'images' => 'nullable|array|max:4',
             'images.*' => 'image|max:5120',
@@ -628,6 +673,27 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         return back()->with('success', 'Listing archived.');
     })->name('arms.archive');
+
+    // ── Arms Enquiries ─────────────────────────────────────────
+
+    Route::get('/arms/enquiries', function () {
+        return view('admin.arms.enquiries', [
+            'enquiries' => ArmsEnquiry::with('listing')->latest()->paginate(25),
+            'unreadCount' => ArmsEnquiry::whereNull('read_at')->count(),
+        ]);
+    })->name('arms.enquiries');
+
+    Route::post('/arms/enquiries/{enquiry}/read', function (ArmsEnquiry $enquiry) {
+        $enquiry->update(['read_at' => now()]);
+
+        return back()->with('success', 'Marked as read.');
+    })->name('arms.enquiries.read');
+
+    Route::post('/arms/enquiries/mark-all-read', function () {
+        ArmsEnquiry::whereNull('read_at')->update(['read_at' => now()]);
+
+        return back()->with('success', 'All arms enquiries marked as read.');
+    })->name('arms.enquiries.mark-all-read');
 
     // ── User Management (developer & owner only) ───────────────
 
