@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Firearm Licence Motivation for Sport Shooting | South Africa')
-@section('description', 'Expert assistance with firearm licence motivations for dedicated and recreational sport shooting in South Africa. Ranyati Motivations, a Ranyati Group division.')
+@section('title', 'Sport Shooting Firearm Licence Motivation | South Africa Guide')
+@section('description', 'Guidance on preparing a firearm licence motivation for sport shooting in South Africa. Covers dedicated status requirements, club membership, and what SAPS expects in your application.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')

@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Resources')
-@section('description', 'Guides, FAQs, and information about firearm motivations, the licensing process, and compliance in South Africa.')
+@section('title', 'Firearm Licence Resources South Africa | Guides & Requirements')
+@section('description', 'Practical guides on firearm licensing in South Africa — renewal requirements, motivation writing, dedicated status, compliance, and step-by-step help for new and existing licence holders.')
 
 @section('site_name', 'Ranyati Motivations')
 @section('home_url', '/')

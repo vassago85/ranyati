@@ -1,7 +1,7 @@
 @extends('layouts.seo-apex')
 
-@section('title', 'Firearm Services | Motivations, NRAPA Membership & Storage | Ranyati Group')
-@section('description', 'Ranyati Motivations and NRAPA assist clients across South Africa. Secure firearm storage is available in Pretoria only.')
+@section('title', 'Firearm Licence Services South Africa | Motivations, Membership & Storage')
+@section('description', 'Firearm licence motivations, NRAPA dedicated status membership, and secure storage — nationwide support from Ranyati Group. Understand what each service covers and how we can help.')
 @section('heading', 'Our services')
 
 @section('content')

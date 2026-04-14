@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Firearm Licence Motivation for Hunting | South Africa')
-@section('description', 'Professional motivations for hunting-purpose firearm licences in South Africa. Ranyati Motivations helps lawful hunters prepare FCA-aligned documentation under Ranyati Group.')
+@section('title', 'Hunting Firearm Licence Motivation | South Africa Guide')
+@section('description', 'How to prepare a hunting motivation for your firearm licence in South Africa. Covers calibre suitability, proof of hunting access, and dedicated hunter status requirements.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')

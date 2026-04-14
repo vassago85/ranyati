@@ -1,7 +1,7 @@
 @extends('layouts.seo-apex')
 
-@section('title', 'Guides & Resources | Firearm Licensing & Compliance | Ranyati Group')
-@section('description', 'Curated guides from Ranyati Group: motivations, NRAPA dedicated status, and secure storage. Links to in-depth articles on each division’s website.')
+@section('title', 'Firearm Licensing Guides South Africa | Step-by-Step Help | Ranyati Group')
+@section('description', 'Practical guides covering firearm licence renewals, motivation writing, dedicated shooter and hunter status, and compliance requirements in South Africa.')
 @section('heading', 'Guides & resources')
 
 @section('content')

@@ -1,7 +1,7 @@
 @extends('layouts.seo-apex')
 
-@section('title', 'FAQ | Ranyati Group — Motivations, NRAPA & Storage')
-@section('description', 'Frequently asked questions about Ranyati Group: nationwide motivations and NRAPA support; firearm storage in Pretoria only.')
+@section('title', 'Ranyati Group FAQ | Firearm Motivations, NRAPA & Storage Questions')
+@section('description', 'Common questions about firearm licence motivations, NRAPA dedicated status membership, and secure firearm storage in South Africa. Clear, honest answers from Ranyati Group.')
 
 @section('heading', 'Frequently asked questions')
 

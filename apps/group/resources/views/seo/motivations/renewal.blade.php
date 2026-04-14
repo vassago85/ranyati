@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Firearm Licence Renewal South Africa | Motivation & Support')
-@section('description', 'Guidance and professional motivation support for firearm licence renewals in South Africa. Ranyati Motivations helps you prepare renewal submissions under the Firearms Control Act.')
+@section('title', 'Firearm Licence Renewal South Africa | Requirements & Step-by-Step Help')
+@section('description', 'Step-by-step help with firearm licence renewal in South Africa. Understand the requirements, avoid common mistakes, and prepare a properly structured renewal motivation before your licence expires.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')

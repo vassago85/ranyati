@@ -6,8 +6,8 @@
     <meta name="google-site-verification" content="ofpn02fgz8G9-u_lZnCwMckrIFkddbLv68ZdBOMEMu8">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JV2NSWMYTQ"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JV2NSWMYTQ');</script>
-    <title>Ranyati Group — Firearm Administration Specialists Since 2006</title>
-    <meta name="description" content="Ranyati Group: nationwide firearm licence motivations and NRAPA membership support (based in Pretoria). Secure firearm storage is available in Pretoria only.">
+    <title>Ranyati Group | Firearm Licence Motivations, NRAPA Membership & Storage</title>
+    <meta name="description" content="Firearm licence motivations, NRAPA dedicated status membership, and secure firearm storage — all under one roof. Professional administration support across South Africa since 2006.">
     <link rel="canonical" href="https://ranyati.co.za/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Ranyati Group">

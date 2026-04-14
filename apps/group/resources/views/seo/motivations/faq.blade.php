@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Firearm Motivation FAQ | Ranyati Motivations South Africa')
-@section('description', 'Answers about firearm licence motivations, timelines, SAPS submissions, and how Ranyati Motivations works with Ranyati Group, NRAPA, and Storage.')
+@section('title', 'Firearm Licence Motivation FAQ | Common Questions Answered')
+@section('description', 'Answers to common questions about firearm licence motivations in South Africa — what to include, how long it takes, SAPS submission requirements, and when professional help is worth it.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')

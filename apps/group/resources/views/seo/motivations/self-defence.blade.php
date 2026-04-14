@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Firearm Licence Motivation for Self-Defence | South Africa')
-@section('description', 'Professional firearm licence motivation support for lawful self-defence in South Africa. Ranyati Motivations helps structure FCA-compliant motivation documents—part of Ranyati Group.')
+@section('title', 'Self-Defence Firearm Licence Motivation | South Africa Guide')
+@section('description', 'How to write a strong self-defence motivation for your firearm licence in South Africa. Learn what SAPS looks for, what to include, and how to avoid common reasons for refusal.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')
