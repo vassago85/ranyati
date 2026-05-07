@@ -34,6 +34,7 @@ services:
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
+      - app-storage:/var/www/html/storage/app/public
       - app-logs:/var/www/html/storage/logs
     networks:
       - ranyati-network
@@ -65,5 +66,6 @@ networks:
     driver: bridge
 
 volumes:
+  app-storage:
   app-logs:
   db-data:
