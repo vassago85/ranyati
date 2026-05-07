@@ -264,6 +264,103 @@
         }
         .btn-share-wa svg { width: 18px; height: 18px; }
         .listing-actions { display: flex; align-items: center; gap: 8px; }
+
+        /* Clickable card content area */
+        .listing-clickable {
+            cursor: pointer; flex: 1; display: flex; flex-direction: column;
+            min-height: 0;
+        }
+        .listing-clickable .listing-title { transition: color 0.18s; }
+        .listing-clickable:hover .listing-title { color: rgba(196,90,60,0.9); }
+        .listing-readmore {
+            display: inline-block; margin-left: 4px;
+            font-size: 11px; font-weight: 700; color: rgba(196,90,60,0.85);
+            text-transform: uppercase; letter-spacing: 0.08em;
+        }
+        .listing-clickable:hover .listing-readmore { color: #fff; }
+
+        /* ── Details modal ────────────────────────────────────── */
+        .details-box {
+            background: linear-gradient(180deg, #141018 0%, #0a070d 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; width: 100%; max-width: 720px;
+            max-height: 90vh; overflow-y: auto;
+            position: relative;
+        }
+        .details-close {
+            position: absolute; top: 14px; right: 14px; z-index: 2;
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); border: none; cursor: pointer;
+            color: rgba(255,255,255,0.6);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .details-close:hover { background: rgba(255,255,255,0.18); color: #fff; }
+        .details-close svg { width: 18px; height: 18px; }
+        .details-header {
+            padding: 28px 32px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .details-calibre {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.2em; color: rgba(196,90,60,0.7);
+        }
+        .details-title {
+            margin-top: 8px; font-size: 22px; font-weight: 800;
+            color: #fff; line-height: 1.2; letter-spacing: -0.02em;
+        }
+        .details-images {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 8px; padding: 20px 32px 0;
+        }
+        .details-images img {
+            width: 100%; aspect-ratio: 4/3; object-fit: cover;
+            border-radius: 8px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.18s, border-color 0.18s;
+        }
+        .details-images img:hover {
+            transform: translateY(-2px);
+            border-color: rgba(196,90,60,0.5);
+        }
+        .details-section { padding: 20px 32px 0; }
+        .details-section h4 {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.18em; color: rgba(255,255,255,0.35);
+            margin-bottom: 8px;
+        }
+        .details-section p {
+            font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.7);
+            white-space: pre-line; word-break: break-word;
+        }
+        .details-footer {
+            margin-top: 24px; padding: 20px 32px 28px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: space-between; gap: 16px;
+            flex-wrap: wrap;
+        }
+        .details-price-block { min-width: 0; }
+        .details-price-label {
+            font-size: 11px; color: rgba(255,255,255,0.3); font-weight: 500;
+        }
+        .details-price-strike {
+            font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.3);
+            text-decoration: line-through; letter-spacing: -0.01em;
+        }
+        .details-price {
+            font-size: 26px; font-weight: 800; color: #fff;
+            letter-spacing: -0.02em;
+        }
+        .details-price-reduced { color: #ef4444; }
+        .details-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        @media (max-width: 640px) {
+            .details-header { padding: 24px 20px 16px; }
+            .details-images { padding: 16px 20px 0; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+            .details-section { padding: 16px 20px 0; }
+            .details-footer { padding: 16px 20px 20px; }
+            .details-title { font-size: 19px; }
+            .details-price { font-size: 22px; }
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased text-white" x-data="armsApp()">
@@ -346,6 +443,21 @@
                                 url('/').'#listing-'.$listing->id,
                             ];
                             $shareUrl = 'https://wa.me/?text='.rawurlencode(implode("\n", $shareLines));
+                            $descTruncated = $listing->description && mb_strlen($listing->description) > 120;
+                            $listingData = [
+                                'id' => $listing->id,
+                                'make' => $listing->make,
+                                'model' => $listing->model,
+                                'calibre' => $listing->calibre,
+                                'priceFormatted' => 'R'.number_format($listing->price, 0),
+                                'originalPriceFormatted' => $listing->original_price && $listing->original_price > $listing->price
+                                    ? 'R'.number_format($listing->original_price, 0)
+                                    : null,
+                                'description' => $listing->description,
+                                'accessories' => $listing->accessories,
+                                'images' => $imgUrls->all(),
+                                'shareUrl' => $shareUrl,
+                            ];
                         @endphp
                         <div id="listing-{{ $listing->id }}" class="card-listing rounded-2xl flex flex-col" x-data="{ hovered: false, activeImg: 0, images: {{ $imgUrls->toJson() }} }" @mouseenter="hovered = true" @mouseleave="hovered = false">
                             @if($listing->original_price && $listing->original_price > $listing->price)
@@ -379,30 +491,32 @@
 
                             {{-- Content --}}
                             <div style="padding: 16px 20px 20px; flex: 1; display: flex; flex-direction: column;">
-                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                    <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(196,90,60,0.6);">{{ $listing->calibre }}</span>
-                                    @if($listing->status === 'reduced')
-                                        <span class="badge-reduced">Reduced Priority</span>
+                                <div class="listing-clickable" @click="openDetails(@js($listingData))" role="button" tabindex="0" @keydown.enter="openDetails(@js($listingData))" @keydown.space.prevent="openDetails(@js($listingData))">
+                                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(196,90,60,0.6);">{{ $listing->calibre }}</span>
+                                        @if($listing->status === 'reduced')
+                                            <span class="badge-reduced">Reduced Priority</span>
+                                        @endif
+                                    </div>
+
+                                    <h3 class="listing-title" style="margin-top: 8px; font-size: 17px; font-weight: 800; color: #fff; line-height: 1.3;">
+                                        {{ $listing->make }} {{ $listing->model }}
+                                    </h3>
+
+                                    @if($listing->accessories)
+                                        <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.5);">
+                                            <span style="color: rgba(255,255,255,0.65); font-weight: 600;">Includes:</span> {{ $listing->accessories }}
+                                        </p>
                                     @endif
+
+                                    @if($listing->description)
+                                        <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.45);">
+                                            {{ Str::limit($listing->description, 120) }}@if($descTruncated)<span class="listing-readmore">Read more</span>@endif
+                                        </p>
+                                    @endif
+
+                                    <div style="flex: 1;"></div>
                                 </div>
-
-                                <h3 style="margin-top: 8px; font-size: 17px; font-weight: 800; color: #fff; line-height: 1.3;">
-                                    {{ $listing->make }} {{ $listing->model }}
-                                </h3>
-
-                                @if($listing->accessories)
-                                    <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.5);">
-                                        <span style="color: rgba(255,255,255,0.65); font-weight: 600;">Includes:</span> {{ $listing->accessories }}
-                                    </p>
-                                @endif
-
-                                @if($listing->description)
-                                    <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.45);">
-                                        {{ Str::limit($listing->description, 120) }}
-                                    </p>
-                                @endif
-
-                                <div style="flex: 1;"></div>
 
                                 {{-- Price + CTA --}}
                                 <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between;">
@@ -446,6 +560,54 @@
 
         </div>
     </section>
+
+    {{-- Listing Details Modal --}}
+    <template x-if="detailsOpen">
+        <div class="modal-backdrop" style="z-index: 110;" @click.self="closeDetails()" @keydown.escape.window="closeDetails()">
+            <div class="details-box" @click.stop>
+                <button class="details-close" @click="closeDetails()" aria-label="Close">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                </button>
+
+                <div class="details-header">
+                    <div class="details-calibre" x-text="detailsListing.calibre"></div>
+                    <h3 class="details-title"><span x-text="detailsListing.make"></span> <span x-text="detailsListing.model"></span></h3>
+                </div>
+
+                <div x-show="detailsListing.images && detailsListing.images.length > 0" class="details-images">
+                    <template x-for="(img, i) in detailsListing.images" :key="i">
+                        <img :src="img" @click="openLightbox(detailsListing.images, i)" alt="" loading="lazy">
+                    </template>
+                </div>
+
+                <div x-show="detailsListing.accessories" class="details-section">
+                    <h4>Includes</h4>
+                    <p x-text="detailsListing.accessories"></p>
+                </div>
+
+                <div x-show="detailsListing.description" class="details-section">
+                    <h4>Description</h4>
+                    <p x-text="detailsListing.description"></p>
+                </div>
+
+                <div class="details-footer">
+                    <div class="details-price-block">
+                        <div class="details-price-label">Asking Price</div>
+                        <div x-show="detailsListing.originalPriceFormatted" class="details-price-strike" x-text="detailsListing.originalPriceFormatted"></div>
+                        <div class="details-price" :class="{ 'details-price-reduced': detailsListing.originalPriceFormatted }" x-text="detailsListing.priceFormatted"></div>
+                    </div>
+                    <div class="details-actions">
+                        <a :href="detailsListing.shareUrl" target="_blank" rel="noopener noreferrer" class="btn-share-wa" aria-label="Share on WhatsApp" title="Share on WhatsApp">
+                            <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                        </a>
+                        <button class="btn-cta rounded-lg px-6 py-2.5 text-[13px] font-bold text-white tracking-wide" @click="openEnquiry(detailsListing.id, detailsListing.make + ' ' + detailsListing.model, detailsListing.calibre, detailsListing.priceFormatted); closeDetails()">
+                            Enquire
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
 
     {{-- Enquiry Modal (3-step OTP flow) --}}
     <template x-if="showModal">
@@ -631,10 +793,24 @@
             _lbTouchX: 0,
             _lbTouchY: 0,
 
+            detailsOpen: false,
+            detailsListing: { id: null, make: '', model: '', calibre: '', priceFormatted: '', originalPriceFormatted: null, description: '', accessories: '', images: [], shareUrl: '' },
+
             init() {
                 this.$watch('lightbox.open', (open) => {
                     document.body.classList.toggle('lb-locked', !!open);
                 });
+                this.$watch('detailsOpen', (open) => {
+                    document.body.classList.toggle('lb-locked', !!open || this.lightbox.open);
+                });
+            },
+
+            openDetails(listing) {
+                this.detailsListing = listing;
+                this.detailsOpen = true;
+            },
+            closeDetails() {
+                this.detailsOpen = false;
             },
 
             openLightbox(images, startIdx) {
