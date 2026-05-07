@@ -620,7 +620,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
             'images' => 'nullable|array|max:10',
-            'images.*' => 'image|max:5120',
+            'images.*' => 'image|max:15360',
         ]);
 
         $imagePaths = [];
@@ -656,7 +656,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
             'images' => 'nullable|array|max:10',
-            'images.*' => 'image|max:5120',
+            'images.*' => 'image|max:15360',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'integer',
         ]);

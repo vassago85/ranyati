@@ -69,7 +69,7 @@
 
                 {{-- Image Manager --}}
                 <div class="form-group" x-data="imageManager()" x-init="init()">
-                    <label class="form-label">Images (max 10, up to 5MB each)</label>
+                    <label class="form-label">Images (max 10, up to 15MB each)</label>
 
                     {{-- Existing + new images grid --}}
                     <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; min-height: 90px;">
@@ -153,7 +153,7 @@
                             const toAdd = Array.from(files).slice(0, slots);
                             for (const file of toAdd) {
                                 if (!file.type.startsWith('image/')) { this.imageError = 'Only image files are accepted.'; continue; }
-                                if (file.size > 5 * 1024 * 1024) { this.imageError = 'Each image must be under 5MB.'; continue; }
+                                if (file.size > 15 * 1024 * 1024) { this.imageError = 'Each image must be under 15MB.'; continue; }
                                 this.newFiles.push({ file, preview: URL.createObjectURL(file) });
                                 this._dataTransfer.items.add(file);
                             }
