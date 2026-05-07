@@ -755,7 +755,7 @@
                 <button x-show="lightbox.images.length > 1" class="lb-nav lb-prev" @click.stop="lightboxPrev()" aria-label="Previous">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
                 </button>
-                <img :src="lightbox.images[lightbox.idx]" alt="" class="lb-img" @click.stop>
+                <img :src="lightboxCurrent" :key="lightbox.idx" alt="" class="lb-img" @click.stop>
                 <button x-show="lightbox.images.length > 1" class="lb-nav lb-next" @click.stop="lightboxNext()" aria-label="Next">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
                 </button>
@@ -814,12 +814,17 @@
             detailsListing: { id: null, make: '', model: '', calibre: '', priceFormatted: '', originalPriceFormatted: null, description: '', accessories: '', images: [], shareUrl: '' },
 
             init() {
-                this.$watch('lightbox.open', (open) => {
-                    document.body.classList.toggle('lb-locked', !!open);
+                this.$effect(() => {
+                    const locked = !!this.lightbox.open || !!this.detailsOpen;
+                    document.body.classList.toggle('lb-locked', locked);
                 });
-                this.$watch('detailsOpen', (open) => {
-                    document.body.classList.toggle('lb-locked', !!open || this.lightbox.open);
-                });
+            },
+
+            get lightboxCurrent() {
+                const imgs = this.lightbox.images;
+                if (!imgs || !imgs.length) return '';
+                const idx = ((this.lightbox.idx % imgs.length) + imgs.length) % imgs.length;
+                return imgs[idx] || '';
             },
 
             openDetails(listing) {
@@ -831,13 +836,23 @@
             },
 
             openLightbox(images, startIdx) {
-                this.lightbox = { open: true, images, idx: startIdx || 0 };
+                const plain = Array.isArray(images) ? images.slice() : Array.from(images || []);
+                const start = Number.isFinite(+startIdx) ? +startIdx : 0;
+                this.lightbox = {
+                    open: true,
+                    images: plain,
+                    idx: Math.max(0, Math.min(start, plain.length - 1)),
+                };
             },
             lightboxNext() {
-                this.lightbox.idx = (this.lightbox.idx + 1) % this.lightbox.images.length;
+                const len = this.lightbox.images.length;
+                if (!len) return;
+                this.lightbox.idx = (this.lightbox.idx + 1) % len;
             },
             lightboxPrev() {
-                this.lightbox.idx = (this.lightbox.idx - 1 + this.lightbox.images.length) % this.lightbox.images.length;
+                const len = this.lightbox.images.length;
+                if (!len) return;
+                this.lightbox.idx = (this.lightbox.idx - 1 + len) % len;
             },
             lightboxTouchStart(e) {
                 const t = e.touches[0];
