@@ -588,7 +588,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
-            'images' => 'nullable|array|max:4',
+            'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:5120',
         ]);
 
@@ -624,7 +624,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
-            'images' => 'nullable|array|max:4',
+            'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:5120',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'integer',

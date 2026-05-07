@@ -80,7 +80,7 @@
 
                 {{-- Image Manager --}}
                 <div class="form-group" x-data="imageManager()" x-init="init()">
-                    <label class="form-label">Images (max 4, up to 5MB each)</label>
+                    <label class="form-label">Images (max 10, up to 5MB each)</label>
 
                     {{-- Existing + new images grid --}}
                     <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; min-height: 90px;">
@@ -105,7 +105,7 @@
                         </template>
 
                         {{-- Drop zone / add button --}}
-                        <div x-show="totalCount() < 4"
+                        <div x-show="totalCount() < 10"
                             @click="$refs.fileInput.click()"
                             @dragover.prevent="dragging = true"
                             @dragleave.prevent="dragging = false"
@@ -126,7 +126,7 @@
                     </template>
 
                     <div class="form-hint" style="margin-top: 8px;">
-                        <span x-text="totalCount()"></span>/4 images. Click the + box or drag &amp; drop. JPG, PNG, WebP accepted.
+                        <span x-text="totalCount()"></span>/10 images. Click the + box or drag &amp; drop. JPG, PNG, WebP accepted.
                     </div>
 
                     <div x-show="imageError" style="margin-top: 8px; font-size: 12px; color: #ef4444;" x-text="imageError"></div>
@@ -158,8 +158,8 @@
 
                         addFiles(files) {
                             this.imageError = '';
-                            const slots = 4 - this.totalCount();
-                            if (slots <= 0) { this.imageError = 'Maximum 4 images allowed.'; return; }
+                            const slots = 10 - this.totalCount();
+                            if (slots <= 0) { this.imageError = 'Maximum 10 images allowed.'; return; }
 
                             const toAdd = Array.from(files).slice(0, slots);
                             for (const file of toAdd) {
