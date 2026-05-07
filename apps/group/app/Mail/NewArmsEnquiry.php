@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\ArmsEnquiry;
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -21,9 +22,10 @@ class NewArmsEnquiry extends Mailable
     {
         $listing = $this->enquiry->listing;
         $subject = "Enquiry: {$listing->make} {$listing->model} ({$listing->calibre}) — from {$this->enquiry->name}";
+        $recipient = Setting::get('arms_enquiry_email', 'info@firearmstorage.co.za');
 
         return new Envelope(
-            to: ['info@firearmstorage.co.za'],
+            to: array_map('trim', explode(',', $recipient)),
             subject: $subject,
         );
     }

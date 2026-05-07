@@ -66,9 +66,15 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="notification_email" class="form-label">Notification Recipient</label>
+                            <label for="notification_email" class="form-label">Motivation Enquiry Recipient</label>
                             <input type="email" id="notification_email" name="notification_email" class="form-input" placeholder="info@firearmmotivations.co.za" value="{{ $settings['notification_email'] ?? 'info@firearmmotivations.co.za' }}">
-                            <div class="form-hint">Enquiry notifications are sent to this address.</div>
+                            <div class="form-hint">Motivation enquiry notifications are sent to this address.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="arms_enquiry_email" class="form-label">Arms Enquiry Recipient</label>
+                            <input type="text" id="arms_enquiry_email" name="arms_enquiry_email" class="form-input" placeholder="info@firearmstorage.co.za" value="{{ $settings['arms_enquiry_email'] ?? 'info@firearmstorage.co.za' }}">
+                            <div class="form-hint">Firearm listing enquiries are sent here. Separate multiple addresses with commas.</div>
                         </div>
                     </div>
                 </div>

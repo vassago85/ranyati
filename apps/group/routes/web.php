@@ -506,6 +506,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::get('/settings', function () {
         $keys = ['mail_mailer', 'mailgun_domain', 'mailgun_secret', 'mailgun_endpoint',
                  'mail_from_name', 'mail_from_address', 'notification_email',
+                 'arms_enquiry_email',
                  'turnstile_site_key', 'turnstile_secret_key'];
         $settings = [];
         foreach ($keys as $key) {
@@ -524,7 +525,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::post('/settings', function (Request $request) {
         $fields = ['mail_mailer', 'mailgun_domain', 'mailgun_endpoint',
                    'mail_from_name', 'mail_from_address', 'notification_email',
-                   'turnstile_site_key'];
+                   'arms_enquiry_email', 'turnstile_site_key'];
 
         foreach ($fields as $field) {
             if ($request->has($field)) {
