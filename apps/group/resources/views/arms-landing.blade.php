@@ -304,8 +304,8 @@
             padding: 28px 32px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .details-calibre {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.2em; color: rgba(196,90,60,0.7);
+            font-size: 10px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.2em; color: rgba(196,90,60,0.45);
         }
         .details-title {
             margin-top: 8px; font-size: 22px; font-weight: 800;
