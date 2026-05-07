@@ -529,6 +529,37 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     })->name('settings');
 
     Route::post('/settings', function (Request $request) {
+        $errors = [];
+
+        foreach (['notification_email' => 'Motivation Enquiry Recipient', 'arms_enquiry_email' => 'Arms Enquiry Recipient'] as $field => $label) {
+            if (! $request->has($field)) {
+                continue;
+            }
+            $raw = trim((string) $request->input($field));
+            if ($raw === '') {
+                continue;
+            }
+            $rawParts = preg_split('/[\s,;]+/', $raw) ?: [];
+            $invalid = [];
+            foreach ($rawParts as $part) {
+                $part = trim($part);
+                if ($part === '') continue;
+                if (! filter_var($part, FILTER_VALIDATE_EMAIL)) {
+                    $invalid[] = $part;
+                }
+            }
+            if (! empty($invalid)) {
+                $errors[$field] = $label.': invalid email '.implode(', ', $invalid).'.';
+                continue;
+            }
+            $clean = implode(', ', Setting::parseEmailList($raw));
+            $request->merge([$field => $clean]);
+        }
+
+        if (! empty($errors)) {
+            return back()->withErrors($errors)->withInput();
+        }
+
         $fields = ['mail_mailer', 'mailgun_domain', 'mailgun_endpoint',
                    'mail_from_name', 'mail_from_address', 'notification_email',
                    'arms_enquiry_email', 'turnstile_site_key'];

@@ -32,4 +32,32 @@ class Setting extends Model
             ->pluck('value', 'key')
             ->toArray();
     }
+
+    /**
+     * Parse a setting value containing one or more email addresses, separated by
+     * commas, semicolons, or whitespace, into a clean, deduplicated array.
+     * Filters out empties and entries that aren't valid email addresses.
+     */
+    public static function parseEmailList(?string $value): array
+    {
+        if (! $value) {
+            return [];
+        }
+
+        $parts = preg_split('/[\s,;]+/', trim($value)) ?: [];
+
+        $emails = [];
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if ($part === '') {
+                continue;
+            }
+            if (! filter_var($part, FILTER_VALIDATE_EMAIL)) {
+                continue;
+            }
+            $emails[strtolower($part)] = $part;
+        }
+
+        return array_values($emails);
+    }
 }

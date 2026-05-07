@@ -9,17 +9,6 @@
 @endsection
 
 @section('content')
-    @if($errors->any())
-        <div class="alert alert-error">
-            <svg style="width:16px;height:16px;flex-shrink:0;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
-            <div>
-                @foreach($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
-            </div>
-        </div>
-    @endif
-
     <div class="card">
         <div class="card-header">
             <h2>{{ $listing ? 'Edit' : 'Create' }} Listing</h2>

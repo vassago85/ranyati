@@ -22,10 +22,14 @@ class NewArmsEnquiry extends Mailable
     {
         $listing = $this->enquiry->listing;
         $subject = "Enquiry: {$listing->make} {$listing->model} ({$listing->calibre}) — from {$this->enquiry->name}";
-        $recipient = Setting::get('arms_enquiry_email', 'info@firearmstorage.co.za');
+
+        $recipients = Setting::parseEmailList(Setting::get('arms_enquiry_email'));
+        if (empty($recipients)) {
+            $recipients = ['info@firearmstorage.co.za'];
+        }
 
         return new Envelope(
-            to: array_map('trim', explode(',', $recipient)),
+            to: $recipients,
             subject: $subject,
         );
     }

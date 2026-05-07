@@ -26,10 +26,13 @@ class NewMotivationEnquiry extends Mailable
             $subject .= ' (NRAPA ' . $this->enquiry->membership_number . ')';
         }
 
-        $recipient = Setting::get('notification_email', 'info@firearmmotivations.co.za');
+        $recipients = Setting::parseEmailList(Setting::get('notification_email'));
+        if (empty($recipients)) {
+            $recipients = ['info@firearmmotivations.co.za'];
+        }
 
         return new Envelope(
-            to: [$recipient],
+            to: $recipients,
             subject: $subject,
         );
     }
