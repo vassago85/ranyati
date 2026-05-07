@@ -163,6 +163,90 @@
         .empty-state {
             text-align: center; padding: 80px 24px;
         }
+
+        /* ── Lightbox ─────────────────────────────────────────── */
+        .lb-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.94); backdrop-filter: blur(8px);
+            display: flex; flex-direction: column;
+            animation: lbFade 0.18s ease-out;
+        }
+        @keyframes lbFade {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .lb-top {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 16px; flex-shrink: 0; gap: 12px;
+        }
+        .lb-counter {
+            font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.55);
+            letter-spacing: 0.05em;
+        }
+        .lb-icon-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.08); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; color: #fff; flex-shrink: 0;
+        }
+        .lb-icon-btn:hover { background: rgba(255,255,255,0.18); }
+        .lb-icon-btn svg { width: 20px; height: 20px; }
+        .lb-stage {
+            flex: 1 1 0; min-height: 0;
+            display: flex; align-items: center; justify-content: center;
+            position: relative;
+            padding: 8px 60px;
+            touch-action: pan-y;
+        }
+        .lb-img {
+            max-width: 100%; max-height: 100%;
+            width: auto; height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+            user-select: none; -webkit-user-drag: none;
+        }
+        .lb-nav {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s; color: #fff; z-index: 2;
+        }
+        .lb-nav:hover { background: rgba(255,255,255,0.22); }
+        .lb-nav svg { width: 22px; height: 22px; }
+        .lb-prev { left: 12px; }
+        .lb-next { right: 12px; }
+        .lb-thumbs {
+            flex-shrink: 0;
+            display: flex; gap: 8px; padding: 14px 16px;
+            overflow-x: auto; justify-content: center;
+            scrollbar-width: thin;
+        }
+        .lb-thumbs::-webkit-scrollbar { height: 6px; }
+        .lb-thumbs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+        .lb-thumb {
+            width: 56px; height: 56px; object-fit: cover;
+            border-radius: 6px; cursor: pointer; opacity: 0.45;
+            border: 2px solid transparent; transition: all 0.18s;
+            flex-shrink: 0;
+        }
+        .lb-thumb:hover { opacity: 0.85; }
+        .lb-thumb.is-active { opacity: 1; border-color: rgba(196,90,60,0.85); }
+
+        @media (max-width: 640px) {
+            .lb-stage { padding: 8px 12px; }
+            .lb-nav {
+                width: 38px; height: 38px;
+                background: rgba(0,0,0,0.55);
+            }
+            .lb-prev { left: 6px; }
+            .lb-next { right: 6px; }
+            .lb-thumb { width: 48px; height: 48px; }
+            .lb-thumbs { padding: 10px 12px; justify-content: flex-start; }
+        }
+
+        body.lb-locked { overflow: hidden; }
     </style>
 </head>
 <body class="min-h-screen antialiased text-white" x-data="armsApp()">
@@ -440,36 +524,36 @@
 
     {{-- Image Lightbox --}}
     <template x-if="lightbox.open">
-        <div style="position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.92); backdrop-filter: blur(8px); display: flex; flex-direction: column; align-items: center; justify-content: center;"
-             @click.self="lightbox.open = false" @keydown.escape.window="lightbox.open = false" @keydown.left.window="lightboxPrev()" @keydown.right.window="lightboxNext()">
+        <div class="lb-overlay"
+             @click.self="lightbox.open = false"
+             @keydown.escape.window="lightbox.open = false"
+             @keydown.left.window="lightboxPrev()"
+             @keydown.right.window="lightboxNext()">
 
-            {{-- Close --}}
-            <button @click="lightbox.open = false" style="position: absolute; top: 16px; right: 16px; z-index: 210; background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-                <svg style="width: 22px; height: 22px; color: #fff;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
-            </button>
-
-            {{-- Counter --}}
-            <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4);">
-                <span x-text="lightbox.idx + 1"></span> / <span x-text="lightbox.images.length"></span>
+            <div class="lb-top">
+                <span class="lb-counter">
+                    <span x-text="lightbox.idx + 1"></span> / <span x-text="lightbox.images.length"></span>
+                </span>
+                <button class="lb-icon-btn" @click="lightbox.open = false" aria-label="Close">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                </button>
             </div>
 
-            {{-- Prev --}}
-            <button x-show="lightbox.images.length > 1" @click.stop="lightboxPrev()" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); z-index: 210; background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-                <svg style="width: 22px; height: 22px; color: #fff;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
-            </button>
+            <div class="lb-stage"
+                 @touchstart.passive="lightboxTouchStart($event)"
+                 @touchend="lightboxTouchEnd($event)">
+                <button x-show="lightbox.images.length > 1" class="lb-nav lb-prev" @click.stop="lightboxPrev()" aria-label="Previous">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                </button>
+                <img :src="lightbox.images[lightbox.idx]" alt="" class="lb-img" @click.stop>
+                <button x-show="lightbox.images.length > 1" class="lb-nav lb-next" @click.stop="lightboxNext()" aria-label="Next">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                </button>
+            </div>
 
-            {{-- Next --}}
-            <button x-show="lightbox.images.length > 1" @click.stop="lightboxNext()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 210; background: rgba(255,255,255,0.08); border: none; border-radius: 50%; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.08)'">
-                <svg style="width: 22px; height: 22px; color: #fff;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
-            </button>
-
-            {{-- Main image --}}
-            <img :src="lightbox.images[lightbox.idx]" alt="" style="max-width: min(550px, 70vw); max-height: 50vh; width: auto; height: auto; object-fit: contain; border-radius: 8px;" @click.stop>
-
-            {{-- Thumbnail strip --}}
-            <div x-show="lightbox.images.length > 1" style="display: flex; gap: 8px; margin-top: 16px; padding: 0 16px;" @click.stop>
+            <div x-show="lightbox.images.length > 1" class="lb-thumbs" @click.stop>
                 <template x-for="(img, i) in lightbox.images" :key="i">
-                    <img :src="img" @click="lightbox.idx = i" style="width: 64px; height: 48px; object-fit: cover; border-radius: 6px; cursor: pointer; transition: all 0.2s;" :style="lightbox.idx === i ? 'border: 2px solid rgba(196,90,60,0.8); opacity: 1;' : 'border: 2px solid transparent; opacity: 0.4;'" loading="lazy">
+                    <img :src="img" @click="lightbox.idx = i" class="lb-thumb" :class="{ 'is-active': lightbox.idx === i }" loading="lazy" :alt="'Image ' + (i + 1)">
                 </template>
             </div>
         </div>
@@ -513,6 +597,14 @@
     function armsApp() {
         return {
             lightbox: { open: false, images: [], idx: 0 },
+            _lbTouchX: 0,
+            _lbTouchY: 0,
+
+            init() {
+                this.$watch('lightbox.open', (open) => {
+                    document.body.classList.toggle('lb-locked', !!open);
+                });
+            },
 
             openLightbox(images, startIdx) {
                 this.lightbox = { open: true, images, idx: startIdx || 0 };
@@ -522,6 +614,21 @@
             },
             lightboxPrev() {
                 this.lightbox.idx = (this.lightbox.idx - 1 + this.lightbox.images.length) % this.lightbox.images.length;
+            },
+            lightboxTouchStart(e) {
+                const t = e.touches[0];
+                this._lbTouchX = t.clientX;
+                this._lbTouchY = t.clientY;
+            },
+            lightboxTouchEnd(e) {
+                if (this.lightbox.images.length < 2) return;
+                const t = e.changedTouches[0];
+                const dx = t.clientX - this._lbTouchX;
+                const dy = t.clientY - this._lbTouchY;
+                if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+                    if (dx < 0) this.lightboxNext();
+                    else this.lightboxPrev();
+                }
             },
 
             showModal: false,
