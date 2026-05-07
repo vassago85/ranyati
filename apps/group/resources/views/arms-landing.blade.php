@@ -4,18 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Ranyati Arms — Firearms For Sale</title>
-    <meta name="description" content="Browse quality firearms for sale. Make, model, calibre and pricing — enquire directly. A division of Ranyati Group.">
+    <title>Ranyati Arms — Quality Used Firearms for Sale | Personally Inspected</title>
+    <meta name="description" content="Quality used firearms for sale in South Africa. Every firearm is personally inspected for condition and provenance before listing. Browse current stock, view make, model, calibre and pricing, and enquire directly. A division of Ranyati Group.">
     <link rel="canonical" href="https://arms.ranyati.co.za/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Ranyati Arms">
-    <meta property="og:title" content="Ranyati Arms — Firearms For Sale">
-    <meta property="og:description" content="Browse quality firearms for sale from Ranyati Arms, a division of Ranyati Group.">
+    <meta property="og:title" content="Ranyati Arms — Quality Used Firearms for Sale">
+    <meta property="og:description" content="Quality used firearms — every item personally inspected before listing. Browse current stock and enquire directly through Ranyati Arms.">
     <meta property="og:url" content="https://arms.ranyati.co.za/">
     <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Ranyati Arms — Firearms For Sale">
-    <meta name="twitter:description" content="Browse quality firearms for sale. Enquire directly through Ranyati Arms.">
+    <meta name="twitter:title" content="Ranyati Arms — Quality Used Firearms for Sale">
+    <meta name="twitter:description" content="Quality used firearms — every item personally inspected before listing. Browse current stock and enquire through Ranyati Arms.">
     <meta name="twitter:image" content="{{ asset('ranyati-group-logo.png') }}">
     <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
@@ -28,9 +28,11 @@
         "@@context": "https://schema.org",
         "@type": "Store",
         "name": "Ranyati Arms",
-        "description": "Quality firearms for sale — browse, enquire, and purchase through Ranyati Arms.",
+        "description": "Quality used firearms for sale in South Africa. Every firearm is personally inspected for condition and provenance before being listed. Browse current stock, view full details and enquire directly with Ranyati Arms.",
         "url": "https://arms.ranyati.co.za",
         "email": "info@firearmstorage.co.za",
+        "areaServed": {"@type": "Country", "name": "South Africa"},
+        "knowsAbout": ["Used Firearms", "Pre-owned Firearms", "Firearm Inspection", "Firearms Control Act", "Firearm Sales"],
         "parentOrganization": {
             "@type": "Organization",
             "name": "Ranyati Group",
@@ -123,7 +125,7 @@
         .anim-3 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards; opacity: 0; }
         .anim-4 { animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s forwards; opacity: 0; }
 
-        .header-contact { display: none; }
+        .header-contact, .header-pills { display: none; }
         .header-logo { width: 100%; }
 
         .footer-grid { display: flex; flex-direction: column; gap: 32px; padding: 40px 0; }
@@ -132,7 +134,8 @@
 
         @media (min-width: 768px) {
             .header-contact { display: flex; }
-            .header-logo { width: 40%; }
+            .header-pills { display: flex; }
+            .header-logo { width: 25%; }
             .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; padding: 56px 0; }
             .footer-right { align-items: flex-end; }
             .footer-right-inner { align-items: flex-end; }
@@ -368,13 +371,27 @@
     {{-- Header --}}
     <header style="position: absolute; top: 0; left: 0; right: 0; z-index: 50;">
         <div style="max-width: 80rem; margin: 0 auto; padding: 0 1.5rem;">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
+            <div style="display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid rgba(255,255,255,0.04);">
                 <div class="header-logo" style="flex-shrink: 0;">
-                    <a href="/">
+                    <a href="https://ranyati.co.za" title="Ranyati Group">
                         <img src="{{ asset('logo-ranyati_arms-white_text.png') }}" alt="Ranyati Arms" style="height: 30px; width: auto; object-fit: contain;" />
                     </a>
                 </div>
-                <div class="header-contact" style="flex-direction: column; align-items: flex-end; gap: 0;">
+                <div class="header-pills" style="width: 50%; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; row-gap: 6px;">
+                    <a href="https://motivations.ranyati.co.za" title="Motivations" style="display: inline-flex; align-items: center; justify-content: center; width: 132px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(245,130,32,0.2)'" onmouseout="this.style.background='rgba(245,130,32,0.1)'">
+                        <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}" alt="Motivations" style="max-height: 24px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    </a>
+                    <a href="https://nrapa.ranyati.co.za" title="NRAPA" style="display: inline-flex; align-items: center; justify-content: center; width: 132px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(56,189,248,0.1); box-shadow: inset 0 0 0 1px rgba(56,189,248,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(56,189,248,0.2)'" onmouseout="this.style.background='rgba(56,189,248,0.1)'">
+                        <img src="{{ asset('logo-nrapa-wiite_text.png') }}" alt="NRAPA" style="max-height: 24px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    </a>
+                    <a href="https://storage.ranyati.co.za" title="Storage" style="display: inline-flex; align-items: center; justify-content: center; width: 132px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(52,211,153,0.1); box-shadow: inset 0 0 0 1px rgba(52,211,153,0.15); transition: background 0.2s; overflow: hidden;" onmouseover="this.style.background='rgba(52,211,153,0.2)'" onmouseout="this.style.background='rgba(52,211,153,0.1)'">
+                        <img src="{{ asset('logo-ranyati_storage-white_text.png') }}" alt="Storage" style="max-height: 24px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.6;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'" />
+                    </a>
+                    <a href="https://arms.ranyati.co.za" title="Arms — Used Firearms for Sale" style="display: inline-flex; align-items: center; justify-content: center; width: 132px; height: 36px; padding: 6px; border-radius: 10px; background: rgba(196,90,60,0.18); box-shadow: inset 0 0 0 1px rgba(196,90,60,0.3); transition: background 0.2s; overflow: hidden;">
+                        <img src="{{ asset('logo-ranyati_arms-white_text.png') }}" alt="Arms" style="max-height: 24px; max-width: 120px; width: auto; height: auto; object-fit: contain; opacity: 0.95;" />
+                    </a>
+                </div>
+                <div class="header-contact" style="width: 25%; flex-direction: column; align-items: flex-end; gap: 0; margin-left: auto;">
                     <a href="mailto:info@firearmstorage.co.za" style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
                         <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
                         info@firearmstorage.co.za
@@ -399,14 +416,14 @@
             </div>
 
             <h1 class="mt-8 text-[2rem] font-black leading-[1.05] tracking-[-0.03em] text-white sm:text-[2.75rem] lg:text-[3.5rem] anim-1">
-                Firearms For Sale
+                Quality Used Firearms<br class="hidden sm:block"> For Sale
             </h1>
             <p class="mt-3 text-[13px] font-semibold uppercase tracking-[0.25em] anim-1" style="color: rgba(196,90,60,0.7);">
                 A Division of Ranyati Group
             </p>
 
-            <p class="mx-auto mt-6 max-w-lg text-[15px] leading-[1.8] text-white/45 anim-2">
-                Browse our current selection of firearms available for sale. Enquire directly on any listing and our team will be in touch.
+            <p class="mx-auto mt-6 max-w-xl text-[15px] leading-[1.8] text-white/55 anim-2">
+                Quality pre-owned firearms — every item is <span style="color: #fff; font-weight: 600;">personally inspected</span> for condition and provenance before being listed. Browse current stock and enquire directly on any listing.
             </p>
 
             @if($listings->count() > 0)
