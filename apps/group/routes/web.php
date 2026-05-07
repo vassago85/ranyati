@@ -87,6 +87,7 @@ Route::get('/sitemap.xml', function () {
             ''                                    => ['priority' => '1.0', 'changefreq' => 'monthly',  'lastmod' => $today],
             '/enquire'                            => ['priority' => '0.9', 'changefreq' => 'monthly',  'lastmod' => $today],
             '/faq'                                => ['priority' => '0.85', 'changefreq' => 'weekly',  'lastmod' => $today],
+            '/firearm-motivation-letter'          => ['priority' => '0.9',  'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-motivation-self-defence' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-motivation-sport-shooting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-motivation-hunting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
@@ -285,6 +286,11 @@ Route::get('/faq', function () {
     return view('seo.faq');
 });
 
+Route::get('/firearm-motivation-letter', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    return view('seo.motivations.firearm-motivation-letter');
+});
 Route::get('/firearm-licence-motivation-self-defence', function () use ($motivationsOnly) {
     $motivationsOnly();
 

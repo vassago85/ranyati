@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-JV2NSWMYTQ"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-JV2NSWMYTQ');</script>
-    <title>Ranyati Motivations — Comprehensive Firearm Motivations</title>
-    <meta name="description" content="Professional comprehensive motivations for firearm licence applications, renewals, and compliance support in South Africa. A division of Ranyati Group.">
+    <title>Firearm Motivation Letter South Africa — Professional Licence Motivations | Ranyati</title>
+    <meta name="description" content="Need a firearm motivation letter? Professional motivation letters for firearm licence applications, renewals, appeals, and compliance in South Africa. Trusted since 2006.">
     <link rel="canonical" href="https://motivations.ranyati.co.za/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Ranyati Motivations">
-    <meta property="og:title" content="Ranyati Motivations — Comprehensive Firearm Motivations">
-    <meta property="og:description" content="Professional firearm motivations for licence applications, renewals, and compliance support in South Africa.">
+    <meta property="og:title" content="Firearm Motivation Letter South Africa — Professional Licence Motivations | Ranyati">
+    <meta property="og:description" content="Need a firearm motivation letter? Professional motivation letters for firearm licence applications, renewals, appeals, and compliance in South Africa.">
     <meta property="og:url" content="https://motivations.ranyati.co.za/">
     <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Ranyati Motivations — Firearm Licence Motivations">
-    <meta name="twitter:description" content="Professional motivations for firearm licence applications, renewals, and compliance support.">
+    <meta name="twitter:title" content="Firearm Motivation Letter South Africa | Ranyati Motivations">
+    <meta name="twitter:description" content="Professional firearm motivation letters for licence applications, renewals, and compliance support in South Africa.">
     <meta name="twitter:image" content="{{ asset('ranyati-group-logo.png') }}">
     <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
@@ -28,7 +28,7 @@
         "@@context": "https://schema.org",
         "@type": "ProfessionalService",
         "name": "Ranyati Motivations",
-        "description": "Professional firearm licence motivations, renewals, and compliance documentation for clients across South Africa (based in Pretoria).",
+        "description": "Professional firearm motivation letters for licence applications, renewals, appeals, and compliance documentation across South Africa.",
         "url": "https://motivations.ranyati.co.za",
         "telephone": "+27-87-151-0987",
         "email": "info@firearmmotivations.co.za",
@@ -48,7 +48,7 @@
             "@type": "Country",
             "name": "South Africa"
         },
-        "serviceType": ["Firearm Motivations", "Licence Applications", "Licence Renewals", "Compliance Support", "Appeals"]
+        "serviceType": ["Firearm Motivation Letters", "Firearm Licence Motivations", "Licence Applications", "Licence Renewals", "Compliance Support", "Appeals"]
     }
     </script>
     <style>
@@ -192,14 +192,14 @@
             </div>
 
             <h1 class="mt-10 text-[2.5rem] font-black leading-[1.05] tracking-[-0.03em] text-white sm:text-[3.25rem] lg:text-[4rem] anim-1">
-                Comprehensive Firearm<br class="hidden sm:block"> Motivations
+                Firearm Motivation<br class="hidden sm:block"> Letters
             </h1>
             <p class="mt-4 text-[13px] font-semibold uppercase tracking-[0.25em] text-[#F58220]/70 anim-1">
                 A Division of Ranyati Group
             </p>
 
             <p class="mx-auto mt-7 max-w-lg text-[15px] leading-[1.8] text-white/45 anim-2">
-                Professional motivations for firearm licence applications, renewals, and compliance support. We simplify a complex legal process so you can focus on responsible firearm ownership.
+                Professional firearm motivation letters for licence applications, renewals, and compliance support in South Africa. We simplify a complex legal process so you can focus on responsible firearm ownership.
             </p>
 
             <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 anim-3">
@@ -239,7 +239,7 @@
                 <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-[#F58220]/60">What We Do</p>
                 <h2 class="mt-3 text-[1.75rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.25rem]">Expert motivation services</h2>
                 <p class="mx-auto mt-4 max-w-xl text-[14px] leading-[1.7] text-white/35">
-                    Nearly two decades of experience in firearm administration, delivered by professionals who understand the Firearms Control Act inside and out.
+                    Nearly two decades of experience writing firearm motivation letters, delivered by professionals who understand the Firearms Control Act inside and out.
                 </p>
             </div>
 
@@ -248,8 +248,8 @@
                     <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
                         <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
                     </div>
-                    <h3 class="mt-6 text-[15px] font-bold text-white">New Licence Motivations</h3>
-                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Comprehensive motivations for new firearm licence applications, covering self-defence, sport shooting, hunting, and professional use.</p>
+                    <h3 class="mt-6 text-[15px] font-bold text-white">New Licence Motivation Letters</h3>
+                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Comprehensive firearm motivation letters for new licence applications, covering self-defence, sport shooting, hunting, and professional use.</p>
                 </div>
 
                 <div class="card-service rounded-2xl p-8">
@@ -257,7 +257,7 @@
                         <svg class="size-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182"/></svg>
                     </div>
                     <h3 class="mt-6 text-[15px] font-bold text-white">Licence Renewals</h3>
-                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Timely and thorough renewal motivations to ensure continuity of your existing firearm licences before expiry.</p>
+                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Timely and thorough renewal motivation letters to ensure continuity of your existing firearm licences before expiry.</p>
                 </div>
 
                 <div class="card-service rounded-2xl p-8">
@@ -337,7 +337,7 @@
                     Ready to Get Started?
                 </h2>
                 <p class="mx-auto mt-4 max-w-md text-[14px] leading-[1.7] text-white/40">
-                    Submit an enquiry and our team will contact you to discuss your firearm motivation requirements.
+                    Submit an enquiry and our team will contact you to discuss your firearm motivation letter requirements.
                 </p>
                 <div class="mt-8">
                     <a href="/enquire" class="btn-cta inline-flex rounded-xl px-10 py-4 text-[14px] font-bold text-white tracking-wide">
@@ -362,6 +362,7 @@
                 <div class="footer-center" style="display: flex; flex-direction: column;">
                     <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">Guides</h4>
                     <div class="footer-pills" style="display: flex; flex-direction: column; gap: 6px; margin-top: 16px;">
+                        <a href="/firearm-motivation-letter" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Firearm Motivation Letter Guide</a>
                         <a href="/firearm-licence-motivation-self-defence" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Self-defence Motivation</a>
                         <a href="/firearm-licence-motivation-sport-shooting" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Sport Shooting Motivation</a>
                         <a href="/firearm-licence-motivation-hunting" style="font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">Hunting Motivation</a>
@@ -389,6 +390,7 @@
             <div style="border-top: 1px solid rgba(255,255,255,0.04); padding: 20px 0 12px;">
                 <nav aria-label="Guides" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;margin-bottom:12px;">
                     <a href="https://ranyati.co.za" style="font-size:12px;color:rgba(255,255,255,0.4);">Ranyati Group</a>
+                    <a href="/firearm-motivation-letter" style="font-size:12px;color:rgba(255,255,255,0.4);">Firearm motivation letter</a>
                     <a href="/firearm-licence-motivation-self-defence" style="font-size:12px;color:rgba(255,255,255,0.4);">Self-defence motivation</a>
                     <a href="/firearm-licence-motivation-sport-shooting" style="font-size:12px;color:rgba(255,255,255,0.4);">Sport shooting motivation</a>
                     <a href="/firearm-licence-motivation-hunting" style="font-size:12px;color:rgba(255,255,255,0.4);">Hunting motivation</a>

@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Hunting Firearm Licence Motivation | South Africa Guide')
-@section('description', 'How to prepare a hunting motivation for your firearm licence in South Africa. Covers calibre suitability, proof of hunting access, and dedicated hunter status requirements.')
+@section('title', 'Hunting Firearm Motivation Letter | South Africa Licence Guide')
+@section('description', 'How to prepare a hunting firearm motivation letter for your licence application in South Africa. Covers calibre suitability, proof of hunting access, and dedicated hunter status requirements.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')
@@ -16,7 +16,7 @@
     <a href="/enquire">Enquire</a>
 @endsection
 
-@section('heading', 'Firearm licence motivation for hunting')
+@section('heading', 'Firearm motivation letter for hunting')
 @section('subheading', 'Ethical hunting, calibre suitability, and lawful access')
 @section('breadcrumb', 'Hunting motivation')
 
@@ -32,8 +32,8 @@
 <script type="application/ld+json">{!! json_encode([
     '@context' => 'https://schema.org',
     '@type' => 'ProfessionalService',
-    'name' => 'Ranyati Motivations — Hunting motivations',
-    'description' => 'Firearm licence motivation documents for hunting purposes in South Africa.',
+    'name' => 'Ranyati Motivations — Hunting firearm motivation letters',
+    'description' => 'Professional firearm motivation letters for hunting licence applications in South Africa.',
     'url' => 'https://motivations.ranyati.co.za/firearm-licence-motivation-hunting',
     'parentOrganization' => ['@type' => 'Organization', 'name' => 'Ranyati Group', 'url' => 'https://ranyati.co.za'],
     'areaServed' => ['@type' => 'Country', 'name' => 'South Africa'],
@@ -41,7 +41,7 @@
 @endpush
 
 @section('content')
-    <p>Hunting motivations should connect your experience, intended quarry and terrain, and the suitability of the firearm and calibre you apply for. SAPS may scrutinise access to legal hunting opportunities and your compliance history. We help present a factual, respectful account tied to South African hunting law and good practice.</p>
+    <p>Hunting motivation letters should connect your experience, intended quarry and terrain, and the suitability of the firearm and calibre you apply for. SAPS may scrutinise access to legal hunting opportunities and your compliance history. We help present a factual, respectful account tied to South African hunting law and good practice.</p>
 
     <h2>Dedicated hunter status</h2>
     <p>Where dedicated hunter status applies, accredited association membership and ongoing proof of activity may be required. <a href="https://nrapa.ranyati.co.za/info/dedicated-hunter-south-africa">NRAPA’s dedicated hunter information</a> explains the association side; your motivation still needs to stand on its own merits for the specific application.</p>

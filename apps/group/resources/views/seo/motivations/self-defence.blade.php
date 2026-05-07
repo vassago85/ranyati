@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Self-Defence Firearm Licence Motivation | South Africa Guide')
-@section('description', 'How to write a strong self-defence motivation for your firearm licence in South Africa. Learn what SAPS looks for, what to include, and how to avoid common reasons for refusal.')
+@section('title', 'Self-Defence Firearm Motivation Letter | South Africa Licence Guide')
+@section('description', 'How to write a strong self-defence firearm motivation letter for your licence application in South Africa. What SAPS looks for, what to include, and how to avoid common reasons for refusal.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')
@@ -16,7 +16,7 @@
     <a href="/enquire">Enquire</a>
 @endsection
 
-@section('heading', 'Firearm licence motivation for self-defence')
+@section('heading', 'Firearm motivation letter for self-defence')
 @section('subheading', 'Structured, professional motivations aligned with South African law')
 @section('breadcrumb', 'Self-defence motivation')
 
@@ -33,8 +33,8 @@
     $svc = [
         '@context' => 'https://schema.org',
         '@type' => 'ProfessionalService',
-        'name' => 'Ranyati Motivations — Self-defence motivations',
-        'description' => 'Professional firearm licence motivation documents for lawful self-defence purposes in South Africa.',
+        'name' => 'Ranyati Motivations — Self-defence firearm motivation letters',
+        'description' => 'Professional firearm motivation letters for self-defence licence applications in South Africa.',
         'url' => 'https://motivations.ranyati.co.za/firearm-licence-motivation-self-defence',
         'parentOrganization' => ['@type' => 'Organization', 'name' => 'Ranyati Group', 'url' => 'https://ranyati.co.za'],
         'areaServed' => ['@type' => 'Country', 'name' => 'South Africa'],
@@ -44,7 +44,7 @@
 @endpush
 
 @section('content')
-    <p>A self-defence motivation must reflect your personal circumstances and lawful purpose under the Firearms Control Act (Act 60 of 2000). SAPS assesses whether the motivation is genuine and whether the applicant is competent and stable. Our role is to help you articulate a clear, coherent narrative supported by the facts you supply—not to guarantee an outcome.</p>
+    <p>A self-defence <strong>firearm motivation letter</strong> must reflect your personal circumstances and lawful purpose under the Firearms Control Act (Act 60 of 2000). SAPS assesses whether the motivation letter is genuine and whether the applicant is competent and stable. Our role is to help you articulate a clear, coherent narrative supported by the facts you supply—not to guarantee an outcome.</p>
 
     <h2>What SAPS typically expects</h2>
     <p>Expect questions about your living situation, security context, safe storage plans, and why a specific type of firearm is appropriate. Generic or copied text weakens an application; your motivation should read as authentic and specific to you.</p>

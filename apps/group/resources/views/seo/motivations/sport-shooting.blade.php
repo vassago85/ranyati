@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
-@section('title', 'Sport Shooting Firearm Licence Motivation | South Africa Guide')
-@section('description', 'Guidance on preparing a firearm licence motivation for sport shooting in South Africa. Covers dedicated status requirements, club membership, and what SAPS expects in your application.')
+@section('title', 'Sport Shooting Firearm Motivation Letter | South Africa Licence Guide')
+@section('description', 'How to prepare a firearm motivation letter for sport shooting in South Africa. Covers dedicated status requirements, club membership, and what SAPS expects in your application.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')
@@ -16,7 +16,7 @@
     <a href="/enquire">Enquire</a>
 @endsection
 
-@section('heading', 'Firearm licence motivation for sport shooting')
+@section('heading', 'Firearm motivation letter for sport shooting')
 @section('subheading', 'Competition, club participation, and association pathways in South Africa')
 @section('breadcrumb', 'Sport shooting motivation')
 
@@ -32,8 +32,8 @@
 <script type="application/ld+json">{!! json_encode([
     '@context' => 'https://schema.org',
     '@type' => 'ProfessionalService',
-    'name' => 'Ranyati Motivations — Sport shooting motivations',
-    'description' => 'Firearm licence motivation documents for sport shooting purposes in South Africa.',
+    'name' => 'Ranyati Motivations — Sport shooting firearm motivation letters',
+    'description' => 'Professional firearm motivation letters for sport shooting licence applications in South Africa.',
     'url' => 'https://motivations.ranyati.co.za/firearm-licence-motivation-sport-shooting',
     'parentOrganization' => ['@type' => 'Organization', 'name' => 'Ranyati Group', 'url' => 'https://ranyati.co.za'],
     'areaServed' => ['@type' => 'Country', 'name' => 'South Africa'],
@@ -41,7 +41,7 @@
 @endpush
 
 @section('content')
-    <p>Sport shooting motivations often reference your discipline (e.g. practical shooting, precision rifle, gong shooting), club affiliation, competition participation, and how the firearm type matches sanctioned activities. Where dedicated sport shooter status is required, SAPS-accredited association membership—such as through <a href="https://nrapa.ranyati.co.za">NRAPA</a>—may form part of your broader compliance picture.</p>
+    <p>Sport shooting motivation letters often reference your discipline (e.g. practical shooting, precision rifle, gong shooting), club affiliation, competition participation, and how the firearm type matches sanctioned activities. Where dedicated sport shooter status is required, SAPS-accredited association membership—such as through <a href="https://nrapa.ranyati.co.za">NRAPA</a>—may form part of your broader compliance picture.</p>
 
     <h2>Dedicated status vs general sport use</h2>
     <p>Some licences turn on dedicated status and ongoing activity requirements; others may reflect introductory or club-based sport use. We align the motivation language with the pathway you are actually following and the evidence you can provide.</p>

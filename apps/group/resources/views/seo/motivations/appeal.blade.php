@@ -1,7 +1,7 @@
 @extends('layouts.resources')
 
 @section('title', 'Firearm Licence Appeal South Africa | Support After Refusal or Delay')
-@section('description', 'SAPS refused or delayed your firearm licence? Understand the appeal process, timelines, and how to prepare a structured motivation for review. Professional guidance from Ranyati Motivations.')
+@section('description', 'SAPS refused or delayed your firearm licence? Understand the appeal process, timelines, and how to prepare a structured motivation letter for review. Professional guidance from Ranyati Motivations.')
 @section('breadcrumb_mode', 'flat')
 
 @section('site_name', 'Ranyati Motivations')

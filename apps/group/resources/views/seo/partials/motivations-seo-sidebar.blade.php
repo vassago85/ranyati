@@ -1,3 +1,4 @@
+<a href="/firearm-motivation-letter" class="{{ request()->is('firearm-motivation-letter') ? 'active' : '' }}">Firearm motivation letter</a>
 <a href="/firearm-licence-motivation-self-defence" class="{{ request()->is('firearm-licence-motivation-self-defence') ? 'active' : '' }}">Self-defence motivation</a>
 <a href="/firearm-licence-motivation-sport-shooting" class="{{ request()->is('firearm-licence-motivation-sport-shooting') ? 'active' : '' }}">Sport shooting motivation</a>
 <a href="/firearm-licence-motivation-hunting" class="{{ request()->is('firearm-licence-motivation-hunting') ? 'active' : '' }}">Hunting motivation</a>
