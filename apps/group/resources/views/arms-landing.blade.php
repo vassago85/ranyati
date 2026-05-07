@@ -304,8 +304,8 @@
             padding: 28px 32px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
         .details-calibre {
-            font-size: 10px; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.2em; color: rgba(196,90,60,0.45);
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.2em; color: rgba(255,225,205,0.92);
         }
         .details-title {
             margin-top: 8px; font-size: 22px; font-weight: 800;
@@ -510,7 +510,7 @@
                             <div style="padding: 16px 20px 20px; flex: 1; display: flex; flex-direction: column;">
                                 <div class="listing-clickable" @click="openDetails(@js($listingData))" role="button" tabindex="0" @keydown.enter="openDetails(@js($listingData))" @keydown.space.prevent="openDetails(@js($listingData))">
                                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                                        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(196,90,60,0.6);">{{ $listing->calibre }}</span>
+                                        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,225,205,0.92);">{{ $listing->calibre }}</span>
                                         @if($listing->status === 'reduced')
                                             <span class="badge-reduced">Reduced Priority</span>
                                         @endif
