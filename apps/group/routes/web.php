@@ -643,9 +643,15 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             $currentImages = array_values($currentImages);
         }
 
+        $newCount = $request->hasFile('images') ? count($request->file('images')) : 0;
+        if (count($currentImages) + $newCount > 10) {
+            return back()
+                ->withErrors(['images' => 'Total images cannot exceed 10. You have '.count($currentImages).' kept and tried to add '.$newCount.'.'])
+                ->withInput();
+        }
+
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                if (count($currentImages) >= 4) break;
                 $currentImages[] = $image->store('arms', 'public');
             }
         }
