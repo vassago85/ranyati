@@ -236,35 +236,35 @@
 
                 <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($listings as $listing)
-                        <div class="card-listing rounded-2xl flex flex-col" x-data="{ hovered: false, activeImg: 0, images: {{ json_encode(collect($listing->images ?? [])->map(fn($img) => asset('storage/' . $img))->values()) }} }" @mouseenter="hovered = true" @mouseleave="hovered = false">
+                        @php $imgUrls = collect($listing->images ?? [])->map(fn($img) => '/storage/' . $img)->values(); @endphp
+                        <div class="card-listing rounded-2xl flex flex-col" x-data="{ hovered: false, activeImg: 0, images: {{ $imgUrls->toJson() }} }" @mouseenter="hovered = true" @mouseleave="hovered = false">
                             @if($listing->original_price && $listing->original_price > $listing->price)
                                 <div style="position: absolute; top: 16px; left: 16px; z-index: 10; background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 4px;">Reduced</div>
                             @endif
                             {{-- Image Gallery --}}
                             <div style="padding: 12px 12px 0;">
-                                <template x-if="images.length > 0">
+                                @if($imgUrls->count() > 0)
                                     <div>
                                         <div style="position: relative; cursor: pointer;" @click="openLightbox(images, activeImg)">
-                                            <img :src="images[activeImg]" alt="{{ $listing->make }} {{ $listing->model }}" class="listing-image" loading="lazy">
+                                            <img src="{{ $imgUrls->first() }}" x-bind:src="images[activeImg]" alt="{{ $listing->make }} {{ $listing->model }}" class="listing-image" loading="lazy">
                                             <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 3px 8px; font-size: 10px; color: rgba(255,255,255,0.6); pointer-events: none;">
                                                 <svg style="width: 12px; height: 12px; display: inline; vertical-align: -2px; margin-right: 3px;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
-                                                <span x-text="activeImg + 1 + '/' + images.length"></span>
+                                                <span x-text="(activeImg + 1) + '/{{ $imgUrls->count() }}'">1/{{ $imgUrls->count() }}</span>
                                             </div>
                                         </div>
-                                        <template x-if="images.length > 1">
+                                        @if($imgUrls->count() > 1)
                                             <div style="display: flex; gap: 6px; margin-top: 8px;">
-                                                <template x-for="(img, i) in images" :key="i">
-                                                    <img :src="img" @click="activeImg = i" class="gallery-thumb" :class="activeImg === i ? 'active' : ''" :alt="'Image ' + (i+1)" loading="lazy">
-                                                </template>
+                                                @foreach($imgUrls as $i => $thumbUrl)
+                                                    <img src="{{ $thumbUrl }}" @click="activeImg = {{ $i }}" class="gallery-thumb" :class="activeImg === {{ $i }} ? 'active' : ''" alt="Image {{ $i + 1 }}" loading="lazy">
+                                                @endforeach
                                             </div>
-                                        </template>
+                                        @endif
                                     </div>
-                                </template>
-                                <template x-if="images.length === 0">
+                                @else
                                     <div class="listing-image flex items-center justify-center" style="background: rgba(255,255,255,0.03);">
                                         <svg style="width: 48px; height: 48px; color: rgba(255,255,255,0.08);" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"/></svg>
                                     </div>
-                                </template>
+                                @endif
                             </div>
 
                             {{-- Content --}}
