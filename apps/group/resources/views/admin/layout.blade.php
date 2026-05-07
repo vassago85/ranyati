@@ -17,12 +17,17 @@
         .sidebar {
             position: fixed; top: 0; left: 0; bottom: 0; width: 240px;
             background: #0d1424; border-right: 1px solid rgba(255,255,255,0.06);
-            display: flex; flex-direction: column; z-index: 40;
+            display: flex; flex-direction: column; z-index: 50;
+            overflow-y: auto; overscroll-behavior: contain;
+            transition: transform 0.25s ease;
         }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 3px; }
         .sidebar-brand {
             padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.04);
+            flex-shrink: 0;
         }
-        .sidebar-nav { padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-nav { padding: 16px 12px; flex: 1 0 auto; display: flex; flex-direction: column; gap: 4px; }
         .sidebar-link {
             display: flex; align-items: center; gap: 10px; padding: 10px 12px;
             border-radius: 8px; font-size: 13px; font-weight: 500;
@@ -33,18 +38,62 @@
         .sidebar-link svg { width: 18px; height: 18px; flex-shrink: 0; }
         .sidebar-footer {
             padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.04);
-            font-size: 11px; color: rgba(255,255,255,0.2);
+            font-size: 11px; color: rgba(255,255,255,0.2); flex-shrink: 0;
         }
+
+        .sidebar-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(2px); z-index: 45;
+            opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+        }
+        .sidebar-backdrop.is-open { opacity: 1; pointer-events: auto; }
+
+        .hamburger {
+            display: none; align-items: center; justify-content: center;
+            width: 38px; height: 38px; border-radius: 8px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        .hamburger:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .hamburger svg { width: 20px; height: 20px; }
 
         .main { margin-left: 240px; min-height: 100vh; }
         .topbar {
             padding: 16px 32px; border-bottom: 1px solid rgba(255,255,255,0.04);
-            display: flex; align-items: center; justify-content: space-between;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
             background: rgba(13,20,36,0.6); backdrop-filter: blur(12px);
             position: sticky; top: 0; z-index: 30;
         }
-        .topbar h1 { font-size: 16px; font-weight: 700; color: #fff; }
+        .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .topbar h1 { font-size: 16px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
         .content { padding: 32px; }
+
+        @media (max-width: 1023px) {
+            .sidebar {
+                width: 280px; max-width: 85vw;
+                transform: translateX(-100%);
+                box-shadow: 8px 0 32px rgba(0,0,0,0.4);
+            }
+            .sidebar.is-open { transform: translateX(0); }
+            .main { margin-left: 0; }
+            .hamburger { display: inline-flex; }
+            .topbar { padding: 12px 16px; }
+            .content { padding: 20px 16px; }
+        }
+
+        @media (max-width: 640px) {
+            .stat-grid { grid-template-columns: 1fr 1fr; }
+            .topbar h1 { font-size: 15px; }
+        }
+
+        @media (max-width: 480px) {
+            .stat-grid { grid-template-columns: 1fr; }
+            .content { padding: 16px 12px; }
+        }
+
+        body.sidebar-locked { overflow: hidden; }
 
         .card {
             background: linear-gradient(180deg, rgba(15,25,50,0.8) 0%, rgba(10,18,35,0.9) 100%);
@@ -127,23 +176,15 @@
         .dot-orange { background: #F58220; }
         .dot-green { background: #34d399; }
 
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.06); }
-            .sidebar-nav { flex-direction: row; overflow-x: auto; padding: 8px 12px; }
-            .sidebar-footer { display: none; }
-            .main { margin-left: 0; }
-            .content { padding: 16px; }
-            .stat-grid { grid-template-columns: 1fr 1fr; }
-        }
     </style>
 </head>
-<body>
-    <div class="sidebar">
+<body x-data="{ sidebarOpen: false }" x-effect="document.body.classList.toggle('sidebar-locked', sidebarOpen && window.innerWidth < 1024)" @keydown.escape.window="sidebarOpen = false" @resize.window="if (window.innerWidth >= 1024) sidebarOpen = false">
+    <aside class="sidebar" :class="{ 'is-open': sidebarOpen }">
         <div class="sidebar-brand">
             <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 24px; width: auto; opacity: 0.8;" />
             <div style="margin-top: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.2);">Admin Panel</div>
         </div>
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" @click="if ($event.target.closest('a') && window.innerWidth < 1024) sidebarOpen = false">
             <div style="padding: 4px 12px 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(245,130,32,0.45);">Motivations</div>
             <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"/></svg>
@@ -193,12 +234,19 @@
         <div class="sidebar-footer">
             &copy; {{ date('Y') }} Ranyati Group
         </div>
-    </div>
+    </aside>
+
+    <div class="sidebar-backdrop" :class="{ 'is-open': sidebarOpen }" @click="sidebarOpen = false" aria-hidden="true"></div>
 
     <div class="main">
         <div class="topbar">
-            <h1>@yield('title', 'Dashboard')</h1>
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="topbar-left">
+                <button type="button" class="hamburger" @click="sidebarOpen = !sidebarOpen" :aria-expanded="sidebarOpen" aria-label="Toggle navigation">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/></svg>
+                </button>
+                <h1>@yield('title', 'Dashboard')</h1>
+            </div>
+            <div class="topbar-actions">
                 @yield('actions')
             </div>
         </div>
