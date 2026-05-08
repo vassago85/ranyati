@@ -41,14 +41,23 @@
 @endpush
 
 @section('content')
-    <p>Sport shooting motivation letters often reference your discipline (e.g. practical shooting, precision rifle, gong shooting), club affiliation, competition participation, and how the firearm type matches sanctioned activities. Where dedicated sport shooter status is required, SAPS-accredited association membership—such as through <a href="https://nrapa.ranyati.co.za">NRAPA</a>—may form part of your broader compliance picture.</p>
+    <p>Sport shooting motivations need to reference your discipline (practical / IPSC, <a href="/prs-shooting-south-africa">precision rifle (PRS)</a>, gong shooting, smallbore, clay target, action rifle, and so on), club affiliation, competition participation, and how the firearm type matches sanctioned activities for that discipline. Where dedicated sport shooter status is required, SAPS-accredited association membership — such as through <a href="https://nrapa.ranyati.co.za">NRAPA</a> — forms part of your broader compliance picture.</p>
+
+    <h2>Disciplines we routinely motivate for</h2>
+    <ul>
+        <li><strong>Precision Rifle Series (PRS) and NRL Hunter</strong> — long-range competition formats. <a href="/prs-shooting-south-africa">Read the beginner's guide</a> if you're new to the sport.</li>
+        <li><strong>Practical / IPSC and 3-gun</strong> — handgun, rifle, and shotgun courses of fire under accredited rules.</li>
+        <li><strong>Action rifle / gong shooting / field rifle</strong> — common entry-level sport categories at SA clubs.</li>
+        <li><strong>Smallbore and rimfire formats</strong> — including rimfire PRS, which is a popular and affordable on-ramp.</li>
+        <li><strong>Clay target — trap, skeet, sporting clays</strong> — shotgun-focused disciplines with their own dedicated structures.</li>
+    </ul>
 
     <h2>Dedicated status vs general sport use</h2>
-    <p>Some licences turn on dedicated status and ongoing activity requirements; others may reflect introductory or club-based sport use. We align the motivation language with the pathway you are actually following and the evidence you can provide.</p>
+    <p>Some licences turn on dedicated status and ongoing activity requirements; others may reflect introductory or club-based sport use. We align the motivation language with the pathway you're actually following and the evidence you can provide — calibre choice, match calendar, intended divisions, and historical participation.</p>
 
     <h2>Working with NRAPA</h2>
-    <p>If you need dedicated sport shooter administration, NRAPA’s portal covers membership, activities, and certificates. We can signpost how motivations and membership documentation fit together—without substituting NRAPA’s official processes.</p>
+    <p>If you need dedicated sport shooter administration, <a href="https://nrapa.ranyati.co.za">NRAPA</a>'s portal covers membership, activity recording, and the QR-verified certificates SAPS will check. We sign-post how the motivation and the membership documentation fit together — without substituting NRAPA's official processes.</p>
 
     <h2>Further reading</h2>
-    <p><a href="/resources/services">Our services</a> · <a href="/resources/firearm-licence-process">Licence process</a> · <a href="https://ranyati.co.za/guides">Ranyati Group guides hub</a></p>
+    <p><a href="/prs-shooting-south-africa">PRS beginner's guide</a> · <a href="/resources/services">Our services</a> · <a href="/resources/firearm-licence-process">Licence process</a> · <a href="https://ranyati.co.za/guides">Ranyati Group guides hub</a></p>
 @endsection

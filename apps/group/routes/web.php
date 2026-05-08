@@ -90,6 +90,7 @@ Route::get('/sitemap.xml', function () {
             '/firearm-motivation-letter'          => ['priority' => '0.9',  'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-motivation-self-defence' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-motivation-sport-shooting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
+            '/prs-shooting-south-africa'          => ['priority' => '0.8',  'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-motivation-hunting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-renewal-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
             '/firearm-licence-appeal-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
@@ -300,6 +301,11 @@ Route::get('/firearm-licence-motivation-sport-shooting', function () use ($motiv
     $motivationsOnly();
 
     return view('seo.motivations.sport-shooting');
+});
+Route::get('/prs-shooting-south-africa', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    return view('seo.motivations.prs-shooting');
 });
 Route::get('/firearm-licence-motivation-hunting', function () use ($motivationsOnly) {
     $motivationsOnly();

@@ -22,6 +22,7 @@
 @section('sidebar_nav')
     <a href="/firearm-licence-motivation-self-defence" class="{{ request()->is('firearm-licence-motivation-self-defence') ? 'active' : '' }}">Self-defence</a>
     <a href="/firearm-licence-motivation-sport-shooting" class="{{ request()->is('firearm-licence-motivation-sport-shooting') ? 'active' : '' }}">Sport shooting</a>
+    <a href="/prs-shooting-south-africa" class="{{ request()->is('prs-shooting-south-africa') ? 'active' : '' }}">PRS beginner's guide</a>
     <a href="/firearm-licence-motivation-hunting" class="{{ request()->is('firearm-licence-motivation-hunting') ? 'active' : '' }}">Hunting</a>
     <a href="/firearm-licence-renewal-south-africa" class="{{ request()->is('firearm-licence-renewal-south-africa') ? 'active' : '' }}">Renewal</a>
     <a href="/faq" class="{{ request()->is('faq') ? 'active' : '' }}">Site FAQ</a>
@@ -65,6 +66,11 @@
 <div class="info-card">
     <h4><a href="/resources/services" style="color:#F58220;">Our Services</a></h4>
     <p>Comprehensive firearm administration services including motivations, renewals, appeals, and estate administration.</p>
+</div>
+
+<div class="info-card">
+    <h4><a href="/prs-shooting-south-africa" style="color:#F58220;">PRS Shooting — Beginner's Guide</a></h4>
+    <p>New to Precision Rifle Series? Disciplines, gear, calibres, where to shoot, dedicated status, and what your firearm motivation needs to cover.</p>
 </div>
 
 <div class="info-card">
