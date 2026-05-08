@@ -8,10 +8,10 @@
 @section('home_url', '/')
 @section('logo_asset', 'logo-ranyati_motivations-white-text.png')
 @section('contact_email', 'info@firearmmotivations.co.za')
-@section('cta_heading', 'Sport shooting motivation')
-@section('cta_text', 'Enquire for help with your motivation and supporting narrative.')
+@section('cta_heading', 'Get Your Comprehensive Firearm Motivation')
+@section('cta_text', 'Sport-shooting applications need the right discipline framing, supporting evidence, and a properly structured SAPS-compliant motivation. Enquire and we\'ll handle the full case.')
 @section('cta_url', '/enquire')
-@section('cta_button', 'Enquire now')
+@section('cta_button', 'Enquire Now')
 @section('header_extra')
     <a href="/enquire">Enquire</a>
 @endsection

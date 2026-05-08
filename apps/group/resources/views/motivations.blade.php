@@ -195,14 +195,14 @@
             </div>
 
             <h1 class="mt-10 text-[2.5rem] font-black leading-[1.05] tracking-[-0.03em] text-white sm:text-[3.25rem] lg:text-[4rem] anim-1">
-                Firearm Motivation<br class="hidden sm:block"> Letters
+                Comprehensive<br class="hidden sm:block"> Firearm Motivations
             </h1>
             <p class="mt-4 text-[13px] font-semibold uppercase tracking-[0.25em] text-[#F58220]/70 anim-1">
                 A Division of Ranyati Group
             </p>
 
             <p class="mx-auto mt-7 max-w-lg text-[15px] leading-[1.8] text-white/45 anim-2">
-                Professional firearm motivation letters for licence applications, renewals, and compliance support in South Africa. We simplify a complex legal process so you can focus on responsible firearm ownership.
+                A professional firearm motivation is far more than a letter — it's the carefully researched, properly structured, legally compliant case that anchors your licence application or renewal. We handle every element, so you can focus on responsible firearm ownership.
             </p>
 
             <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-4 anim-3">
@@ -242,7 +242,7 @@
                 <p class="text-[10px] font-bold uppercase tracking-[0.25em] text-[#F58220]/60">What We Do</p>
                 <h2 class="mt-3 text-[1.75rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.25rem]">Expert motivation services</h2>
                 <p class="mx-auto mt-4 max-w-xl text-[14px] leading-[1.7] text-white/35">
-                    Nearly two decades of experience writing firearm motivation letters, delivered by professionals who understand the Firearms Control Act inside and out.
+                    Nearly two decades of comprehensive firearm motivation work — research, structured argument, and SAPS-compliant documentation — delivered by professionals who understand the Firearms Control Act inside and out.
                 </p>
             </div>
 
@@ -251,8 +251,8 @@
                     <div class="flex size-12 items-center justify-center rounded-xl" style="background: rgba(245,130,32,0.1); box-shadow: inset 0 0 0 1px rgba(245,130,32,0.15);">
                         <svg class="size-6 text-[#F58220]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
                     </div>
-                    <h3 class="mt-6 text-[15px] font-bold text-white">New Licence Motivation Letters</h3>
-                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Comprehensive firearm motivation letters for new licence applications, covering self-defence, sport shooting, hunting, and professional use.</p>
+                    <h3 class="mt-6 text-[15px] font-bold text-white">New Licence Motivations</h3>
+                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Comprehensive motivation packages for new licence applications, covering self-defence, sport shooting, hunting, and professional use.</p>
                 </div>
 
                 <div class="card-service rounded-2xl p-8">
@@ -260,7 +260,7 @@
                         <svg class="size-6 text-sky-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182"/></svg>
                     </div>
                     <h3 class="mt-6 text-[15px] font-bold text-white">Licence Renewals</h3>
-                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Timely and thorough renewal motivation letters to ensure continuity of your existing firearm licences before expiry.</p>
+                    <p class="mt-3 text-[13px] leading-[1.7] text-white/35">Timely, thorough renewal motivations to keep your existing firearm licences current — well before they expire.</p>
                 </div>
 
                 <div class="card-service rounded-2xl p-8">
@@ -335,15 +335,16 @@
     {{-- CTA --}}
     <section class="relative bg-[#020810] border-t border-white/[0.04] pb-28 sm:pb-36">
         <div class="mx-auto max-w-3xl px-6 lg:px-8 pt-24 text-center">
-            <div style="background: linear-gradient(180deg, rgba(245,130,32,0.06) 0%, rgba(245,130,32,0.02) 100%); border: 1px solid rgba(245,130,32,0.1); border-radius: 20px; padding: 48px 32px;">
-                <h2 class="text-[1.5rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2rem]">
-                    Ready to Get Started?
+            <div style="background: linear-gradient(180deg, rgba(245,130,32,0.09) 0%, rgba(245,130,32,0.03) 100%); border: 1px solid rgba(245,130,32,0.2); border-radius: 22px; padding: 56px 36px; box-shadow: 0 32px 64px -32px rgba(245,130,32,0.25);">
+                <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-[#F58220]/80">Ready when you are</p>
+                <h2 class="mt-3 text-[1.625rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2.25rem]">
+                    Get Your Comprehensive<br class="hidden sm:block"> Firearm Motivation
                 </h2>
-                <p class="mx-auto mt-4 max-w-md text-[14px] leading-[1.7] text-white/40">
-                    Submit an enquiry and our team will contact you to discuss your firearm motivation letter requirements.
+                <p class="mx-auto mt-5 max-w-lg text-[14.5px] leading-[1.7] text-white/55">
+                    Researched, properly structured, and SAPS-compliant — handled by specialists since 2006. Submit an enquiry and our team will be in touch.
                 </p>
-                <div class="mt-8">
-                    <a href="/enquire" class="btn-cta inline-flex rounded-xl px-10 py-4 text-[14px] font-bold text-white tracking-wide">
+                <div class="mt-9">
+                    <a href="/enquire" class="btn-cta inline-flex rounded-xl px-12 py-4 text-[15px] font-extrabold text-white tracking-wide">
                         Enquire Now
                     </a>
                 </div>

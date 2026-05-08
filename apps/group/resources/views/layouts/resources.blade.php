@@ -133,23 +133,26 @@
         }
 
         .res-cta {
-            max-width: 52rem; margin: 0 auto 80px; padding: 0 24px;
+            max-width: 64rem; margin: 0 auto 80px; padding: 0 24px;
         }
         .res-cta-inner {
-            padding: 48px 32px; border-radius: 20px; text-align: center;
+            padding: 56px 40px; border-radius: 22px; text-align: center;
             background: linear-gradient(180deg, var(--cta-from) 0%, var(--cta-to) 100%);
             border: 1px solid var(--cta-border);
+            box-shadow: 0 32px 64px -32px var(--btn-shadow);
         }
-        .res-cta-inner h3 { font-size: 1.5rem; font-weight: 900; color: #fff; }
-        .res-cta-inner p { margin-top: 12px; font-size: 14px; color: rgba(255,255,255,0.4); max-width: 28rem; margin-left: auto; margin-right: auto; }
+        .res-cta-eyebrow { font-size: 10px; font-weight: 800; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
+        .res-cta-inner h3 { margin-top: 12px; font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1.15; letter-spacing: -0.02em; }
+        @media (min-width: 640px) { .res-cta-inner h3 { font-size: 2rem; } }
+        .res-cta-inner p { margin: 16px auto 0; font-size: 14.5px; line-height: 1.7; color: rgba(255,255,255,0.55); max-width: 34rem; }
         .res-cta-btn {
-            display: inline-flex; margin-top: 24px; padding: 14px 36px;
-            border-radius: 12px; border: none; font-size: 14px; font-weight: 700; color: #fff;
+            display: inline-flex; margin-top: 28px; padding: 16px 44px;
+            border-radius: 12px; border: none; font-size: 15px; font-weight: 800; color: #fff;
             background: var(--btn-bg);
-            box-shadow: 0 2px 12px -2px var(--btn-shadow);
-            cursor: pointer; transition: all 0.25s;
+            box-shadow: 0 4px 20px -4px var(--btn-shadow);
+            cursor: pointer; transition: all 0.25s; letter-spacing: 0.02em;
         }
-        .res-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px -4px var(--btn-shadow); }
+        .res-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 32px -6px var(--btn-shadow); }
 
         .res-footer {
             background: #020810; border-top: 1px solid rgba(255,255,255,0.04);
@@ -251,8 +254,9 @@
     {{-- CTA --}}
     <div class="res-cta">
         <div class="res-cta-inner">
-            <h3>@yield('cta_heading', 'Ready to Get Started?')</h3>
-            <p>@yield('cta_text', 'Get in touch with our team today.')</p>
+            <p class="res-cta-eyebrow">@yield('cta_eyebrow', 'Ready when you are')</p>
+            <h3>@yield('cta_heading', 'Get Your Comprehensive Firearm Motivation')</h3>
+            <p>@yield('cta_text', 'Researched, properly structured, and SAPS-compliant — handled by specialists since 2006.')</p>
             <a href="@yield('cta_url', '/enquire')" class="res-cta-btn">@yield('cta_button', 'Enquire Now')</a>
         </div>
     </div>
