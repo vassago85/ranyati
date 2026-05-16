@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AgentDocsController;
+use App\Http\Controllers\RobotsController;
+use App\Http\Controllers\SitemapController;
 use App\Mail\NewArmsEnquiry;
 use App\Mail\NewMotivationEnquiry;
 use App\Models\ArmsEnquiry;
@@ -77,94 +80,22 @@ Route::get('/resources/{slug?}', function (?string $slug = null) {
     return view($view);
 })->where('slug', '[a-z0-9-]+');
 
-Route::get('/sitemap.xml', function () {
-    $host = request()->getHost();
-    $today = date('Y-m-d');
+// ── SEO / agent endpoints (host-aware) ──────────────────────────
+//
+// Sitemap and robots are extracted into dedicated controllers so that
+// content updates (new pages, new disallows, Content-Signal directives) live
+// in PHP files instead of inline closures, and lastmod values are derived
+// from the underlying Blade view's filemtime() rather than today's date.
 
-    if (str_starts_with($host, 'motivations.')) {
-        $base = 'https://motivations.ranyati.co.za';
-        $pages = [
-            ''                                    => ['priority' => '1.0', 'changefreq' => 'monthly',  'lastmod' => $today],
-            '/enquire'                            => ['priority' => '0.9', 'changefreq' => 'monthly',  'lastmod' => $today],
-            '/faq'                                => ['priority' => '0.85', 'changefreq' => 'weekly',  'lastmod' => $today],
-            '/firearm-motivation-letter'          => ['priority' => '0.9',  'changefreq' => 'monthly', 'lastmod' => $today],
-            '/firearm-licence-motivation-self-defence' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/firearm-licence-motivation-sport-shooting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/prs-shooting-south-africa'          => ['priority' => '0.8',  'changefreq' => 'monthly', 'lastmod' => $today],
-            '/firearm-licence-motivation-hunting' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/firearm-licence-renewal-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/firearm-licence-appeal-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/resources'                          => ['priority' => '0.9', 'changefreq' => 'weekly',   'lastmod' => $today],
-            '/resources/about'                    => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
-            '/resources/firearm-licence-process'  => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
-            '/resources/firearms-control-act'     => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
-            '/resources/services'                 => ['priority' => '0.8', 'changefreq' => 'monthly',  'lastmod' => $today],
-            '/resources/faq'                      => ['priority' => '0.8', 'changefreq' => 'weekly',   'lastmod' => $today],
-            '/resources/documents-required'       => ['priority' => '0.7', 'changefreq' => 'monthly',  'lastmod' => $today],
-        ];
-    } elseif (str_starts_with($host, 'storage.')) {
-        $base = 'https://storage.ranyati.co.za';
-        $pages = [
-            ''                           => ['priority' => '1.0', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/firearm-storage-pretoria'  => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/long-term-firearm-storage-south-africa' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/temporary-firearm-storage' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/secure-firearm-storage-faq' => ['priority' => '0.85', 'changefreq' => 'weekly', 'lastmod' => $today],
-            '/resources'                 => ['priority' => '0.9', 'changefreq' => 'weekly',  'lastmod' => $today],
-            '/resources/about'           => ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/resources/safe-custody'    => ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/resources/fca-requirements'=> ['priority' => '0.8', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/resources/faq'             => ['priority' => '0.8', 'changefreq' => 'weekly',  'lastmod' => $today],
-        ];
-    } elseif (str_starts_with($host, 'arms.')) {
-        $base = 'https://arms.ranyati.co.za';
-        $pages = [
-            '' => ['priority' => '1.0', 'changefreq' => 'daily', 'lastmod' => $today],
-        ];
-    } else {
-        $base = 'https://ranyati.co.za';
-        $pages = [
-            '' => ['priority' => '1.0', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/about' => ['priority' => '0.9', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/services' => ['priority' => '0.9', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/contact' => ['priority' => '0.85', 'changefreq' => 'monthly', 'lastmod' => $today],
-            '/faq' => ['priority' => '0.85', 'changefreq' => 'weekly', 'lastmod' => $today],
-            '/guides' => ['priority' => '0.85', 'changefreq' => 'weekly', 'lastmod' => $today],
-        ];
-    }
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/robots.txt', RobotsController::class)->name('robots');
 
-    $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-    $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-    foreach ($pages as $path => $meta) {
-        $xml .= '<url>';
-        $xml .= '<loc>' . $base . $path . '</loc>';
-        $xml .= '<lastmod>' . $meta['lastmod'] . '</lastmod>';
-        $xml .= '<changefreq>' . $meta['changefreq'] . '</changefreq>';
-        $xml .= '<priority>' . $meta['priority'] . '</priority>';
-        $xml .= '</url>';
-    }
-    $xml .= '</urlset>';
-
-    return response($xml, 200, ['Content-Type' => 'application/xml']);
-});
-
-Route::get('/robots.txt', function () {
-    $host = request()->getHost();
-
-    if (str_starts_with($host, 'motivations.')) {
-        $sitemap = 'https://motivations.ranyati.co.za/sitemap.xml';
-    } elseif (str_starts_with($host, 'storage.')) {
-        $sitemap = 'https://storage.ranyati.co.za/sitemap.xml';
-    } elseif (str_starts_with($host, 'arms.')) {
-        $sitemap = 'https://arms.ranyati.co.za/sitemap.xml';
-    } else {
-        $sitemap = 'https://ranyati.co.za/sitemap.xml';
-    }
-
-    $txt = "User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: {$sitemap}\n";
-
-    return response($txt, 200, ['Content-Type' => 'text/plain']);
-});
+// Machine-readable agent documents — Motivations host only (the controller
+// 404s on apex/storage/arms hosts so this content never leaks cross-brand).
+Route::get('/llms.txt',    [AgentDocsController::class, 'llms'])->name('agent.llms');
+Route::get('/about.md',    [AgentDocsController::class, 'aboutMd'])->name('agent.about-md');
+Route::get('/services.md', [AgentDocsController::class, 'servicesMd'])->name('agent.services-md');
+Route::get('/faq.md',      [AgentDocsController::class, 'faqMd'])->name('agent.faq-md');
 
 // ── SEO support pages (host-aware; same path may resolve differently per hostname) ──
 

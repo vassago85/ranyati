@@ -23,34 +23,119 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@type": "ProfessionalService",
-        "name": "Ranyati Motivations",
-        "description": "Professional firearm motivation letters for licence applications, renewals, appeals, and compliance documentation across South Africa.",
-        "url": "https://motivations.ranyati.co.za",
-        "telephone": "+27-87-151-0987",
-        "email": "info@firearmmotivations.co.za",
-        "parentOrganization": {
-            "@type": "Organization",
-            "name": "Ranyati Group",
-            "url": "https://ranyati.co.za"
-        },
-        "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "241 Jean Avenue",
-            "addressLocality": "Pretoria",
-            "addressRegion": "Gauteng",
-            "addressCountry": "ZA"
-        },
-        "areaServed": {
-            "@type": "Country",
-            "name": "South Africa"
-        },
-        "serviceType": ["Firearm Motivation Letters", "Firearm Licence Motivations", "Licence Applications", "Licence Renewals", "Compliance Support", "Appeals"]
-    }
-    </script>
+    @php
+        $motivationsOrgId   = 'https://motivations.ranyati.co.za/#organization';
+        $motivationsSiteId  = 'https://motivations.ranyati.co.za/#website';
+        $motivationsPageId  = 'https://motivations.ranyati.co.za/#webpage';
+        $ranyatiGroupId     = 'https://ranyati.co.za/#organization';
+
+        $motivationsGraph = [
+            '@context' => 'https://schema.org',
+            '@graph' => [
+                [
+                    '@type' => 'ProfessionalService',
+                    '@id' => $motivationsOrgId,
+                    'name' => 'Ranyati Motivations',
+                    'legalName' => 'Ranyati Firearm Motivations (Pty) Ltd',
+                    'alternateName' => ['Ranyati Firearm Motivations', 'Ranyati Group — Motivations'],
+                    'description' => 'Professional firearm motivation letters for licence applications, renewals, appeals, and compliance documentation across South Africa. A division of the Ranyati Group, specialist firearm administration since 2006.',
+                    'url' => 'https://motivations.ranyati.co.za',
+                    'logo' => url(asset('logo-ranyati_motivations-white-text.png')),
+                    'image' => url(asset('ranyati-motivations-logo.png')),
+                    'foundingDate' => '2006',
+                    'telephone' => '+27-87-151-0987',
+                    'email' => 'info@firearmmotivations.co.za',
+                    'address' => [
+                        '@type' => 'PostalAddress',
+                        'streetAddress' => '241 Jean Avenue',
+                        'addressLocality' => 'Pretoria',
+                        'addressRegion' => 'Gauteng',
+                        'postalCode' => '0157',
+                        'addressCountry' => 'ZA',
+                    ],
+                    'contactPoint' => [
+                        '@type' => 'ContactPoint',
+                        'telephone' => '+27-87-151-0987',
+                        'email' => 'info@firearmmotivations.co.za',
+                        'contactType' => 'customer service',
+                        'areaServed' => 'ZA',
+                        'availableLanguage' => ['English', 'Afrikaans'],
+                    ],
+                    'areaServed' => [
+                        '@type' => 'Country',
+                        'name' => 'South Africa',
+                    ],
+                    'serviceType' => [
+                        'Firearm Motivation Letters',
+                        'Firearm Licence Motivations',
+                        'Self-defence Firearm Licence Motivations',
+                        'Sport-shooting Firearm Licence Motivations',
+                        'Hunting Firearm Licence Motivations',
+                        'Firearm Licence Renewals',
+                        'Firearm Licence Appeals',
+                        'Estate Firearm Administration',
+                        'Firearms Control Act Compliance Support',
+                    ],
+                    'parentOrganization' => [
+                        '@type' => 'Organization',
+                        '@id' => $ranyatiGroupId,
+                        'name' => 'Ranyati Group',
+                        'legalName' => 'Ranyati Firearm Motivations (Pty) Ltd',
+                        'url' => 'https://ranyati.co.za',
+                        'logo' => url(asset('logo-ranyatigroup-white_text.png')),
+                        'subOrganization' => [
+                            ['@type' => 'Organization', 'name' => 'Ranyati Motivations', 'url' => 'https://motivations.ranyati.co.za'],
+                            ['@type' => 'Organization', 'name' => 'NRAPA — National Rifle and Pistol Association of South Africa', 'url' => 'https://nrapa.ranyati.co.za'],
+                            ['@type' => 'Organization', 'name' => 'Ranyati Storage', 'url' => 'https://storage.ranyati.co.za'],
+                            ['@type' => 'Organization', 'name' => 'Ranyati Arms', 'url' => 'https://arms.ranyati.co.za'],
+                        ],
+                    ],
+                ],
+                [
+                    '@type' => 'WebSite',
+                    '@id' => $motivationsSiteId,
+                    'name' => 'Ranyati Motivations',
+                    'url' => 'https://motivations.ranyati.co.za',
+                    'description' => 'Professional firearm motivation letters for licence applications, renewals, and appeals in South Africa.',
+                    'inLanguage' => 'en-ZA',
+                    'publisher' => ['@id' => $motivationsOrgId],
+                ],
+                [
+                    '@type' => 'WebPage',
+                    '@id' => $motivationsPageId,
+                    'url' => 'https://motivations.ranyati.co.za/',
+                    'name' => 'Firearm Motivation Letter South Africa — Professional Licence Motivations | Ranyati',
+                    'description' => 'Need a firearm motivation letter? Professional motivation letters for firearm licence applications, renewals, appeals, and compliance in South Africa. Trusted since 2006.',
+                    'inLanguage' => 'en-ZA',
+                    'isPartOf' => ['@id' => $motivationsSiteId],
+                    'about' => [
+                        ['@type' => 'Thing', 'name' => 'Firearm Licence Motivations (South Africa)'],
+                        ['@type' => 'Thing', 'name' => 'Self-defence Firearm Licence Motivations'],
+                        ['@type' => 'Thing', 'name' => 'Sport-shooting Firearm Licence Motivations'],
+                        ['@type' => 'Thing', 'name' => 'Hunting Firearm Licence Motivations'],
+                        ['@type' => 'Thing', 'name' => 'Firearm Licence Renewals'],
+                        ['@type' => 'Thing', 'name' => 'Firearm Licence Appeals and Reviews'],
+                        ['@type' => 'Thing', 'name' => 'Firearms Control Act Compliance'],
+                        ['@type' => 'Thing', 'name' => 'Dedicated Sport Shooter Status (via NRAPA)'],
+                        ['@type' => 'Thing', 'name' => 'Dedicated Hunter Status (via NRAPA)'],
+                        ['@type' => 'Thing', 'name' => 'Estate Firearm Administration'],
+                    ],
+                    'primaryImageOfPage' => [
+                        '@type' => 'ImageObject',
+                        'url' => url(asset('ranyati-motivations-logo.png')),
+                    ],
+                    'breadcrumb' => [
+                        '@type' => 'BreadcrumbList',
+                        'itemListElement' => [
+                            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => 'https://motivations.ranyati.co.za/'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    @endphp
+    <script type="application/ld+json">{!! json_encode($motivationsGraph, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
+    @stack('structured_data')
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; background: #020810; }
 

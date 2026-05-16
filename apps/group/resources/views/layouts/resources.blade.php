@@ -192,9 +192,13 @@
             'item' => $row['item'],
         ], $resBreadcrumbItems);
     @endphp
+    {{-- '@@context' / '@@type' are intentional: Laravel 11+ ships a Blade
+         @context directive that otherwise corrupts these JSON-LD keys, even
+         inside string literals. The double @@ tells Blade to emit a literal
+         single @ in the compiled PHP. --}}
     <script type="application/ld+json">{!! json_encode([
-        '@context' => 'https://schema.org',
-        '@type' => 'BreadcrumbList',
+        '@@context' => 'https://schema.org',
+        '@@type' => 'BreadcrumbList',
         'itemListElement' => $resBreadcrumbJson,
     ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
     @stack('structured_data')
