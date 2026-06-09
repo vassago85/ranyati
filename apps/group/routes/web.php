@@ -7,6 +7,7 @@ use App\Mail\NewArmsEnquiry;
 use App\Mail\NewMotivationEnquiry;
 use App\Models\ArmsEnquiry;
 use App\Models\ArmsListing;
+use App\Models\Document;
 use App\Models\MotivationEnquiry;
 use App\Models\Setting;
 use App\Models\User;
@@ -253,6 +254,29 @@ Route::get('/firearm-licence-appeal-south-africa', function () use ($motivations
 
     return view('seo.motivations.appeal');
 });
+
+// ── Forms & Documents (Motivations host) ────────────────────────
+// Public, downloadable application questionnaires and fee structures.
+
+Route::get('/forms', function () use ($motivationsOnly) {
+    $motivationsOnly();
+
+    $documents = Document::published()->ordered()->get()
+        ->groupBy(fn (Document $doc) => $doc->category ?: 'General');
+
+    return view('forms', compact('documents'));
+})->name('forms');
+
+Route::get('/forms/{document}/download', function (Document $document) use ($motivationsOnly) {
+    $motivationsOnly();
+
+    abort_unless($document->is_published, 404);
+    abort_unless(Storage::disk('public')->exists($document->path), 404);
+
+    $document->increment('download_count');
+
+    return Storage::disk('public')->download($document->path, $document->original_name);
+})->name('forms.download');
 
 Route::get('/firearm-storage-pretoria', function () use ($storageOnly) {
     $storageOnly();
@@ -675,6 +699,97 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         return back()->with('success', 'All arms enquiries marked as read.');
     })->name('arms.enquiries.mark-all-read');
+
+    // ── Documents (downloadable forms & questionnaires) ────────
+
+    Route::get('/documents', function () {
+        return view('admin.documents.index', [
+            'documents' => Document::ordered()->paginate(50),
+        ]);
+    })->name('documents');
+
+    Route::get('/documents/create', function () {
+        return view('admin.documents.form', ['document' => null]);
+    })->name('documents.create');
+
+    Route::post('/documents', function (Request $request) {
+        $validated = $request->validate([
+            'category' => 'nullable|string|max:255',
+            'files' => 'required|array|min:1|max:30',
+            'files.*' => 'file|mimes:pdf,doc,docx,xls,xlsx|max:25600',
+        ]);
+
+        $nextOrder = (int) (Document::max('sort_order') ?? 0);
+        $count = 0;
+
+        foreach ($request->file('files') as $file) {
+            $original = $file->getClientOriginalName();
+
+            Document::create([
+                'title' => Document::titleFromFilename($original),
+                'category' => $validated['category'] ?? null,
+                'path' => $file->store('documents', 'public'),
+                'original_name' => $original,
+                'mime' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'sort_order' => ++$nextOrder,
+                'is_published' => true,
+                'created_by' => auth()->id(),
+            ]);
+            $count++;
+        }
+
+        return redirect()->route('admin.documents')
+            ->with('success', $count.' document'.($count === 1 ? '' : 's').' uploaded.');
+    })->name('documents.store');
+
+    Route::get('/documents/{document}/edit', function (Document $document) {
+        return view('admin.documents.form', compact('document'));
+    })->name('documents.edit');
+
+    Route::put('/documents/{document}', function (Request $request, Document $document) {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'category' => 'nullable|string|max:255',
+            'sort_order' => 'nullable|integer|min:0',
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:25600',
+        ]);
+
+        $data = [
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'category' => $validated['category'] ?? null,
+            'sort_order' => $validated['sort_order'] ?? $document->sort_order,
+            'is_published' => $request->boolean('is_published'),
+        ];
+
+        if ($request->hasFile('file')) {
+            Storage::disk('public')->delete($document->path);
+            $file = $request->file('file');
+            $data['path'] = $file->store('documents', 'public');
+            $data['original_name'] = $file->getClientOriginalName();
+            $data['mime'] = $file->getClientMimeType();
+            $data['size'] = $file->getSize();
+        }
+
+        $document->update($data);
+
+        return redirect()->route('admin.documents')->with('success', 'Document updated.');
+    })->name('documents.update');
+
+    Route::post('/documents/{document}/toggle', function (Document $document) {
+        $document->update(['is_published' => ! $document->is_published]);
+
+        return back()->with('success', $document->is_published ? 'Document published.' : 'Document hidden.');
+    })->name('documents.toggle');
+
+    Route::delete('/documents/{document}', function (Document $document) {
+        Storage::disk('public')->delete($document->path);
+        $document->delete();
+
+        return redirect()->route('admin.documents')->with('success', 'Document deleted.');
+    })->name('documents.delete');
 
     // ── User Management (developer & owner only) ───────────────
 

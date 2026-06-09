@@ -20,6 +20,7 @@
 @section('breadcrumb', 'All Resources')
 
 @section('sidebar_nav')
+    <a href="/forms" class="{{ request()->is('forms') ? 'active' : '' }}">Application Forms</a>
     <a href="/firearm-licence-motivation-self-defence" class="{{ request()->is('firearm-licence-motivation-self-defence') ? 'active' : '' }}">Self-defence</a>
     <a href="/firearm-licence-motivation-sport-shooting" class="{{ request()->is('firearm-licence-motivation-sport-shooting') ? 'active' : '' }}">Sport shooting</a>
     <a href="/prs-shooting-south-africa" class="{{ request()->is('prs-shooting-south-africa') ? 'active' : '' }}">PRS beginner's guide</a>
@@ -47,6 +48,11 @@
 
 @section('content')
 <p>Our resource centre provides guides, FAQs, and practical information to help you understand the firearm licensing process in South Africa. Whether you are applying for your first licence, renewing an existing one, or handling estate firearms, these pages will point you in the right direction.</p>
+
+<div class="info-card">
+    <h4><a href="/forms" style="color:#F58220;">Application Forms &amp; Questionnaires</a></h4>
+    <p>Download the questionnaires and fee structures you need to start your application — competency, self-defence, hunting, sport shooting, and renewals.</p>
+</div>
 
 <div class="info-card">
     <h4><a href="/resources/about" style="color:#F58220;">About Us</a></h4>
