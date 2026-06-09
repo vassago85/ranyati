@@ -9,6 +9,8 @@ use App\Models\ArmsEnquiry;
 use App\Models\ArmsListing;
 use App\Models\Document;
 use App\Models\MotivationEnquiry;
+use App\Models\QuestionnaireResponse;
+use App\Support\QuestionnaireRegistry;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,6 +21,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 Route::get('/', function () {
     $host = request()->getHost();
@@ -790,6 +793,92 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         return redirect()->route('admin.documents')->with('success', 'Document deleted.');
     })->name('documents.delete');
+
+    // ── Digital Questionnaires (scaffold — admin only, not public) ──
+
+    Route::get('/questionnaires', function () {
+        return view('admin.questionnaires.index', [
+            'questionnaires' => QuestionnaireRegistry::all(),
+            'responses' => QuestionnaireResponse::with('submitter')->latest()->paginate(25),
+        ]);
+    })->name('questionnaires');
+
+    Route::get('/questionnaires/responses/{response}', function (QuestionnaireResponse $response) {
+        $definition = QuestionnaireRegistry::find($response->questionnaire_key);
+
+        return view('admin.questionnaires.show', compact('response', 'definition'));
+    })->name('questionnaires.response');
+
+    Route::delete('/questionnaires/responses/{response}', function (QuestionnaireResponse $response) {
+        $response->delete();
+
+        return redirect()->route('admin.questionnaires')->with('success', 'Response deleted.');
+    })->name('questionnaires.response.delete');
+
+    Route::get('/questionnaires/{key}/fill', function (string $key) {
+        $definition = QuestionnaireRegistry::find($key);
+        abort_unless($definition, 404);
+
+        return view('admin.questionnaires.fill', compact('key', 'definition'));
+    })->name('questionnaires.fill');
+
+    Route::post('/questionnaires/{key}', function (Request $request, string $key) {
+        $definition = QuestionnaireRegistry::find($key);
+        abort_unless($definition, 404);
+
+        $fields = QuestionnaireRegistry::fields($definition);
+
+        $rules = [];
+        $labels = [];
+        foreach ($fields as $field) {
+            $name = $field['name'];
+            $labels[$name] = $field['label'];
+            $required = $field['required'] ?? false;
+
+            $rules[$name] = match ($field['type']) {
+                'checkbox' => $required ? 'accepted' : 'nullable',
+                'email' => ($required ? 'required' : 'nullable').'|email|max:255',
+                'textarea' => ($required ? 'required' : 'nullable').'|string|max:5000',
+                'select', 'radio' => ($required ? 'required' : 'nullable').'|string|in:'.implode(',', $field['options'] ?? []),
+                default => ($required ? 'required' : 'nullable').'|string|max:255',
+            };
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+        $validator->setAttributeNames(collect($labels)->map(fn ($l) => mb_strtolower($l))->all());
+        $validated = $validator->validate();
+
+        $answers = [];
+        $applicantName = null;
+        $applicantEmail = null;
+        foreach ($fields as $field) {
+            $name = $field['name'];
+            $value = $field['type'] === 'checkbox'
+                ? $request->boolean($name)
+                : ($validated[$name] ?? null);
+            $answers[$name] = $value;
+
+            if (($field['primary'] ?? null) === 'name') {
+                $applicantName = $value;
+            }
+            if (($field['primary'] ?? null) === 'email') {
+                $applicantEmail = $value;
+            }
+        }
+
+        $response = QuestionnaireResponse::create([
+            'questionnaire_key' => $key,
+            'questionnaire_title' => $definition['title'],
+            'applicant_name' => $applicantName,
+            'applicant_email' => $applicantEmail,
+            'answers' => $answers,
+            'status' => 'submitted',
+            'submitted_by' => auth()->id(),
+        ]);
+
+        return redirect()->route('admin.questionnaires.response', $response)
+            ->with('success', 'Questionnaire submitted and saved.');
+    })->name('questionnaires.submit');
 
     // ── User Management (developer & owner only) ───────────────
 
