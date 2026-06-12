@@ -111,6 +111,19 @@
         td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.03); color: rgba(255,255,255,0.6); }
         tr:hover td { background: rgba(255,255,255,0.02); }
 
+        /* On narrow screens, let tables scroll sideways instead of being
+           clipped by the card's overflow:hidden (which hid the action
+           buttons in the right-most column on mobile). */
+        @media (max-width: 1023px) {
+            table {
+                display: block; overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                white-space: nowrap;
+            }
+            th, td { padding: 10px 12px; }
+            td .btn, th .btn { flex-shrink: 0; }
+        }
+
         .badge {
             display: inline-flex; align-items: center; padding: 3px 10px;
             border-radius: 999px; font-size: 11px; font-weight: 600;
