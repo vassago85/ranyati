@@ -11,9 +11,14 @@
 @php
     $imageList = $images->all();
     $hasReduced = $listing->original_price && $listing->original_price > $listing->price;
+
+    $makeModel = trim($listing->make.' '.$listing->model);
+    $titleText = trim((string) $listing->title);
+    $showTitle = $titleText !== '' && mb_strtolower($titleText) !== mb_strtolower($makeModel);
+
     $cardData = [
         'images' => $imageList,
-        'filename' => \Illuminate\Support\Str::slug(trim($listing->make.' '.$listing->model)).'-ranyati-arms.png',
+        'filename' => \Illuminate\Support\Str::slug($makeModel ?: 'listing').'-ranyati-arms.png',
     ];
 @endphp
 
@@ -59,13 +64,12 @@
         text-transform: uppercase; color: rgba(255,200,175,0.65);
     }
     .acard-photo {
-        margin-top: 40px;
-        width: 100%; height: 880px;
+        margin-top: 32px;
+        width: 100%; height: 720px;
         border-radius: 28px;
         border: 1px solid rgba(255,255,255,0.10);
-        background-color: rgba(255,255,255,0.03);
+        background-color: #14080510;
         background-position: center; background-repeat: no-repeat; background-size: cover;
-        box-shadow: 0 40px 90px -30px rgba(0,0,0,0.7);
     }
     .acard-photo-empty {
         display: flex; align-items: center; justify-content: center;
@@ -73,23 +77,35 @@
     }
     .acard-photo-empty svg { width: 200px; height: 200px; }
     .acard-calibre {
-        margin-top: 56px;
+        margin-top: 44px;
         font-size: 30px; font-weight: 700; letter-spacing: 0.26em;
         text-transform: uppercase; color: rgba(255,205,180,0.92);
     }
-    .acard-title {
-        margin-top: 18px;
-        font-size: 86px; font-weight: 900; line-height: 1.04;
+    .acard-headline {
+        margin-top: 14px;
+        font-size: 78px; font-weight: 900; line-height: 1.04;
         letter-spacing: -0.02em; color: #fff;
-        overflow: hidden;
+        overflow: hidden; max-height: 168px;
+    }
+    .acard-subtitle {
+        margin-top: 14px;
+        font-size: 34px; font-weight: 600; line-height: 1.25;
+        color: rgba(255,255,255,0.82);
+        overflow: hidden; max-height: 90px;
+    }
+    .acard-description {
+        margin-top: 22px;
+        font-size: 28px; font-weight: 400; line-height: 1.45;
+        color: rgba(255,255,255,0.78);
+        overflow: hidden; max-height: 165px;
     }
     .acard-includes {
-        margin-top: 26px;
-        font-size: 30px; line-height: 1.5; color: rgba(255,255,255,0.62);
-        overflow: hidden; max-height: 138px;
+        margin-top: 18px;
+        font-size: 26px; line-height: 1.45; color: rgba(255,255,255,0.55);
+        overflow: hidden; max-height: 116px;
     }
-    .acard-includes b { color: rgba(255,255,255,0.85); font-weight: 700; }
-    .acard-spacer { flex: 1 1 auto; min-height: 24px; }
+    .acard-includes b { color: rgba(255,255,255,0.80); font-weight: 700; }
+    .acard-spacer { flex: 1 1 auto; min-height: 20px; }
     .acard-priceblock {
         border-top: 1px solid rgba(255,255,255,0.10);
         padding-top: 40px;
@@ -143,7 +159,15 @@
                 @endif
 
                 <div class="acard-calibre">{{ $listing->calibre }}</div>
-                <div class="acard-title">{{ $listing->make }} {{ $listing->model }}</div>
+                <div class="acard-headline">{{ $makeModel }}</div>
+
+                @if($showTitle)
+                    <div class="acard-subtitle">{{ $titleText }}</div>
+                @endif
+
+                @if($listing->description)
+                    <div class="acard-description">{{ $listing->description }}</div>
+                @endif
 
                 @if($listing->accessories)
                     <div class="acard-includes"><b>Includes:</b> {{ $listing->accessories }}</div>
