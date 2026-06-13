@@ -90,6 +90,7 @@
                             <td style="text-align: right;">
                                 <div style="display: flex; gap: 6px; justify-content: flex-end;">
                                     <a href="{{ route('admin.arms.edit', $listing) }}" class="btn btn-secondary btn-sm">Edit</a>
+                                    <a href="{{ route('admin.arms.card', $listing) }}" class="btn btn-secondary btn-sm" title="Download a WhatsApp Status card">Card</a>
 
                                     @if($listing->status === 'archived')
                                         <form method="POST" action="{{ route('admin.arms.feature', $listing) }}" style="display:inline;">

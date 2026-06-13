@@ -609,6 +609,14 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         return view('admin.arms.form', compact('listing'));
     })->name('arms.edit');
 
+    Route::get('/arms/{listing}/card', function (ArmsListing $listing) {
+        $images = collect($listing->images ?? [])
+            ->map(fn ($img) => asset('storage/'.$img))
+            ->values();
+
+        return view('admin.arms.card', compact('listing', 'images'));
+    })->name('arms.card');
+
     Route::put('/arms/{listing}', function (Request $request, ArmsListing $listing) {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
