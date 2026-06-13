@@ -65,11 +65,12 @@
     }
     .acard-photo {
         margin-top: 32px;
-        width: 100%; height: 720px;
+        width: 100%; height: 760px;
         border-radius: 28px;
         border: 1px solid rgba(255,255,255,0.10);
-        background-color: #14080510;
-        background-position: center; background-repeat: no-repeat; background-size: cover;
+        background-color: rgba(0,0,0,0.25);
+        background-position: center; background-repeat: no-repeat;
+        /* background-size is bound via Alpine (contain | cover) */
     }
     .acard-photo-empty {
         display: flex; align-items: center; justify-content: center;
@@ -94,15 +95,15 @@
         overflow: hidden; max-height: 90px;
     }
     .acard-description {
-        margin-top: 22px;
-        font-size: 28px; font-weight: 400; line-height: 1.45;
+        margin-top: 20px;
+        font-size: 26px; font-weight: 400; line-height: 1.45;
         color: rgba(255,255,255,0.78);
-        overflow: hidden; max-height: 165px;
+        overflow: hidden; max-height: 130px;
     }
     .acard-includes {
-        margin-top: 18px;
-        font-size: 26px; line-height: 1.45; color: rgba(255,255,255,0.55);
-        overflow: hidden; max-height: 116px;
+        margin-top: 14px;
+        font-size: 24px; line-height: 1.4; color: rgba(255,255,255,0.55);
+        overflow: hidden; max-height: 90px;
     }
     .acard-includes b { color: rgba(255,255,255,0.80); font-weight: 700; }
     .acard-spacer { flex: 1 1 auto; min-height: 20px; }
@@ -138,6 +139,22 @@
         cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s;
     }
     .cb-thumb.is-active { border-color: #C45A3C; }
+    .cb-fit {
+        display: inline-flex; padding: 4px; border-radius: 8px;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+        margin-top: 8px;
+    }
+    .cb-fit button {
+        background: transparent; color: rgba(255,255,255,0.65);
+        border: 0; padding: 8px 14px; border-radius: 6px;
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        transition: all 0.15s;
+    }
+    .cb-fit button:hover { color: #fff; }
+    .cb-fit button.is-active {
+        background: #C45A3C; color: #fff;
+    }
+    .cb-help { font-size: 11px; color: rgba(255,255,255,0.40); margin-top: 6px; line-height: 1.5; }
 </style>
 
 <div class="cardbuilder" x-data="armsCard(@js($cardData))">
@@ -151,7 +168,7 @@
                 </div>
 
                 @if(count($imageList) > 0)
-                    <div class="acard-photo" :style="`background-image: url('${current}')`"></div>
+                    <div class="acard-photo" :style="`background-image: url('${current}'); background-size: ${fit};`"></div>
                 @else
                     <div class="acard-photo acard-photo-empty">
                         <svg fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z"/></svg>
@@ -201,8 +218,17 @@
                 Download a ready-to-post WhatsApp Status card (1080&times;1920) for this firearm. Pick the photo you want, then download and post it to your status.
             </p>
 
+            @if(count($imageList) > 0)
+                <div class="form-label">Photo fit</div>
+                <div class="cb-fit" role="group" aria-label="Photo fit">
+                    <button type="button" :class="fit === 'contain' ? 'is-active' : ''" @click="fit = 'contain'">Fit whole image</button>
+                    <button type="button" :class="fit === 'cover' ? 'is-active' : ''" @click="fit = 'cover'">Fill &amp; crop</button>
+                </div>
+                <div class="cb-help">Use <b>Fit whole image</b> for long/portrait rifle photos so they aren't cropped. Use <b>Fill &amp; crop</b> when you have a tight close-up you want to fill the frame.</div>
+            @endif
+
             @if(count($imageList) > 1)
-                <div class="form-label">Choose photo</div>
+                <div class="form-label" style="margin-top: 18px;">Choose photo</div>
                 <div class="cb-thumbs">
                     @foreach($imageList as $i => $img)
                         <img src="{{ $img }}" class="cb-thumb" :class="selected === {{ $i }} ? 'is-active' : ''" @click="selected = {{ $i }}" alt="Photo {{ $i + 1 }}">
@@ -233,6 +259,7 @@ function armsCard(data) {
         images: data.images || [],
         filename: data.filename || 'ranyati-arms.png',
         selected: 0,
+        fit: 'contain',
         working: false,
 
         get current() {
