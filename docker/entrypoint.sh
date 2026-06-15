@@ -43,6 +43,12 @@ php artisan cache:clear 2>/dev/null || true
 
 php artisan storage:link 2>/dev/null || true
 
+# Compress any arms listing images that are still un-optimised (e.g. uploaded
+# before the ImageOptimizer existed, or restored from a backup). The
+# --threshold guard makes this an effective no-op once images are small.
+echo "Optimising arms images (skipping already-small files)..."
+php artisan arms:optimize-images --threshold=400 || echo "  Image optimisation had issues, continuing..."
+
 chown -R www-data:www-data /var/www/html/storage
 chmod -R 775 /var/www/html/storage
 
