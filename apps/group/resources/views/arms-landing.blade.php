@@ -817,10 +817,13 @@
             detailsListing: { id: null, make: '', model: '', calibre: '', priceFormatted: '', originalPriceFormatted: null, description: '', accessories: '', images: [], shareUrl: '' },
 
             init() {
-                this.$effect(() => {
+                const syncBodyLock = () => {
                     const locked = !!this.lightbox.open || !!this.detailsOpen;
                     document.body.classList.toggle('lb-locked', locked);
-                });
+                };
+                this.$watch('lightbox.open', syncBodyLock);
+                this.$watch('detailsOpen', syncBodyLock);
+                syncBodyLock();
             },
 
             get lightboxCurrent() {
