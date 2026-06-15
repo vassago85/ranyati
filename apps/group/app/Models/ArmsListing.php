@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ArmsListing extends Model
 {
@@ -87,5 +89,32 @@ class ArmsListing extends Model
             'status' => 'archived',
             'archived_at' => now(),
         ]);
+    }
+
+    /**
+     * Garbage-collect stored photos whenever a listing is deleted, regardless
+     * of which code path triggered the delete (route handler, tinker, Artisan,
+     * cascade, factory teardown, etc.). Failures are logged but never block
+     * the DB delete itself.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (self $listing): void {
+            foreach ($listing->images ?? [] as $path) {
+                if (! is_string($path) || $path === '') {
+                    continue;
+                }
+
+                try {
+                    Storage::disk('public')->delete($path);
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to delete arms image on listing delete', [
+                        'listing_id' => $listing->id,
+                        'path' => $path,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+        });
     }
 }
