@@ -590,7 +590,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $imagePaths[] = $image->store('arms', 'public');
+                $imagePaths[] = \App\Support\ImageOptimizer::storeUpload($image, 'arms');
             }
         }
 
@@ -655,7 +655,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $currentImages[] = $image->store('arms', 'public');
+                $currentImages[] = \App\Support\ImageOptimizer::storeUpload($image, 'arms');
             }
         }
 
