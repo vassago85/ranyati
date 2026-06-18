@@ -242,16 +242,10 @@
         .svc-bank {
             margin-top: 14px;
             border-radius: 10px;
-            background: rgba(255,255,255,0.02);
-            border: 1px dashed rgba(255,255,255,0.08);
-            padding: 12px 14px;
-            font-size: 11.5px; line-height: 1.65;
-            color: rgba(255,255,255,0.45);
+            background: rgba(245,130,32,0.05);
+            border: 1px solid rgba(245,130,32,0.15);
+            padding: 14px 16px;
         }
-        .svc-bank .row { display: flex; justify-content: space-between; gap: 10px; }
-        .svc-bank .row span:first-child { color: rgba(255,255,255,0.35); }
-        .svc-bank .row span:last-child  { color: rgba(255,255,255,0.75); font-family: monospace; font-weight: 600; }
-        .svc-bank .note { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body class="min-h-screen antialiased text-white">
@@ -512,7 +506,6 @@
                     $services = \App\Support\MotivationServices::all();
                     $servicesByGroup = collect($services)->groupBy('group');
                     $servicePrices = collect($services)->mapWithKeys(fn ($s) => [$s['key'] => $s['price']])->toArray();
-                    $bank = \App\Support\MotivationServices::bankDetails();
                     $oldServices = (array) old('services', []);
                 @endphp
 
@@ -629,17 +622,16 @@
                             <span class="svc-total-amount" x-text="formatRand(total())"></span>
                         </div>
 
-                        {{-- Bank details + payment notice --}}
+                        {{-- Reassurance: no payment needed yet, office will confirm pricing --}}
                         <div class="svc-bank" x-show="selected.length > 0" x-cloak x-transition>
-                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Banking details (EFT)</div>
-                            <div class="row"><span>Account name</span><span>{{ $bank['account_name'] }}</span></div>
-                            <div class="row"><span>Bank</span><span>{{ $bank['bank'] }} ({{ $bank['branch'] }})</span></div>
-                            <div class="row"><span>Branch code</span><span>{{ $bank['branch_code'] }}</span></div>
-                            <div class="row"><span>Account number</span><span>{{ $bank['account_no'] }}</span></div>
-                            <div class="row"><span>Reference</span><span>Name &amp; surname</span></div>
-                            <div class="row"><span>POP to</span><span>{{ $bank['proof_email'] }}</span></div>
-                            <div class="note">
-                                Payment is required <b style="color:rgba(255,255,255,0.7);">prior to commencement</b> of the writing and compiling of your motivation. EFT or credit card (credit card facilities only at our Garsfontein office).
+                            <div style="display:flex; gap:12px; align-items:flex-start;">
+                                <svg style="width:18px; height:18px; flex-shrink:0; margin-top:1px; color:#F58220;" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                                <div>
+                                    <div style="font-weight:600; color:rgba(255,255,255,0.85); font-size:12.5px; margin-bottom:4px;">No payment needed yet</div>
+                                    <div style="font-size:11.5px; color:rgba(255,255,255,0.55); line-height:1.6;">
+                                        Our office will be in touch to confirm the final pricing and discuss any additional services you may need. The totals above are indicative.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

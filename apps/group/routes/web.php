@@ -416,6 +416,18 @@ Route::post('/enquire', function (Request $request) {
 
     Mail::send(new NewMotivationEnquiry($enquiry));
 
+    // Send the customer their own branded acknowledgement. Wrapped because a
+    // delivery hiccup to a single customer's address must never break the
+    // form submission flow or block the staff notification above.
+    try {
+        Mail::send(new \App\Mail\MotivationEnquiryReceipt($enquiry));
+    } catch (\Throwable $e) {
+        \Illuminate\Support\Facades\Log::warning('Motivation enquiry customer receipt failed', [
+            'enquiry_id' => $enquiry->id,
+            'error' => $e->getMessage(),
+        ]);
+    }
+
     return redirect()->route('enquire')->with('success', 'Thank you! Your enquiry has been submitted. Our team will be in touch shortly.');
 })->name('enquire.submit');
 
