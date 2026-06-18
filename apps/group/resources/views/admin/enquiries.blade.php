@@ -26,6 +26,7 @@
                         <th>Email</th>
                         <th>Type</th>
                         <th>Purpose</th>
+                        <th>Services</th>
                         <th>Source</th>
                         <th>Date</th>
                         <th></th>
@@ -45,6 +46,17 @@
                             <td>{{ $enquiry->email }}</td>
                             <td>{{ $enquiry->endorsement_type ?? '—' }}</td>
                             <td>{{ $enquiry->purpose ?? '—' }}</td>
+                            <td style="white-space:nowrap;">
+                                @php
+                                    $svcResolved = \App\Support\MotivationServices::resolve($enquiry->services ?? []);
+                                    $svcTotal = \App\Support\MotivationServices::total($enquiry->services ?? []);
+                                @endphp
+                                @if(! empty($svcResolved))
+                                    <span class="badge badge-orange" title="R{{ number_format($svcTotal, 0, '.', ',') }} estimated">{{ count($svcResolved) }} &middot; R{{ number_format($svcTotal, 0, '.', ',') }}</span>
+                                @else
+                                    <span style="color:rgba(255,255,255,0.25);">—</span>
+                                @endif
+                            </td>
                             <td>
                                 @if($enquiry->source === 'nrapa_endorsement')
                                     <span class="badge badge-blue">NRAPA</span>

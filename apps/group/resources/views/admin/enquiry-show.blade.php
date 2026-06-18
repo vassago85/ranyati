@@ -66,6 +66,29 @@
                     @endif
                 </div>
 
+                @php
+                    $selectedServices = \App\Support\MotivationServices::resolve($enquiry->services ?? []);
+                    $servicesTotal = \App\Support\MotivationServices::total($enquiry->services ?? []);
+                @endphp
+
+                @if(! empty($selectedServices))
+                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.04);">
+                    <div class="form-label">Services Requested</div>
+                    <div style="margin-top:10px; display:flex; flex-direction:column; gap:8px;">
+                        @foreach($selectedServices as $svc)
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:10px 14px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.04);">
+                                <div style="font-size:13px; color:rgba(255,255,255,0.9); font-weight:500;">{{ $svc['label'] }}</div>
+                                <div style="font-size:13px; font-weight:700; color:#F58220; white-space:nowrap;">R{{ number_format($svc['price'], 0, '.', ',') }}</div>
+                            </div>
+                        @endforeach
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-radius:8px; background:rgba(245,130,32,0.08); border:1px solid rgba(245,130,32,0.25); margin-top:4px;">
+                            <div style="font-size:12px; font-weight:600; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:0.1em;">Estimated total</div>
+                            <div style="font-size:16px; font-weight:800; color:#F58220;">R{{ number_format($servicesTotal, 0, '.', ',') }}</div>
+                        </div>
+                    </div>
+                </div>
+                @endif
+
                 @if($enquiry->message)
                 <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.04);">
                     <div class="form-label">Message</div>

@@ -365,12 +365,26 @@ Route::post('/enquire', function (Request $request) {
         'phone' => 'nullable|string|max:50',
         'endorsement_type' => 'nullable|string|max:255',
         'purpose' => 'nullable|string|max:255',
+        'services' => 'nullable|array',
+        'services.*' => ['string', 'max:80', \Illuminate\Validation\Rule::in(\App\Support\MotivationServices::validKeys())],
         'membership_number' => 'nullable|string|max:100',
         'message' => 'nullable|string|max:2000',
         'source' => 'nullable|string|max:100',
         'otp' => $nrapaBypass ? 'required|string' : 'required|string|size:6',
         'cf-turnstile-response' => 'nullable|string',
     ]);
+
+    // Defensive: drop any submitted keys not in the current registry so a
+    // stale form on the client can never poison the stored enquiry.
+    if (! empty($validated['services'])) {
+        $valid = array_flip(\App\Support\MotivationServices::validKeys());
+        $validated['services'] = array_values(array_filter(
+            $validated['services'],
+            fn ($k) => isset($valid[$k]),
+        ));
+    } else {
+        $validated['services'] = [];
+    }
 
     if (! $nrapaBypass) {
         $email = strtolower(trim($validated['email']));

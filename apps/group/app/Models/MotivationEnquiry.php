@@ -12,6 +12,7 @@ class MotivationEnquiry extends Model
         'phone',
         'endorsement_type',
         'purpose',
+        'services',
         'membership_number',
         'message',
         'source',
@@ -22,6 +23,7 @@ class MotivationEnquiry extends Model
     {
         return [
             'read_at' => 'datetime',
+            'services' => 'array',
         ];
     }
 }

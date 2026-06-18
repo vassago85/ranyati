@@ -176,6 +176,82 @@
         .shake { animation: shake 0.4s ease; }
 
         .cf-turnstile { display: flex; justify-content: center; margin-top: 4px; }
+
+        /* Services & fees checkbox group */
+        .svc-intro {
+            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 14px 16px;
+            font-size: 12px; line-height: 1.6;
+            color: rgba(255,255,255,0.55);
+        }
+        .svc-intro b { color: rgba(255,255,255,0.85); font-weight: 600; }
+        .svc-intro-toggle {
+            color: #F58220; cursor: pointer; font-weight: 600;
+            background: transparent; border: 0; padding: 0;
+            font-size: 12px;
+        }
+        .svc-intro-toggle:hover { text-decoration: underline; }
+
+        .svc-group-label {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.16em; color: rgba(255,255,255,0.3);
+            margin-top: 16px; margin-bottom: 8px;
+        }
+        .svc-item {
+            display: flex; gap: 12px; align-items: flex-start;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            cursor: pointer;
+            transition: border-color .15s, background .15s;
+            margin-bottom: 8px;
+        }
+        .svc-item:hover { border-color: rgba(245,130,32,0.25); background: rgba(255,255,255,0.04); }
+        .svc-item input[type="checkbox"] {
+            margin-top: 3px;
+            width: 16px; height: 16px;
+            accent-color: #F58220;
+            flex-shrink: 0;
+        }
+        .svc-item.is-checked { border-color: rgba(245,130,32,0.40); background: rgba(245,130,32,0.06); }
+        .svc-item-body { flex: 1; min-width: 0; }
+        .svc-item-row {
+            display: flex; justify-content: space-between; align-items: baseline;
+            gap: 12px;
+        }
+        .svc-item-label { font-size: 13px; font-weight: 600; color: #fff; }
+        .svc-item-price {
+            font-size: 13px; font-weight: 700; color: #F58220;
+            white-space: nowrap;
+        }
+        .svc-item-desc { font-size: 11.5px; line-height: 1.55; color: rgba(255,255,255,0.45); margin-top: 4px; }
+
+        .svc-total {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 14px; padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(245,130,32,0.10);
+            border: 1px solid rgba(245,130,32,0.30);
+        }
+        .svc-total-label { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.1em; }
+        .svc-total-amount { font-size: 18px; font-weight: 800; color: #F58220; letter-spacing: -0.01em; }
+
+        .svc-bank {
+            margin-top: 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(255,255,255,0.08);
+            padding: 12px 14px;
+            font-size: 11.5px; line-height: 1.65;
+            color: rgba(255,255,255,0.45);
+        }
+        .svc-bank .row { display: flex; justify-content: space-between; gap: 10px; }
+        .svc-bank .row span:first-child { color: rgba(255,255,255,0.35); }
+        .svc-bank .row span:last-child  { color: rgba(255,255,255,0.75); font-family: monospace; font-weight: 600; }
+        .svc-bank .note { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body class="min-h-screen antialiased text-white">
@@ -432,7 +508,24 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('enquire.submit') }}" class="space-y-5">
+                @php
+                    $services = \App\Support\MotivationServices::all();
+                    $servicesByGroup = collect($services)->groupBy('group');
+                    $servicePrices = collect($services)->mapWithKeys(fn ($s) => [$s['key'] => $s['price']])->toArray();
+                    $bank = \App\Support\MotivationServices::bankDetails();
+                    $oldServices = (array) old('services', []);
+                @endphp
+
+                <form method="POST" action="{{ route('enquire.submit') }}" class="space-y-5"
+                      x-data="{
+                          selected: @js($oldServices),
+                          prices: @js($servicePrices),
+                          showIntro: false,
+                          formatRand(n) { return 'R' + Number(n).toLocaleString('en-ZA'); },
+                          total() {
+                              return this.selected.reduce((sum, k) => sum + (this.prices[k] || 0), 0);
+                          },
+                      }">
                     @csrf
 
                     <input type="hidden" name="email" :value="email">
@@ -495,6 +588,59 @@
                                 @endforeach
                             </select>
                             @error('purpose') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+
+                    {{-- Services & fees ── tick which services you'd like to use --}}
+                    <div>
+                        <label class="form-label">Services &amp; Fees</label>
+                        <div class="svc-intro">
+                            <p>
+                                Tick the services below that you'd like to make use of. We've been preparing successful firearm motivations since 2006 (over <b>18,000+</b> completed applications) and act as a one-stop service for Firearms Control Act administration. A typical motivation takes <b>7 – 10 working days</b>; expedited turn-arounds are available.
+                            </p>
+                            <button type="button" class="svc-intro-toggle" @click="showIntro = !showIntro" x-text="showIntro ? 'Hide details' : 'How it works \u2192'"></button>
+                            <div x-show="showIntro" x-cloak x-transition style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.06);">
+                                <p>Each motivation consists of all the reasons to counter the reasons used by the Central Firearm Registry (CFR) in the past to refuse an application, as well as your supporting documentation (which we thoroughly check). The completed motivation — approximately 30 pages — is printed and bound in book form and submitted, with your SAPS application, to your Designated Firearms Officer (DFO) in your area of residence.</p>
+                            </div>
+                        </div>
+
+                        @foreach($servicesByGroup as $group => $items)
+                            <div class="svc-group-label">{{ $group }}</div>
+                            @foreach($items as $svc)
+                                <label class="svc-item" :class="selected.includes('{{ $svc['key'] }}') ? 'is-checked' : ''">
+                                    <input type="checkbox" name="services[]" value="{{ $svc['key'] }}" x-model="selected">
+                                    <div class="svc-item-body">
+                                        <div class="svc-item-row">
+                                            <div class="svc-item-label">{{ $svc['label'] }}</div>
+                                            <div class="svc-item-price">R{{ number_format($svc['price'], 0, '.', ',') }}</div>
+                                        </div>
+                                        <div class="svc-item-desc">{{ $svc['description'] }}</div>
+                                    </div>
+                                </label>
+                            @endforeach
+                        @endforeach
+
+                        @error('services') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                        @error('services.*') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+
+                        {{-- Live total --}}
+                        <div class="svc-total" x-show="selected.length > 0" x-cloak x-transition>
+                            <span class="svc-total-label">Estimated total <span x-text="'(' + selected.length + ' service' + (selected.length === 1 ? '' : 's') + ')'" style="font-weight:500; color:rgba(255,255,255,0.45); text-transform:none; letter-spacing:0;"></span></span>
+                            <span class="svc-total-amount" x-text="formatRand(total())"></span>
+                        </div>
+
+                        {{-- Bank details + payment notice --}}
+                        <div class="svc-bank" x-show="selected.length > 0" x-cloak x-transition>
+                            <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color: rgba(255,255,255,0.6); margin-bottom: 8px;">Banking details (EFT)</div>
+                            <div class="row"><span>Account name</span><span>{{ $bank['account_name'] }}</span></div>
+                            <div class="row"><span>Bank</span><span>{{ $bank['bank'] }} ({{ $bank['branch'] }})</span></div>
+                            <div class="row"><span>Branch code</span><span>{{ $bank['branch_code'] }}</span></div>
+                            <div class="row"><span>Account number</span><span>{{ $bank['account_no'] }}</span></div>
+                            <div class="row"><span>Reference</span><span>Name &amp; surname</span></div>
+                            <div class="row"><span>POP to</span><span>{{ $bank['proof_email'] }}</span></div>
+                            <div class="note">
+                                Payment is required <b style="color:rgba(255,255,255,0.7);">prior to commencement</b> of the writing and compiling of your motivation. EFT or credit card (credit card facilities only at our Garsfontein office).
+                            </div>
                         </div>
                     </div>
 

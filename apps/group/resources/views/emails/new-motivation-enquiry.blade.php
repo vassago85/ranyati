@@ -11,6 +11,11 @@
         .value { font-size: 15px; margin-top: 2px; }
         .message-box { background: #f7f7f7; border-left: 3px solid #F58220; padding: 12px 16px; margin-top: 16px; }
         .source { margin-top: 24px; padding-top: 16px; border-top: 1px solid #eee; font-size: 12px; color: #999; }
+        .svc-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        .svc-table td { padding: 8px 12px; border-bottom: 1px solid #eee; font-size: 14px; vertical-align: top; }
+        .svc-table td.price { text-align: right; font-weight: bold; color: #F58220; white-space: nowrap; width: 100px; }
+        .svc-total-row td { padding-top: 12px; padding-bottom: 12px; border-bottom: none; font-weight: bold; background: #fff5eb; }
+        .svc-total-row td.price { font-size: 16px; }
     </style>
 </head>
 <body>
@@ -53,6 +58,27 @@
             <div class="label">Purpose</div>
             <div class="value">{{ $enquiry->purpose }}</div>
         </div>
+        @endif
+
+        @php
+            $selectedServices = \App\Support\MotivationServices::resolve($enquiry->services ?? []);
+            $servicesTotal = \App\Support\MotivationServices::total($enquiry->services ?? []);
+        @endphp
+
+        @if(! empty($selectedServices))
+        <div class="label" style="margin-top: 18px;">Services Requested</div>
+        <table class="svc-table">
+            @foreach($selectedServices as $svc)
+                <tr>
+                    <td>{{ $svc['label'] }}</td>
+                    <td class="price">R{{ number_format($svc['price'], 0, '.', ',') }}</td>
+                </tr>
+            @endforeach
+            <tr class="svc-total-row">
+                <td>Estimated total</td>
+                <td class="price">R{{ number_format($servicesTotal, 0, '.', ',') }}</td>
+            </tr>
+        </table>
         @endif
 
         @if($enquiry->message)
