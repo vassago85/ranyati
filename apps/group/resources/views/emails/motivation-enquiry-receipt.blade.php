@@ -13,7 +13,7 @@
             padding: 28px 28px 24px;
             text-align: center;
         }
-        .brand { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #F58220; }
+        .header .logo { height: 52px; width: auto; max-width: 80%; display: block; margin: 0 auto 14px; }
         .header h1 { font-size: 22px; font-weight: 700; margin: 8px 0 0; line-height: 1.3; }
         .body { padding: 28px; }
         .body p { margin: 0 0 14px; font-size: 14px; color: #444; }
@@ -45,7 +45,14 @@
 <body>
     <div class="wrap">
         <div class="header">
-            <div class="brand">Ranyati Firearm Motivations</div>
+            {{-- Logo is white-text on transparent; the dark navy gradient above provides the required dark backdrop. --}}
+            {{-- alt text styled with .logo-fallback so it reads cleanly when email clients block remote images. --}}
+            <img src="{{ asset('logo-ranyati_motivations-white-text.png') }}"
+                 alt="Ranyati Firearm Motivations"
+                 class="logo"
+                 width="220"
+                 height="52"
+                 style="height:52px; width:auto; max-width:80%; display:block; margin:0 auto 14px; color:#F58220; font-size:14px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase;" />
             <h1>Thank you — we have your enquiry</h1>
         </div>
 
