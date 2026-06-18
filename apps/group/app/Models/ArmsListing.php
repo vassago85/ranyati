@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ArmsListing extends Model
 {
     protected $fillable = [
         'title',
+        'slug',
         'make',
         'model',
         'calibre',
@@ -26,6 +29,15 @@ class ArmsListing extends Model
         'archived_at',
         'created_by',
     ];
+
+    /**
+     * Bind route model lookups to slug so per-listing URLs like
+     * /listings/glock-19-gen5-9mm-7a2b3c resolve correctly.
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
 
     protected function casts(): array
     {
@@ -92,13 +104,47 @@ class ArmsListing extends Model
     }
 
     /**
-     * Garbage-collect stored photos whenever a listing is deleted, regardless
-     * of which code path triggered the delete (route handler, tinker, Artisan,
-     * cascade, factory teardown, etc.). Failures are logged but never block
-     * the DB delete itself.
+     * Build a unique, URL-safe slug from make/model/calibre with a short
+     * random suffix to prevent collisions across similar listings (e.g. two
+     * Glock 19 Gen5 listings will produce different slugs).
+     */
+    public static function generateSlug(?string $make, ?string $model, ?string $calibre, ?int $ignoreId = null): string
+    {
+        $base = Str::slug(trim(($make ?? '').' '.($model ?? '').' '.($calibre ?? ''))) ?: 'listing';
+
+        do {
+            $candidate = $base.'-'.Str::lower(Str::random(6));
+            $query = static::query()->where('slug', $candidate);
+            if ($ignoreId !== null) {
+                $query->where('id', '!=', $ignoreId);
+            }
+        } while ($query->exists());
+
+        return $candidate;
+    }
+
+    /**
+     * Absolute public URL for this listing on arms.ranyati.co.za.
+     */
+    public function getPublicUrl(): string
+    {
+        return 'https://arms.ranyati.co.za/listings/'.$this->slug;
+    }
+
+    /**
+     * Hooks:
+     *  - Auto-generate a slug if missing on save.
+     *  - Garbage-collect stored photos whenever a listing is deleted,
+     *    regardless of which code path triggered the delete.
      */
     protected static function booted(): void
     {
+        static::saving(function (self $listing): void {
+            if (empty($listing->slug)) {
+                $listing->slug = self::generateSlug($listing->make, $listing->model, $listing->calibre, $listing->id);
+            }
+        });
+
         static::deleting(function (self $listing): void {
             foreach ($listing->images ?? [] as $path) {
                 if (! is_string($path) || $path === '') {

@@ -115,9 +115,30 @@ class SitemapController extends Controller
 
     private function armsEntries(): array
     {
-        return $this->resolveLastmod([
+        $entries = $this->resolveLastmod([
             ['path' => '/', 'view' => 'arms-landing', 'priority' => '1.0', 'changefreq' => 'daily'],
         ]);
+
+        // Each visible (non-archived) listing gets its own sitemap entry so Google
+        // can discover, crawl, and re-crawl them as stock changes. `lastmod`
+        // mirrors the listing's updated_at so re-priced / re-described listings
+        // get re-crawled promptly.
+        $listings = \App\Models\ArmsListing::query()
+            ->visible()
+            ->whereNotNull('slug')
+            ->orderByDesc('updated_at')
+            ->get(['slug', 'updated_at']);
+
+        foreach ($listings as $listing) {
+            $entries[] = [
+                'path'       => '/listings/'.$listing->slug,
+                'priority'   => '0.8',
+                'changefreq' => 'weekly',
+                'lastmod'    => optional($listing->updated_at)->toDateString() ?? date('Y-m-d'),
+            ];
+        }
+
+        return $entries;
     }
 
     private function apexEntries(): array

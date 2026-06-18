@@ -122,6 +122,26 @@ $armsOnly = function (): void {
 
 // ── Arms public routes ──────────────────────────────────────────
 
+// Per-listing detail page. Each visible listing gets its own URL so it can
+// be indexed individually, share with the listing's own photo, and surface
+// in long-tail searches like "used Glock 19 Pretoria". Archived listings
+// 404 so search engines drop them from the index.
+Route::get('/listings/{listing:slug}', function (ArmsListing $listing) use ($armsOnly) {
+    $armsOnly();
+
+    if ($listing->status === 'archived') {
+        abort(404);
+    }
+
+    return view('arms-listing-detail', [
+        'listing' => $listing,
+        'related' => ArmsListing::prioritised()
+            ->where('id', '!=', $listing->id)
+            ->limit(6)
+            ->get(),
+    ]);
+})->name('arms.listing.show');
+
 Route::post('/arms/send-otp', function (Request $request) use ($armsOnly) {
     $armsOnly();
 

@@ -107,11 +107,16 @@ TXT;
     private function armsBody(): string
     {
         return <<<TXT
-# Ranyati Arms — quality used firearms for sale
+# Ranyati Arms — quality used firearms for sale in Pretoria, Gauteng
 # Operated by Ranyati Firearm Motivations (Pty) Ltd / Ranyati Group
 # https://arms.ranyati.co.za
 
 User-agent: *
+# Public, indexable: the landing page and every per-listing detail page.
+Allow: /
+Allow: /listings/
+
+# Admin / operational endpoints stay out of the crawl.
 Disallow: /admin
 Disallow: /admin/
 Disallow: /dashboard
@@ -125,6 +130,8 @@ Disallow: /documents
 Disallow: /verify
 Disallow: /up
 Disallow: /arms/send-otp
+# /listing/ (singular) is the OTP-gated enquiry endpoint, distinct from the
+# public /listings/ (plural) detail pages allowed above.
 Disallow: /listing/
 
 Content-Signal: ai-train=no, search=yes, ai-input=yes

@@ -4,18 +4,22 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Ranyati Arms — Quality Used Firearms for Sale | Personally Inspected</title>
-    <meta name="description" content="Quality used firearms for sale in South Africa. Every firearm is personally inspected for condition and provenance before listing. Browse current stock, view make, model, calibre and pricing, and enquire directly. A division of Ranyati Group.">
+    <title>Used Firearms for Sale in Pretoria &amp; Gauteng | Ranyati Arms — Personally Inspected</title>
+    <meta name="description" content="Used firearms for sale in Pretoria, Gauteng &amp; South Africa-wide — second-hand handguns, rifles and shotguns. Every firearm is personally inspected for condition and provenance before listing. Browse current stock and enquire directly. A division of Ranyati Group.">
+    <meta name="keywords" content="used firearms for sale, second-hand firearms Pretoria, used guns Gauteng, used handguns South Africa, used rifles for sale, used shotguns Pretoria, pre-owned firearms, firearm dealer Pretoria, Ranyati Arms">
     <link rel="canonical" href="https://arms.ranyati.co.za/">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="geo.region" content="ZA-GP">
+    <meta name="geo.placename" content="Pretoria">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Ranyati Arms">
-    <meta property="og:title" content="Ranyati Arms — Quality Used Firearms for Sale">
-    <meta property="og:description" content="Quality used firearms — every item personally inspected before listing. Browse current stock and enquire directly through Ranyati Arms.">
+    <meta property="og:title" content="Used Firearms for Sale in Pretoria &amp; Gauteng | Ranyati Arms">
+    <meta property="og:description" content="Quality used firearms in Pretoria, Gauteng — every item personally inspected before listing. Browse current stock and enquire directly through Ranyati Arms.">
     <meta property="og:url" content="https://arms.ranyati.co.za/">
     <meta property="og:image" content="{{ asset('ranyati-group-logo.png') }}">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Ranyati Arms — Quality Used Firearms for Sale">
-    <meta name="twitter:description" content="Quality used firearms — every item personally inspected before listing. Browse current stock and enquire through Ranyati Arms.">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Used Firearms for Sale in Pretoria &amp; Gauteng | Ranyati Arms">
+    <meta name="twitter:description" content="Quality used firearms in Pretoria, Gauteng — every item personally inspected before listing. Browse current stock and enquire through Ranyati Arms.">
     <meta name="twitter:image" content="{{ asset('ranyati-group-logo.png') }}">
     <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
     <link rel="apple-touch-icon" href="{{ asset('ranyati-icon.png') }}">
@@ -23,23 +27,73 @@
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800,900" rel="stylesheet" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@type": "Store",
-        "name": "Ranyati Arms",
-        "description": "Quality used firearms for sale in South Africa. Every firearm is personally inspected for condition and provenance before being listed. Browse current stock, view full details and enquire directly with Ranyati Arms.",
-        "url": "https://arms.ranyati.co.za",
-        "email": "info@firearmstorage.co.za",
-        "areaServed": {"@type": "Country", "name": "South Africa"},
-        "knowsAbout": ["Used Firearms", "Pre-owned Firearms", "Firearm Inspection", "Firearms Control Act", "Firearm Sales"],
-        "parentOrganization": {
-            "@type": "Organization",
-            "name": "Ranyati Group",
-            "url": "https://ranyati.co.za"
-        }
-    }
-    </script>
+
+    @php
+        $storeJsonLd = [
+            '@context'    => 'https://schema.org',
+            '@type'       => ['Store', 'LocalBusiness'],
+            'name'        => 'Ranyati Arms',
+            'description' => 'Used firearms for sale in Pretoria, Gauteng and across South Africa. Every firearm is personally inspected for condition and provenance before being listed.',
+            'url'         => 'https://arms.ranyati.co.za',
+            'logo'        => asset('logo-ranyati_arms-white_text.png'),
+            'image'       => asset('ranyati-group-logo.png'),
+            'address'     => [
+                '@type'           => 'PostalAddress',
+                'addressLocality' => 'Pretoria',
+                'addressRegion'   => 'Gauteng',
+                'addressCountry'  => 'ZA',
+            ],
+            'areaServed'  => [
+                ['@type' => 'City',           'name' => 'Pretoria'],
+                ['@type' => 'City',           'name' => 'Johannesburg'],
+                ['@type' => 'AdministrativeArea', 'name' => 'Gauteng'],
+                ['@type' => 'Country',        'name' => 'South Africa'],
+            ],
+            'knowsAbout'  => ['Used Firearms', 'Pre-owned Firearms', 'Used Handguns', 'Used Rifles', 'Used Shotguns', 'Firearm Inspection', 'Firearms Control Act', 'Firearm Sales'],
+            'parentOrganization' => [
+                '@type' => 'Organization',
+                'name'  => 'Ranyati Group',
+                'url'   => 'https://ranyati.co.za',
+            ],
+        ];
+
+        $itemListJsonLd = [
+            '@context'        => 'https://schema.org',
+            '@type'           => 'ItemList',
+            'itemListElement' => $listings->values()->map(function ($l, $i) {
+                $isReduced = $l->original_price && $l->original_price > $l->price;
+                $firstImg = collect($l->images ?? [])->first();
+                $imgUrl = $firstImg ? asset('storage/'.$firstImg) : asset('ranyati-group-logo.png');
+                return [
+                    '@type'    => 'ListItem',
+                    'position' => $i + 1,
+                    'item'     => [
+                        '@type'         => 'Product',
+                        'name'          => trim($l->make.' '.$l->model.' — '.$l->calibre),
+                        'url'           => $l->getPublicUrl(),
+                        'image'         => $imgUrl,
+                        'brand'         => ['@type' => 'Brand', 'name' => $l->make],
+                        'sku'           => 'RA-'.$l->id,
+                        'category'      => 'Used Firearm',
+                        'itemCondition' => 'https://schema.org/UsedCondition',
+                        'offers'        => [
+                            '@type'         => 'Offer',
+                            'url'           => $l->getPublicUrl(),
+                            'priceCurrency' => 'ZAR',
+                            'price'         => number_format((float) $l->price, 2, '.', ''),
+                            'availability'  => 'https://schema.org/InStock',
+                            'itemCondition' => 'https://schema.org/UsedCondition',
+                        ],
+                    ],
+                ];
+            })->all(),
+        ];
+    @endphp
+
+    <script type="application/ld+json">{!! json_encode($storeJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @if($listings->count() > 0)
+        <script type="application/ld+json">{!! json_encode($itemListJsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+    @endif
     <style>
         body { font-family: 'Inter', system-ui, sans-serif; background: #020810; }
 
@@ -485,17 +539,17 @@
                             <div style="padding: 12px 12px 0;">
                                 @if($imgUrls->count() > 0)
                                     <div>
-                                        <div style="position: relative; cursor: pointer;" @click="openLightbox(images, activeImg)">
-                                            <img src="{{ $imgUrls->first() }}" x-bind:src="images[activeImg]" alt="{{ $listing->make }} {{ $listing->model }}" class="listing-image" loading="lazy">
+                                        <a href="{{ route('arms.listing.show', $listing) }}" style="display:block; position: relative; cursor: pointer;" @click.prevent="openLightbox(images, activeImg)" aria-label="View {{ $listing->make }} {{ $listing->model }} {{ $listing->calibre }} for sale">
+                                            <img src="{{ $imgUrls->first() }}" x-bind:src="images[activeImg]" alt="Used {{ $listing->make }} {{ $listing->model }} {{ $listing->calibre }} for sale at Ranyati Arms, Pretoria" class="listing-image" width="800" height="600" loading="lazy">
                                             <div style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 3px 8px; font-size: 10px; color: rgba(255,255,255,0.6); pointer-events: none;">
                                                 <svg style="width: 12px; height: 12px; display: inline; vertical-align: -2px; margin-right: 3px;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
                                                 <span x-text="(activeImg + 1) + '/{{ $imgUrls->count() }}'">1/{{ $imgUrls->count() }}</span>
                                             </div>
-                                        </div>
+                                        </a>
                                         @if($imgUrls->count() > 1)
                                             <div style="display: flex; gap: 6px; margin-top: 8px;">
                                                 @foreach($imgUrls as $i => $thumbUrl)
-                                                    <img src="{{ $thumbUrl }}" @click="activeImg = {{ $i }}" class="gallery-thumb" :class="activeImg === {{ $i }} ? 'active' : ''" alt="Image {{ $i + 1 }}" loading="lazy">
+                                                    <img src="{{ $thumbUrl }}" @click="activeImg = {{ $i }}" class="gallery-thumb" :class="activeImg === {{ $i }} ? 'active' : ''" alt="Photo {{ $i + 1 }} of {{ $listing->make }} {{ $listing->model }}" width="120" height="120" loading="lazy">
                                                 @endforeach
                                             </div>
                                         @endif
@@ -517,8 +571,8 @@
                                         @endif
                                     </div>
 
-                                    <h3 class="listing-title" style="margin-top: 8px; font-size: 17px; font-weight: 800; color: #fff; line-height: 1.3;">
-                                        {{ $listing->make }} {{ $listing->model }}
+                                    <h3 class="listing-title" style="margin-top: 8px; font-size: 17px; font-weight: 800; line-height: 1.3;">
+                                        <a href="{{ route('arms.listing.show', $listing) }}" @click.prevent="openDetails(@js($listingData))" style="color: #fff; text-decoration: none;">{{ $listing->make }} {{ $listing->model }}</a>
                                     </h3>
 
                                     @if($listing->accessories)
@@ -577,6 +631,39 @@
                 </div>
             @endif
 
+        </div>
+    </section>
+
+    {{-- SEO content section: location signal + dealer pitch + FCA compliance --}}
+    <section id="about-ranyati-arms" class="relative bg-[#020810] pb-24 sm:pb-32">
+        <div class="mx-auto max-w-4xl px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <p class="text-[10px] font-bold uppercase tracking-[0.25em]" style="color: rgba(196,90,60,0.5);">About Ranyati Arms</p>
+                <h2 class="mt-3 text-[1.5rem] font-black leading-[1.1] tracking-[-0.02em] text-white sm:text-[2rem]">Used Firearms for Sale in Pretoria &amp; Gauteng</h2>
+            </div>
+
+            <div class="grid gap-6 sm:grid-cols-2 text-[14px] leading-[1.75] text-white/65">
+                <div>
+                    <h3 class="text-white font-bold mb-2 text-[15px]">Personally inspected stock</h3>
+                    <p>Every used firearm we list is personally inspected for mechanical condition, bore wear, and documented provenance before it ever appears on this page. We deal in <strong>used handguns, rifles and shotguns</strong> — calibres ranging from .22 LR through to common service and hunting cartridges — sourced through legitimate, properly documented channels.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold mb-2 text-[15px]">Based in Pretoria, Gauteng</h3>
+                    <p>Ranyati Arms is operated from <strong>Pretoria, Gauteng</strong>, serving buyers across Gauteng (including Johannesburg) and the rest of South Africa. Viewings are by appointment. Sales are conducted in accordance with the Firearms Control Act 60 of 2000 — buyers must hold a valid SAPS firearm competency and an applicable licence (or an active motivation/licence application) for the firearm being purchased.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold mb-2 text-[15px]">Part of Ranyati Group</h3>
+                    <p>Ranyati Arms is a division of the <a href="https://ranyati.co.za" class="text-white/85 underline-offset-2 hover:underline">Ranyati Group</a>, which also operates <a href="https://motivations.ranyati.co.za" class="text-white/85 underline-offset-2 hover:underline">Ranyati Motivations</a> (professional firearm licence motivation letters) and <a href="https://storage.ranyati.co.za" class="text-white/85 underline-offset-2 hover:underline">Ranyati Storage</a> (secure firearm storage in Pretoria).</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold mb-2 text-[15px]">How to buy</h3>
+                    <p>Browse the current stock above and click <em>Enquire</em> on any listing. We'll reply with viewing arrangements, the dealer-stock paperwork, and the transfer steps under the Firearms Control Act. If you don't yet hold the relevant licence, our sister brand can prepare a professional motivation for your application.</p>
+                </div>
+            </div>
+
+            <p class="mt-10 text-center text-[11px] leading-[1.6] text-white/35">
+                All sales are subject to the Firearms Control Act 60 of 2000 (South Africa). No firearm is transferred without a valid SAPS competency and applicable licence.
+            </p>
         </div>
     </section>
 
