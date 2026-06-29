@@ -172,7 +172,11 @@ Route::post('/arms/send-otp', function (Request $request) use ($armsOnly) {
     return response()->json(['message' => 'Verification code sent.']);
 })->name('arms.send-otp');
 
-Route::post('/listing/{listing}/enquire', function (Request $request, ArmsListing $listing) use ($armsOnly) {
+// Public arms enquiry POST. Bound explicitly by `id` because the landing-page
+// JS hardcodes `modalListing.id`; the ArmsListing model's default route key is
+// `slug` (for SEO), so without this override Laravel would look up `where slug
+// = 34` and return 404. Keep this an :id route forever.
+Route::post('/listing/{listing:id}/enquire', function (Request $request, ArmsListing $listing) use ($armsOnly) {
     $armsOnly();
 
     $validated = $request->validate([
