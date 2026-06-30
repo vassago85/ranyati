@@ -188,7 +188,7 @@
 <ol>
     <li><strong>Consultation</strong> — We assess your requirements, identify the appropriate licence category, and advise on the documentation needed for your specific application.</li>
     <li><strong>Preparation</strong> — We compile a structured, legally aligned motivation and prepare all supporting documentation to meet CFR and SAPS expectations.</li>
-    <li><strong>Submission &amp; Support</strong> — We guide you through the submission process and provide ongoing support until your application is finalised.</li>
+    <li><strong>Submission &amp; Support</strong> — We guide you through the submission process and provide ongoing support until your application is successfully submitted.</li>
 </ol>
 
 <p>To get started, <a href="/enquire">submit an enquiry</a> and our team will contact you to discuss your requirements. You can also learn more <a href="/resources/about">about Ranyati Motivations</a>, review the <a href="/resources/firearm-licence-process">licence process</a>, or check our <a href="/resources/faq">frequently asked questions</a>.</p>

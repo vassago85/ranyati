@@ -46,7 +46,7 @@ Our public service areas are:
 2. **Documentation.** We prepare a comprehensive motivation aligned with the
    Firearms Control Act and the criteria the registrar typically considers.
 3. **Submission & follow-up.** We guide the applicant through submission and
-   provide ongoing support until the application is finalised. The applicant
+   provide ongoing support until the application is successfully submitted. The applicant
    remains the applicant of record with SAPS.
 
 ## What we do not do

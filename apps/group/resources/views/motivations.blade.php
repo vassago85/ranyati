@@ -418,7 +418,7 @@
                     <div class="step-number" style="background: rgba(245,130,32,0.15); color: #F58220; box-shadow: inset 0 0 0 1px rgba(245,130,32,0.2);">3</div>
                     <div>
                         <h3 class="text-[15px] font-bold text-white">Submission &amp; Follow-up</h3>
-                        <p class="mt-2 text-[13px] leading-[1.7] text-white/35">We guide you through the submission process and provide ongoing support until your application is finalised.</p>
+                        <p class="mt-2 text-[13px] leading-[1.7] text-white/35">We guide you through the submission process and provide ongoing support until your application is successfully submitted.</p>
                     </div>
                 </div>
             </div>
