@@ -19,6 +19,10 @@
             <div class="stat-value" style="color: #f59e0b;">{{ $listings->where('status', 'reduced')->count() }}</div>
         </div>
         <div class="card stat-card">
+            <div class="stat-label">Sold</div>
+            <div class="stat-value" style="color: #ef4444;">{{ $listings->where('status', 'sold')->count() }}</div>
+        </div>
+        <div class="card stat-card">
             <div class="stat-label">Archived</div>
             <div class="stat-value" style="color: rgba(255,255,255,0.3);">{{ $listings->where('status', 'archived')->count() }}</div>
         </div>
@@ -77,6 +81,8 @@
                                         <span class="badge badge-green">Active</span>
                                     @elseif($listing->status === 'reduced')
                                         <span class="badge badge-orange">Reduced</span>
+                                    @elseif($listing->status === 'sold')
+                                        <span class="badge" style="background: rgba(239,68,68,0.18); color: #ef4444;">Sold</span>
                                     @else
                                         <span class="badge badge-zinc">Archived</span>
                                     @endif
@@ -92,12 +98,16 @@
                                     <a href="{{ route('admin.arms.edit', $listing) }}" class="btn btn-secondary btn-sm">Edit</a>
                                     <a href="{{ route('admin.arms.card', $listing) }}" class="btn btn-secondary btn-sm" title="Download a WhatsApp Status card">Card</a>
 
-                                    @if($listing->status === 'archived')
+                                    @if($listing->status === 'archived' || $listing->status === 'sold')
                                         <form method="POST" action="{{ route('admin.arms.feature', $listing) }}" style="display:inline;">
                                             @csrf
                                             <button type="submit" class="btn btn-primary btn-sm">Re-feature</button>
                                         </form>
-                                    @elseif($listing->status !== 'archived')
+                                    @else
+                                        <form method="POST" action="{{ route('admin.arms.sold', $listing) }}" style="display:inline;" onsubmit="return confirm('Mark this listing as sold? Its page stays live with a Sold state, but it leaves the grid and sitemap.')">
+                                            @csrf
+                                            <button type="submit" class="btn btn-secondary btn-sm">Mark Sold</button>
+                                        </form>
                                         <form method="POST" action="{{ route('admin.arms.archive', $listing) }}" style="display:inline;">
                                             @csrf
                                             <button type="submit" class="btn btn-secondary btn-sm">Archive</button>

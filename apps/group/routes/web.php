@@ -125,7 +125,9 @@ $armsOnly = function (): void {
 // Per-listing detail page. Each visible listing gets its own URL so it can
 // be indexed individually, share with the listing's own photo, and surface
 // in long-tail searches like "used Glock 19 Pretoria". Archived listings
-// 404 so search engines drop them from the index.
+// 404 so search engines drop them from the index. Sold listings deliberately
+// stay live (HTTP 200, indexable) with a "Sold" state + SoldOut JSON-LD, so a
+// firearm selling never turns its URL into a 404 as stock churns.
 Route::get('/listings/{listing:slug}', function (ArmsListing $listing) use ($armsOnly) {
     $armsOnly();
 
@@ -523,6 +525,18 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         return redirect()->route('admin.enquiries')->with('success', 'Enquiry deleted.');
     })->name('enquiries.delete');
 
+    Route::get('/applications', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'index'])
+        ->name('applications');
+    Route::get('/applications/log', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'log'])
+        ->name('applications.log');
+    Route::post('/applications/circuit/reset', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'resetCircuit'])
+        ->name('applications.circuit.reset');
+    Route::get('/applications/batches/{batchKey}', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'showBatch'])
+        ->whereNumber('batchKey')
+        ->name('applications.batch');
+    Route::get('/applications/users/{user}', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'showUser'])
+        ->name('applications.user');
+
     Route::get('/settings', function () {
         $keys = ['mail_mailer', 'mailgun_domain', 'mailgun_secret', 'mailgun_endpoint',
                  'mail_from_name', 'mail_from_address', 'notification_email',
@@ -633,6 +647,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
+            'description_long' => 'nullable|string|max:20000',
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:15360',
         ]);
@@ -677,6 +692,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'price' => 'required|numeric|min:0',
             'original_price' => 'nullable|numeric|min:0',
             'description' => 'nullable|string|max:5000',
+            'description_long' => 'nullable|string|max:20000',
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:15360',
             'remove_images' => 'nullable|array',
@@ -739,6 +755,12 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         return back()->with('success', 'Listing archived.');
     })->name('arms.archive');
+
+    Route::post('/arms/{listing}/sold', function (ArmsListing $listing) {
+        $listing->markSold();
+
+        return back()->with('success', 'Listing marked as sold. Its page stays live (200) with a Sold state.');
+    })->name('arms.sold');
 
     // ── Arms Enquiries ─────────────────────────────────────────
 
@@ -1010,3 +1032,5 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         return back()->with('success', 'User deleted.');
     })->name('users.delete');
 });
+
+require __DIR__.'/status-tracker.php';

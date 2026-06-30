@@ -510,7 +510,7 @@
                             $imgUrls = collect($listing->images ?? [])->map(fn($img) => '/storage/' . $img)->values();
                             $shareLines = [
                                 $listing->make.' '.$listing->model.' — '.$listing->calibre,
-                                'R'.number_format($listing->price, 0).($listing->original_price && $listing->original_price > $listing->price ? ' (was R'.number_format($listing->original_price, 0).')' : ''),
+                                'R'.number_format($listing->price, 0, '.', ' ').($listing->original_price && $listing->original_price > $listing->price ? ' (was R'.number_format($listing->original_price, 0, '.', ' ').')' : ''),
                                 '',
                                 url('/').'#listing-'.$listing->id,
                             ];
@@ -521,9 +521,9 @@
                                 'make' => $listing->make,
                                 'model' => $listing->model,
                                 'calibre' => $listing->calibre,
-                                'priceFormatted' => 'R'.number_format($listing->price, 0),
+                                'priceFormatted' => 'R'.number_format($listing->price, 0, '.', ' '),
                                 'originalPriceFormatted' => $listing->original_price && $listing->original_price > $listing->price
-                                    ? 'R'.number_format($listing->original_price, 0)
+                                    ? 'R'.number_format($listing->original_price, 0, '.', ' ')
                                     : null,
                                 'description' => $listing->description,
                                 'accessories' => $listing->accessories,
@@ -596,14 +596,14 @@
                                         <span style="font-size: 11px; color: rgba(255,255,255,0.25); font-weight: 500;">Asking Price</span>
                                         @if($listing->original_price && $listing->original_price > $listing->price)
                                             <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.25); text-decoration: line-through; letter-spacing: -0.01em;">
-                                                R{{ number_format($listing->original_price, 0) }}
+                                                R{{ number_format($listing->original_price, 0, '.', ' ') }}
                                             </div>
                                             <div style="font-size: 20px; font-weight: 800; color: #ef4444; letter-spacing: -0.02em;">
-                                                R{{ number_format($listing->price, 0) }}
+                                                R{{ number_format($listing->price, 0, '.', ' ') }}
                                             </div>
                                         @else
                                             <div style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.02em;">
-                                                R{{ number_format($listing->price, 0) }}
+                                                R{{ number_format($listing->price, 0, '.', ' ') }}
                                             </div>
                                         @endif
                                     </div>
@@ -613,7 +613,7 @@
                                             <span>Share on WhatsApp</span>
                                         </a>
                                         <button
-                                            @click="openEnquiry({{ $listing->id }}, '{{ addslashes($listing->make) }} {{ addslashes($listing->model) }}', '{{ addslashes($listing->calibre) }}', 'R{{ number_format($listing->price, 0) }}')"
+                                            @click="openEnquiry({{ $listing->id }}, '{{ addslashes($listing->make) }} {{ addslashes($listing->model) }}', '{{ addslashes($listing->calibre) }}', 'R{{ number_format($listing->price, 0, '.', ' ') }}')"
                                             class="btn-cta rounded-lg px-5 py-2.5 text-[12px] font-bold text-white tracking-wide">
                                             Enquire
                                         </button>

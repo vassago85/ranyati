@@ -65,6 +65,13 @@
                 <div class="form-group">
                     <label class="form-label">Description</label>
                     <textarea name="description" class="form-input" rows="4" placeholder="Additional details about condition, history, etc." style="resize: vertical;">{{ old('description', $listing?->description) }}</textarea>
+                    <div class="form-hint">Short summary shown on the homepage card and as the fallback on the detail page.</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Long Description <span style="color: rgba(255,255,255,0.3); font-weight: 400;">(optional)</span></label>
+                    <textarea name="description_long" class="form-input" rows="8" placeholder="Optional in-depth write-up — condition, provenance, range history, why it's a good buy. Rendered on the detail page when present; falls back to the short description above when left blank." style="resize: vertical;">{{ old('description_long', $listing?->description_long) }}</textarea>
+                    <div class="form-hint">Only shown on the listing detail page. Leave blank to keep using the short description.</div>
                 </div>
 
                 {{-- Image Manager --}}

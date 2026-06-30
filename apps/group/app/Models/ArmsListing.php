@@ -23,6 +23,7 @@ class ArmsListing extends Model
         'price',
         'original_price',
         'description',
+        'description_long',
         'images',
         'status',
         'featured_at',
@@ -70,6 +71,11 @@ class ArmsListing extends Model
         return $query->where('status', 'active');
     }
 
+    public function scopeSold(Builder $query): Builder
+    {
+        return $query->where('status', 'sold');
+    }
+
     public function scopePrioritised(Builder $query): Builder
     {
         return $query->visible()
@@ -99,6 +105,20 @@ class ArmsListing extends Model
     {
         $this->update([
             'status' => 'archived',
+            'archived_at' => now(),
+        ]);
+    }
+
+    /**
+     * Mark a listing as sold. Unlike archiving, a sold listing keeps a live,
+     * indexable URL (200 with a "Sold" state + SoldOut in its JSON-LD) but is
+     * dropped from the homepage grid and sitemap via the visible() scope.
+     * Terminal state — the auto-archiver only touches active/reduced rows.
+     */
+    public function markSold(): void
+    {
+        $this->update([
+            'status' => 'sold',
             'archived_at' => now(),
         ]);
     }

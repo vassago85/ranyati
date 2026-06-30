@@ -5,7 +5,8 @@
 
     $makeModel     = trim($listing->make.' '.$listing->model);
     $headline      = $makeModel.' — '.$listing->calibre;
-    $isReduced     = $listing->original_price && $listing->original_price > $listing->price;
+    $isSold        = $listing->status === 'sold';
+    $isReduced     = ! $isSold && $listing->original_price && $listing->original_price > $listing->price;
     $priceFormatted = 'R'.number_format((float) $listing->price, 0, '.', ' ');
     $originalPriceFormatted = $listing->original_price
         ? 'R'.number_format((float) $listing->original_price, 0, '.', ' ')
@@ -41,9 +42,11 @@
             'url'           => $url,
             'priceCurrency' => 'ZAR',
             'price'         => number_format((float) $listing->price, 2, '.', ''),
-            'availability'  => $listing->status === 'archived'
-                ? 'https://schema.org/OutOfStock'
-                : 'https://schema.org/InStock',
+            'availability'  => match ($listing->status) {
+                'sold'     => 'https://schema.org/SoldOut',
+                'archived' => 'https://schema.org/OutOfStock',
+                default    => 'https://schema.org/InStock',
+            },
             'itemCondition' => 'https://schema.org/UsedCondition',
             'priceValidUntil' => now()->addMonths(3)->toDateString(),
             'seller'        => [
@@ -143,6 +146,31 @@
             letter-spacing: 0.1em; padding: 4px 10px; border-radius: 4px;
         }
 
+        .sold-badge {
+            display: inline-block; background: rgba(255,255,255,0.10);
+            color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.18);
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.14em; padding: 4px 12px; border-radius: 4px;
+        }
+        .btn-sold {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.55); font-weight: 700; font-size: 13px;
+            letter-spacing: 0.02em; border-radius: 10px; padding: 12px 22px;
+            cursor: not-allowed;
+        }
+        .gallery-wrap { position: relative; }
+        .sold-overlay {
+            position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+            background: rgba(2,8,16,0.55); border-radius: 16px; pointer-events: none;
+        }
+        .sold-overlay span {
+            background: rgba(2,8,16,0.85); color: #fff; border: 1px solid rgba(255,255,255,0.2);
+            font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.18em;
+            padding: 10px 24px; border-radius: 8px;
+        }
+
         .spec-row { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
         .spec-row:last-child { border-bottom: 0; }
         .spec-label { color: rgba(255,255,255,0.55); font-size: 13px; }
@@ -218,13 +246,18 @@
             {{-- Gallery --}}
             <div>
                 @if($imgUrls->count() > 0)
-                    <img class="gallery-main"
-                         src="{{ $primaryImage }}"
-                         x-bind:src="images[activeImg]"
-                         width="1200" height="900"
-                         alt="Used {{ $headline }} for sale at Ranyati Arms, Pretoria"
-                         loading="eager"
-                         fetchpriority="high">
+                    <div class="gallery-wrap">
+                        <img class="gallery-main"
+                             src="{{ $primaryImage }}"
+                             x-bind:src="images[activeImg]"
+                             width="1200" height="900"
+                             alt="Used {{ $headline }} for sale at Ranyati Arms, Pretoria"
+                             loading="eager"
+                             fetchpriority="high">
+                        @if($isSold)
+                            <div class="sold-overlay" aria-hidden="true"><span>Sold</span></div>
+                        @endif
+                    </div>
 
                     @if($imgUrls->count() > 1)
                         <div class="gallery-thumbs">
@@ -248,7 +281,9 @@
 
             {{-- Details --}}
             <div>
-                @if($isReduced)
+                @if($isSold)
+                    <span class="sold-badge">Sold</span>
+                @elseif($isReduced)
                     <span class="reduced-badge">Reduced</span>
                 @endif
 
@@ -267,8 +302,9 @@
                     @endif
                 </div>
 
-                @if($listing->description)
-                    <p class="mt-5 text-[14px] leading-[1.7] text-white/75 whitespace-pre-line">{{ $listing->description }}</p>
+                @php $detailDescription = $listing->description_long ?: $listing->description; @endphp
+                @if($detailDescription)
+                    <p class="mt-5 text-[14px] leading-[1.7] text-white/75 whitespace-pre-line">{{ $detailDescription }}</p>
                 @endif
 
                 {{-- Specs --}}
@@ -286,9 +322,13 @@
 
                 {{-- CTAs --}}
                 <div class="mt-7 flex flex-wrap gap-3">
-                    <a href="/#listing-{{ $listing->id }}" class="btn-primary">
-                        Enquire about this firearm
-                    </a>
+                    @if($isSold)
+                        <span class="btn-sold" aria-disabled="true">This firearm has been sold</span>
+                    @else
+                        <a href="/#listing-{{ $listing->id }}" class="btn-primary">
+                            Enquire about this firearm
+                        </a>
+                    @endif
                     <a href="{{ $whatsappShare }}" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Share this listing on WhatsApp">
                         <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                         Share on WhatsApp
