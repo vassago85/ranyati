@@ -337,7 +337,7 @@
 
                 {{-- Compliance --}}
                 <p class="mt-7 text-[11px] leading-[1.6] text-white/35">
-                    Sales are subject to the Firearms Control Act 60 of 2000. Buyers must hold a valid SAPS firearm competency and an applicable licence (or successful motivation/licence application) before transfer. Ranyati Arms is a personally curated stock of used firearms in Pretoria, Gauteng, with every item inspected for condition and provenance before listing.
+                    Sales are subject to the Firearms Control Act 60 of 2000. The licence application for a firearm can only begin once it's purchased — you pay, then receive a SAPS 271 with the firearm's details to apply for your licence. A valid SAPS competency for the relevant category is required, and Ranyati Motivations can assist with the motivation; the firearm is transferred only once the licence is granted. Ranyati Arms is a personally curated stock of used firearms in Pretoria, Gauteng, with every item inspected for condition and provenance before listing.
                 </p>
             </div>
         </div>

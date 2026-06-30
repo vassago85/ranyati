@@ -649,7 +649,7 @@
                 </div>
                 <div>
                     <h3 class="text-white font-bold mb-2 text-[15px]">Based in Pretoria, Gauteng</h3>
-                    <p>Ranyati Arms is operated from <strong>Pretoria, Gauteng</strong>, serving buyers across Gauteng (including Johannesburg) and the rest of South Africa. Viewings are by appointment. Sales are conducted in accordance with the Firearms Control Act 60 of 2000 — buyers must hold a valid SAPS firearm competency and an applicable licence (or an active motivation/licence application) for the firearm being purchased.</p>
+                    <p>Ranyati Arms is operated from <strong>Pretoria, Gauteng</strong>, serving buyers across Gauteng (including Johannesburg) and the rest of South Africa. Viewings are by appointment. Sales are conducted in accordance with the Firearms Control Act 60 of 2000 — you'll need a valid SAPS firearm competency for the relevant category, and the licence for the specific firearm is applied for <strong>after</strong> purchase using the SAPS 271 we issue.</p>
                 </div>
                 <div>
                     <h3 class="text-white font-bold mb-2 text-[15px]">Part of Ranyati Group</h3>
@@ -657,7 +657,7 @@
                 </div>
                 <div>
                     <h3 class="text-white font-bold mb-2 text-[15px]">How to buy</h3>
-                    <p>Browse the current stock above and click <em>Enquire</em> on any listing. We'll reply with viewing arrangements, the dealer-stock paperwork, and the transfer steps under the Firearms Control Act. If you don't yet hold the relevant licence, our sister brand can prepare a professional motivation for your application.</p>
+                    <p>Browse the current stock above and click <em>Enquire</em> on any listing. The licence application for a specific firearm can only begin once you've bought it: you pay for the firearm, and we then issue a <strong>SAPS 271</strong> with the firearm's details so you can lodge your licence application. You'll need a valid SAPS competency for the relevant category, and our sister brand <a href="https://motivations.ranyati.co.za" class="text-white/85 underline-offset-2 hover:underline">Ranyati Motivations</a> can prepare a professional motivation to support it. The firearm is transferred to you only once your licence is granted.</p>
                 </div>
             </div>
 
