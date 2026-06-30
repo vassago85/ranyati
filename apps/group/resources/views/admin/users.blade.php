@@ -90,8 +90,8 @@
                         <div class="form-group">
                             <label for="role" class="form-label">Role</label>
                             <select id="role" name="role" class="form-input">
-                                @foreach(auth()->user()->assignableRoles() as $role)
-                                    <option value="{{ $role }}">{{ \App\Models\User::ROLES[$role] }}</option>
+                                @foreach(array_reverse(auth()->user()->assignableRoles()) as $role)
+                                    <option value="{{ $role }}" @selected($loop->first)>{{ \App\Models\User::ROLES[$role] }}</option>
                                 @endforeach
                             </select>
                         </div>
