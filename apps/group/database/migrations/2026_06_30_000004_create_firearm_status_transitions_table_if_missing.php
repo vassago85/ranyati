@@ -30,8 +30,8 @@ return new class extends Migration
             $table->unsignedInteger('duration_days')->nullable();
             $table->timestamps();
 
-            $table->index(['firearm_application_id', 'entered_at']);
-            $table->index(['status', 'exited_at']);
+            $table->index(['firearm_application_id', 'entered_at'], 'fst_app_entered_idx');
+            $table->index(['status', 'exited_at'], 'fst_status_exited_idx');
         });
     }
 
