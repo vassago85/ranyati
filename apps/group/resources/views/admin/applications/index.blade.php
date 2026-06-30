@@ -63,7 +63,11 @@
                             <td>{{ $batch['monitored_count'] }}</td>
                             <td>{{ $batch['latest_status_at']?->diffForHumans() ?? '—' }}</td>
                             <td style="text-align: right;">
-                                <a href="{{ route('admin.applications.batch', $batch['batch_key']) }}" class="btn btn-secondary btn-sm">View</a>
+                                @if (ctype_digit((string) $batch['batch_key']))
+                                    <a href="{{ route('admin.applications.batch', $batch['batch_key']) }}" class="btn btn-secondary btn-sm">View</a>
+                                @else
+                                    <span class="btn btn-secondary btn-sm" style="opacity:0.4; cursor:not-allowed;" title="Batch detail is only available for numeric SAPS reference batches">—</span>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
