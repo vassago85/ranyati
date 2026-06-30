@@ -296,9 +296,9 @@
                 @endif
 
                 <div class="mt-5 flex items-baseline gap-3 flex-wrap">
-                    <span class="text-[2rem] font-black tracking-[-0.02em]" style="color: {{ $isReduced ? '#ef4444' : '#fff' }};">{{ $priceFormatted }}</span>
+                    <span class="text-[2rem] font-black tracking-[-0.02em]" style="color: {{ $isReduced ? '#ef4444' : '#fff' }}; white-space: nowrap;">{{ $priceFormatted }}</span>
                     @if($isReduced)
-                        <span class="text-[18px] font-semibold line-through" style="color: rgba(255,255,255,0.40);">{{ $originalPriceFormatted }}</span>
+                        <span class="text-[18px] font-semibold line-through" style="color: rgba(255,255,255,0.40); white-space: nowrap;">{{ $originalPriceFormatted }}</span>
                     @endif
                 </div>
 
@@ -358,7 +358,7 @@
                             <div class="mt-3">
                                 <p class="text-[10px] font-bold uppercase tracking-[0.18em]" style="color: rgba(255,205,180,0.75);">{{ $other->calibre }}</p>
                                 <h3 class="mt-1 text-[14px] font-bold text-white">{{ $other->make }} {{ $other->model }}</h3>
-                                <p class="mt-1 text-[15px] font-black tracking-[-0.01em]" style="color: {{ $otherReduced ? '#ef4444' : '#fff' }};">R{{ number_format((float) $other->price, 0, '.', ' ') }}</p>
+                                <p class="mt-1 text-[15px] font-black tracking-[-0.01em]" style="color: {{ $otherReduced ? '#ef4444' : '#fff' }}; white-space: nowrap;">R{{ number_format((float) $other->price, 0, '.', ' ') }}</p>
                             </div>
                         </a>
                     @endforeach

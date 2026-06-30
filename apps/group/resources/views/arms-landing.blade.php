@@ -403,10 +403,12 @@
         .details-price-strike {
             font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.3);
             text-decoration: line-through; letter-spacing: -0.01em;
+            white-space: nowrap;
         }
         .details-price {
             font-size: 26px; font-weight: 800; color: #fff;
             letter-spacing: -0.02em;
+            white-space: nowrap;
         }
         .details-price-reduced { color: #ef4444; }
         .details-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -595,14 +597,14 @@
                                     <div>
                                         <span style="font-size: 11px; color: rgba(255,255,255,0.25); font-weight: 500;">Asking Price</span>
                                         @if($listing->original_price && $listing->original_price > $listing->price)
-                                            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.25); text-decoration: line-through; letter-spacing: -0.01em;">
+                                            <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.25); text-decoration: line-through; letter-spacing: -0.01em; white-space: nowrap;">
                                                 R{{ number_format($listing->original_price, 0, '.', ' ') }}
                                             </div>
-                                            <div style="font-size: 20px; font-weight: 800; color: #ef4444; letter-spacing: -0.02em;">
+                                            <div style="font-size: 20px; font-weight: 800; color: #ef4444; letter-spacing: -0.02em; white-space: nowrap;">
                                                 R{{ number_format($listing->price, 0, '.', ' ') }}
                                             </div>
                                         @else
-                                            <div style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.02em;">
+                                            <div style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.02em; white-space: nowrap;">
                                                 R{{ number_format($listing->price, 0, '.', ' ') }}
                                             </div>
                                         @endif
@@ -733,7 +735,7 @@
                 <div style="background: rgba(196,90,60,0.08); border: 1px solid rgba(196,90,60,0.15); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;">
                     <div style="font-size: 14px; font-weight: 700; color: #fff;" x-text="modalListing.name"></div>
                     <div style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 2px;">
-                        <span x-text="modalListing.calibre"></span> &middot; <span x-text="modalListing.price"></span>
+                        <span x-text="modalListing.calibre"></span> &middot; <span x-text="modalListing.price" style="white-space: nowrap;"></span>
                     </div>
                 </div>
 
