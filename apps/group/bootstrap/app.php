@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminPassword::class,
+            'client' => \App\Http\Middleware\EnsureClient::class,
+            'client.verified' => \App\Http\Middleware\EnsureClientVerified::class,
+            'motivations' => \App\Http\Middleware\EnsureMotivationsSubdomain::class,
         ]);
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,

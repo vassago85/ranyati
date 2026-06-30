@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('arms:manage-listings')->daily();
+Schedule::command('saps:check-applications')->dailyAt('06:00');

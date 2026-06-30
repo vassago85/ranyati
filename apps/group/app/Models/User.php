@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -15,11 +16,13 @@ class User extends Authenticatable
     const ROLE_DEVELOPER = 'developer';
     const ROLE_OWNER = 'owner';
     const ROLE_ADMIN = 'admin';
+    const ROLE_CLIENT = 'client';
 
     const ROLES = [
         self::ROLE_DEVELOPER => 'Developer',
         self::ROLE_OWNER => 'Owner',
         self::ROLE_ADMIN => 'Admin',
+        self::ROLE_CLIENT => 'Client',
     ];
 
     protected $fillable = [
@@ -55,6 +58,16 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return in_array($this->role, [self::ROLE_DEVELOPER, self::ROLE_OWNER, self::ROLE_ADMIN]);
+    }
+
+    public function isClient(): bool
+    {
+        return $this->role === self::ROLE_CLIENT;
+    }
+
+    public function firearmApplications(): HasMany
+    {
+        return $this->hasMany(FirearmApplication::class);
     }
 
     public function getRoleLabelAttribute(): string
