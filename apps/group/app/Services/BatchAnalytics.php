@@ -17,7 +17,8 @@ class BatchAnalytics
      */
     public function batchesOverview(): Collection
     {
-        $expr = $this->batchKeyExpression();
+        $digits = $this->digitsExpression();
+        $expr = "SUBSTR($digits, 1, ".FirearmApplication::BATCH_KEY_LENGTH.")";
 
         return FirearmApplication::query()
             ->select([
@@ -26,7 +27,7 @@ class BatchAnalytics
                 DB::raw('SUM(CASE WHEN monitoring_enabled = 1 THEN 1 ELSE 0 END) as monitored_count'),
                 DB::raw('MAX(last_checked_at) as latest_status_at'),
             ])
-            ->whereRaw("LENGTH(reference_number) >= ".FirearmApplication::BATCH_KEY_LENGTH)
+            ->whereRaw("LENGTH($digits) >= ".FirearmApplication::BATCH_KEY_LENGTH)
             ->groupBy('batch_key')
             ->orderByDesc('applications_count')
             ->orderBy('batch_key')
@@ -43,7 +44,9 @@ class BatchAnalytics
                         ? Carbon::parse($row->latest_status_at)
                         : null,
                 ];
-            });
+            })
+            ->filter(fn ($batch) => ctype_digit($batch['batch_key']))
+            ->values();
     }
 
     /**
@@ -226,10 +229,10 @@ class BatchAnalytics
         return substr($ref, 0, FirearmApplication::BATCH_KEY_LENGTH).str_repeat('*', strlen($ref) - FirearmApplication::BATCH_KEY_LENGTH);
     }
 
-    private function batchKeyExpression(): string
+    private function digitsExpression(): string
     {
-        $length = FirearmApplication::BATCH_KEY_LENGTH;
+        $driver = FirearmApplication::query()->getConnection()->getDriverName();
 
-        return "SUBSTR(reference_number, 1, $length)";
+        return FirearmApplication::digitsSqlExpression($driver);
     }
 }

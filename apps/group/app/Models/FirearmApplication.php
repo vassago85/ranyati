@@ -81,7 +81,23 @@ class FirearmApplication extends Model
 
     public function scopeInBatch(Builder $query, string $batchKey): Builder
     {
-        return $query->where('reference_number', 'like', $batchKey.'%');
+        $digits = self::digitsSqlExpression($query->getConnection()->getDriverName());
+
+        return $query->whereRaw("SUBSTR($digits, 1, ?) = ?", [self::BATCH_KEY_LENGTH, $batchKey]);
+    }
+
+    /**
+     * Driver-aware SQL fragment that yields the digits-only form of reference_number.
+     * Mirrors the PHP digit-extraction used by the batch_key accessor so the
+     * batches overview, batch detail and peer queries all key off the same value.
+     */
+    public static function digitsSqlExpression(string $driver): string
+    {
+        return match ($driver) {
+            'mysql', 'mariadb' => "REGEXP_REPLACE(reference_number, '[^0-9]', '')",
+            'pgsql' => "REGEXP_REPLACE(reference_number, '[^0-9]', '', 'g')",
+            default => 'reference_number',
+        };
     }
 
     public function displayName(): string
