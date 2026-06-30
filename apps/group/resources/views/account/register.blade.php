@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-md mx-auto card p-8">
     <h1 class="text-2xl font-bold text-white mb-2">Create your tracker account</h1>
-    <p class="text-white/50 text-sm mb-6">Add your SAPS reference and serial number. We check status once per day and email you when it changes.</p>
+    <p class="text-white/50 text-sm mb-6">The application tracker is for Ranyati Motivations clients. Register with the same email you used for your motivation enquiry, then add your SAPS reference and serial number — we check status once per day and email you when it changes.</p>
 
     <form method="POST" action="{{ route('account.register.submit') }}" class="space-y-4">
         @csrf

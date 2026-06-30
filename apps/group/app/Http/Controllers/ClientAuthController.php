@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MotivationEnquiry;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -72,6 +73,18 @@ class ClientAuthController extends Controller
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
+
+        // The SAPS tracker is a client-only service — not open to the public.
+        // Only allow accounts for people who have engaged Ranyati Motivations,
+        // i.e. their email already appears on a motivation enquiry.
+        $email = strtolower(trim($data['email']));
+        $isExistingClient = MotivationEnquiry::whereRaw('LOWER(email) = ?', [$email])->exists();
+
+        if (! $isExistingClient) {
+            return back()->withInput($request->only('name', 'email'))->withErrors([
+                'email' => 'Tracker accounts are only available to Ranyati Motivations clients. We could not find a motivation enquiry for this email — please submit an enquiry first, or contact us if you believe this is an error.',
+            ]);
+        }
 
         $user = User::create([
             'name' => $data['name'],
