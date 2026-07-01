@@ -659,10 +659,12 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             }
         }
 
+        $isReduced = ! empty($validated['original_price']) && $validated['original_price'] > $validated['price'];
+
         ArmsListing::create([
             ...\Illuminate\Support\Arr::except($validated, ['images']),
             'images' => $imagePaths,
-            'status' => 'active',
+            'status' => $isReduced ? 'reduced' : 'active',
             'featured_at' => now(),
             'created_by' => auth()->id(),
         ]);
@@ -725,10 +727,19 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             }
         }
 
-        $listing->update([
+        $updateData = [
             ...\Illuminate\Support\Arr::except($validated, ['images', 'remove_images']),
             'images' => $currentImages,
-        ]);
+        ];
+
+        // Keep status in sync with the price for live listings; never override
+        // terminal sold/archived states from an edit.
+        if (in_array($listing->status, ['active', 'reduced'], true)) {
+            $isReduced = ! empty($validated['original_price']) && $validated['original_price'] > $validated['price'];
+            $updateData['status'] = $isReduced ? 'reduced' : 'active';
+        }
+
+        $listing->update($updateData);
 
         return redirect()->route('admin.arms')->with('success', 'Listing updated.');
     })->name('arms.update');
