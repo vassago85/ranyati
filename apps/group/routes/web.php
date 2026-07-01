@@ -966,7 +966,10 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         abort_unless(auth()->user()->canManageUsers(), 403);
 
         return view('admin.users', [
-            'users' => User::orderByRaw("CASE role WHEN 'developer' THEN 1 WHEN 'owner' THEN 2 WHEN 'admin' THEN 3 ELSE 4 END")->get(),
+            'admins' => User::whereIn('role', [User::ROLE_DEVELOPER, User::ROLE_OWNER, User::ROLE_ADMIN])
+                ->orderByRaw("CASE role WHEN 'developer' THEN 1 WHEN 'owner' THEN 2 WHEN 'admin' THEN 3 ELSE 4 END")
+                ->get(),
+            'members' => User::where('role', User::ROLE_CLIENT)->orderByDesc('created_at')->get(),
         ]);
     })->name('users');
 
@@ -1031,6 +1034,59 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         return back()->with('success', 'User deleted.');
     })->name('users.delete');
+
+    // ── Member (tracker) management ────────────────────────────
+    // Members use the existing 'client' role (tracker-only). Admin-created
+    // members are auto-verified so they can sign in immediately.
+
+    Route::post('/users/members', function (Request $request) {
+        abort_unless($request->user()->canManageUsers(), 403);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8',
+        ]);
+
+        User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'role' => User::ROLE_CLIENT,
+            'email_verified_at' => now(),
+        ]);
+
+        return back()->with('success', 'Member created. They can sign in to the tracker immediately.');
+    })->name('users.members.store');
+
+    Route::post('/users/members/{user}/update', function (Request $request, User $user) {
+        abort_unless($request->user()->canManageUsers(), 403);
+        abort_unless($user->isClient(), 404);
+
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        $update = ['name' => $data['name'], 'email' => $data['email']];
+        if ($request->filled('password')) {
+            $update['password'] = $data['password'];
+        }
+
+        $user->update($update);
+
+        return back()->with('success', 'Member updated.');
+    })->name('users.members.update');
+
+    Route::delete('/users/members/{user}', function (Request $request, User $user) {
+        abort_unless($request->user()->canManageUsers(), 403);
+        abort_unless($user->isClient(), 404);
+
+        $user->delete();
+
+        return back()->with('success', 'Member deleted.');
+    })->name('users.members.delete');
 });
 
 require __DIR__.'/status-tracker.php';

@@ -22,7 +22,7 @@ class User extends Authenticatable
         self::ROLE_DEVELOPER => 'Developer',
         self::ROLE_OWNER => 'Owner',
         self::ROLE_ADMIN => 'Admin',
-        self::ROLE_CLIENT => 'Client',
+        self::ROLE_CLIENT => 'Member',
     ];
 
     protected $fillable = [
