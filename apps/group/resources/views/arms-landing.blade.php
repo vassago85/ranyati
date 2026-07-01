@@ -568,8 +568,8 @@
                                 <div class="listing-clickable" @click="openDetails(@js($listingData))" role="button" tabindex="0" @keydown.enter="openDetails(@js($listingData))" @keydown.space.prevent="openDetails(@js($listingData))">
                                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                         <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,225,205,0.92);">{{ $listing->calibre }}</span>
-                                        @if($listing->status === 'reduced')
-                                            <span class="badge-reduced">Reduced Priority</span>
+                                        @if($listing->original_price && $listing->original_price > $listing->price)
+                                            <span class="badge-reduced">Reduced</span>
                                         @endif
                                     </div>
 
