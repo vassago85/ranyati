@@ -8,6 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('firearm_status_transitions')) {
+            return;
+        }
+
         Schema::create('firearm_status_transitions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('firearm_application_id')->constrained()->cascadeOnDelete();

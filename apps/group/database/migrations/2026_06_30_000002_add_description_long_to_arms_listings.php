@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasColumn('arms_listings', 'description_long')) {
+            return;
+        }
+
         Schema::table('arms_listings', function (Blueprint $table) {
             $table->text('description_long')->nullable()->after('description');
         });
