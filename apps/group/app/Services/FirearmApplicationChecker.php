@@ -86,6 +86,32 @@ class FirearmApplicationChecker
 
         $this->circuit->recordSuccess();
 
+        // SAPS occasionally returns a record with an empty status (a transient
+        // blank response). Never overwrite a known status with a blank — keep
+        // the last good status, log the check as unchanged, and don't notify.
+        if (trim((string) ($record['status'] ?? '')) === '') {
+            $application->update([
+                'saps_data_updated_on' => $result['data_updated'] ?? null,
+                'last_checked_at' => $checkedAt,
+                'last_check_error' => null,
+            ]);
+
+            $application->checks()->create([
+                'success' => true,
+                'status_changed' => false,
+                'status' => $application->status,
+                'status_date' => $application->status_date,
+                'status_description' => $application->status_description,
+                'next_step' => $application->next_step,
+                'checked_at' => $checkedAt,
+            ]);
+
+            return [
+                'success' => true,
+                'changed' => false,
+            ];
+        }
+
         $previousStatus = $application->status;
         $previousFingerprint = $application->status_fingerprint;
         $fingerprint = FirearmApplication::fingerprintFromRecord($record);
