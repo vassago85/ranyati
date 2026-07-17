@@ -151,6 +151,13 @@ class FirearmApplicationChecker
             );
         }
 
+        // Once SAPS reaches a final outcome (approved or refused) the status
+        // won't change again — stop polling this application daily. The change
+        // notification above still fires first, so the client hears the news.
+        if ($application->monitoring_enabled && FirearmApplication::isTerminalStatus($record['status'] ?? null)) {
+            $application->update(['monitoring_enabled' => false]);
+        }
+
         return [
             'success' => true,
             'changed' => $changed,

@@ -29,9 +29,11 @@
                             @if ($application->status)
                                 <span class="status-pill text-xs font-semibold px-2.5 py-1 rounded-full">{{ $application->status }}</span>
                             @endif
-                            @unless ($application->monitoring_enabled)
+                            @if (\App\Models\FirearmApplication::isTerminalStatus($application->status))
+                                <span class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300">Finalised — checks stopped</span>
+                            @elseif (! $application->monitoring_enabled)
                                 <span class="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/50">Monitoring paused</span>
-                            @endunless
+                            @endif
                         </div>
                         <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-1 text-sm text-white/60">
                             <div><dt class="inline font-medium text-white/80">Reference:</dt> {{ $application->reference_number }}</div>

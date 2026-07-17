@@ -113,6 +113,31 @@ class FirearmApplication extends Model
         return 'Application '.$this->reference_number;
     }
 
+    /**
+     * A final SAPS outcome after which the status will not change again —
+     * either the licence was approved or the application was refused. There
+     * is no value in polling these every day, so monitoring is switched off
+     * once one of these is reached.
+     */
+    public static function isTerminalStatus(?string $status): bool
+    {
+        $status = strtolower(trim((string) $status));
+
+        if ($status === '') {
+            return false;
+        }
+
+        // "approved" also catches "not approved"; the negative keywords cover
+        // the other final decisions SAPS may report.
+        foreach (['approved', 'reject', 'declin', 'refus', 'unsuccess', 'cancel'] as $needle) {
+            if (str_contains($status, $needle)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function fingerprintFromRecord(array $record): string
     {
         $parts = [

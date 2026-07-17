@@ -43,7 +43,9 @@
                 </div>
             </div>
             <div>
-                @if ($app->monitoring_enabled)
+                @if (\App\Models\FirearmApplication::isTerminalStatus($app->status))
+                    <span class="badge badge-green">Finalised</span>
+                @elseif ($app->monitoring_enabled)
                     <span class="badge badge-green">Monitored</span>
                 @else
                     <span class="badge badge-zinc">Paused</span>
