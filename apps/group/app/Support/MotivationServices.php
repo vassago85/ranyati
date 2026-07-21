@@ -48,13 +48,6 @@ class MotivationServices
                 'group'       => 'Application Forms',
             ],
             [
-                'key'         => 'saps_form',
-                'label'       => 'SAPS271 Licence or SAPS518 Temporary Authorisation Form',
-                'price'       => 405,
-                'description' => 'Completion of the SAPS application form(s). Requires the original signed copy from the Private Owner, Estate or Firearm Dealer.',
-                'group'       => 'Application Forms',
-            ],
-            [
                 'key'         => 'review_form',
                 'label'       => 'Reviewing a completed application form',
                 'price'       => 175,
