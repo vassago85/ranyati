@@ -509,11 +509,16 @@
                     $oldServices = (array) old('services', []);
                 @endphp
 
+                @php
+                    $selectedType = old('endorsement_type', $prefill['type'] ?? '');
+                @endphp
+
                 <form method="POST" action="{{ route('enquire.submit') }}" class="space-y-5"
                       x-data="{
                           selected: @js($oldServices),
                           prices: @js($servicePrices),
                           showIntro: false,
+                          endorsementType: @js($selectedType),
                           formatRand(n) { return 'R' + Number(n).toLocaleString('en-ZA'); },
                           total() {
                               return this.selected.reduce((sum, k) => sum + (this.prices[k] || 0), 0);
@@ -556,11 +561,10 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
                             <label for="endorsement_type" class="form-label">Endorsement Type</label>
-                            <select id="endorsement_type" name="endorsement_type" class="form-input">
+                            <select id="endorsement_type" name="endorsement_type" class="form-input" x-model="endorsementType">
                                 <option value="">Select type...</option>
                                 @php
                                     $types = ['New Application', 'Renewal', 'Additional', 'Transfer', 'Other'];
-                                    $selectedType = old('endorsement_type', $prefill['type'] ?? '');
                                 @endphp
                                 @foreach($types as $type)
                                     <option value="{{ $type }}" @selected($selectedType === $type)>{{ $type }}</option>
@@ -582,6 +586,19 @@
                             </select>
                             @error('purpose') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                         </div>
+                    </div>
+
+                    <div x-show="endorsementType === 'Renewal'" x-cloak x-transition>
+                        <label for="saps_station" class="form-label">Local SAPS Station <span style="color: #F58220;">*</span></label>
+                        <input type="text" id="saps_station" name="saps_station" class="form-input"
+                               placeholder="e.g. Garsfontein, Brooklyn, Pretoria Central"
+                               value="{{ old('saps_station') }}"
+                               :required="endorsementType === 'Renewal'"
+                               :disabled="endorsementType !== 'Renewal'">
+                        <p class="mt-1.5 text-xs" style="color:rgba(255,255,255,0.4); line-height:1.5;">
+                            Renewal requirements differ by station — some want a full motivation, others don’t, and a few (like Garsfontein) use their own forms. This helps us give you the right pricing and process straight away.
+                        </p>
+                        @error('saps_station') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- Services & fees ── tick which services you'd like to use --}}

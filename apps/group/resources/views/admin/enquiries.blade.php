@@ -44,7 +44,12 @@
                             </td>
                             <td style="{{ !$enquiry->read_at ? 'color:#fff;font-weight:600;' : '' }}">{{ $enquiry->name }}</td>
                             <td>{{ $enquiry->email }}</td>
-                            <td>{{ $enquiry->endorsement_type ?? '—' }}</td>
+                            <td>
+                                {{ $enquiry->endorsement_type ?? '—' }}
+                                @if($enquiry->saps_station)
+                                    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px;">{{ $enquiry->saps_station }}</div>
+                                @endif
+                            </td>
                             <td>{{ $enquiry->purpose ?? '—' }}</td>
                             <td style="white-space:nowrap;">
                                 @php

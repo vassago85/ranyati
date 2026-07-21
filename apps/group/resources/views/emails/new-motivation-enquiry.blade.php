@@ -53,6 +53,13 @@
         </div>
         @endif
 
+        @if($enquiry->saps_station)
+        <div class="field">
+            <div class="label">Local SAPS Station</div>
+            <div class="value">{{ $enquiry->saps_station }}</div>
+        </div>
+        @endif
+
         @if($enquiry->purpose)
         <div class="field">
             <div class="label">Purpose</div>

@@ -58,6 +58,12 @@
                         <div style="font-size:14px;color:rgba(255,255,255,0.7);">{{ $enquiry->endorsement_type }}</div>
                     </div>
                     @endif
+                    @if($enquiry->saps_station)
+                    <div>
+                        <div class="form-label">Local SAPS Station</div>
+                        <div style="font-size:14px;color:#fff;font-weight:500;">{{ $enquiry->saps_station }}</div>
+                    </div>
+                    @endif
                     @if($enquiry->purpose)
                     <div>
                         <div class="form-label">Purpose</div>

@@ -370,6 +370,7 @@ Route::post('/enquire', function (Request $request) {
         'email' => 'required|email|max:255',
         'phone' => 'nullable|string|max:50',
         'endorsement_type' => 'nullable|string|max:255',
+        'saps_station' => 'nullable|required_if:endorsement_type,Renewal|string|max:255',
         'purpose' => 'nullable|string|max:255',
         'services' => 'nullable|array',
         'services.*' => ['string', 'max:80', \Illuminate\Validation\Rule::in(\App\Support\MotivationServices::validKeys())],
@@ -378,6 +379,8 @@ Route::post('/enquire', function (Request $request) {
         'source' => 'nullable|string|max:100',
         'otp' => $nrapaBypass ? 'required|string' : 'required|string|size:6',
         'cf-turnstile-response' => 'nullable|string',
+    ], [
+        'saps_station.required_if' => 'Please enter your local SAPS station so we can advise the correct renewal process and pricing.',
     ]);
 
     // Defensive: drop any submitted keys not in the current registry so a
@@ -390,6 +393,14 @@ Route::post('/enquire', function (Request $request) {
         ));
     } else {
         $validated['services'] = [];
+    }
+
+    // Station is only relevant for renewals — clear it for every other type so
+    // a leftover value from a previous form interaction can't stick around.
+    if (($validated['endorsement_type'] ?? null) !== 'Renewal') {
+        $validated['saps_station'] = null;
+    } else {
+        $validated['saps_station'] = trim((string) ($validated['saps_station'] ?? '')) ?: null;
     }
 
     if (! $nrapaBypass) {

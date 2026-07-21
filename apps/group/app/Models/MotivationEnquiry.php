@@ -11,6 +11,7 @@ class MotivationEnquiry extends Model
         'email',
         'phone',
         'endorsement_type',
+        'saps_station',
         'purpose',
         'services',
         'membership_number',
