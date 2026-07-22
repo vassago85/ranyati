@@ -26,6 +26,7 @@ class ArmsListing extends Model
         'description_long',
         'images',
         'status',
+        'is_featured',
         'featured_at',
         'archived_at',
         'created_by',
@@ -46,6 +47,7 @@ class ArmsListing extends Model
             'images' => 'array',
             'price' => 'decimal:2',
             'original_price' => 'decimal:2',
+            'is_featured' => 'boolean',
             'featured_at' => 'datetime',
             'archived_at' => 'datetime',
         ];
@@ -79,8 +81,9 @@ class ArmsListing extends Model
     public function scopePrioritised(Builder $query): Builder
     {
         return $query->visible()
-            ->orderByRaw("CASE status WHEN 'active' THEN 0 WHEN 'reduced' THEN 1 ELSE 2 END")
-            ->orderByDesc('featured_at');
+            ->orderByDesc('is_featured')
+            ->orderByDesc('featured_at')
+            ->orderByDesc('id');
     }
 
     public function getLeadImageUrlAttribute(): string
@@ -92,12 +95,37 @@ class ArmsListing extends Model
             : asset('ranyati-icon.png');
     }
 
+    /**
+     * Pin a listing to the top of the public stock grid. Also restores
+     * archived/sold listings back to a live active state.
+     */
     public function feature(): void
     {
         $this->update([
             'status' => 'active',
+            'is_featured' => true,
             'featured_at' => now(),
             'archived_at' => null,
+        ]);
+    }
+
+    public function unfeature(): void
+    {
+        $this->update([
+            'is_featured' => false,
+        ]);
+    }
+
+    /**
+     * Put an archived/sold listing back on the public grid without featuring it.
+     */
+    public function restore(): void
+    {
+        $this->update([
+            'status' => 'active',
+            'is_featured' => false,
+            'archived_at' => null,
+            'featured_at' => now(),
         ]);
     }
 
@@ -105,6 +133,7 @@ class ArmsListing extends Model
     {
         $this->update([
             'status' => 'archived',
+            'is_featured' => false,
             'archived_at' => now(),
         ]);
     }
@@ -113,12 +142,12 @@ class ArmsListing extends Model
      * Mark a listing as sold. Unlike archiving, a sold listing keeps a live,
      * indexable URL (200 with a "Sold" state + SoldOut in its JSON-LD) but is
      * dropped from the homepage grid and sitemap via the visible() scope.
-     * Terminal state — the auto-archiver only touches active/reduced rows.
      */
     public function markSold(): void
     {
         $this->update([
             'status' => 'sold',
+            'is_featured' => false,
             'archived_at' => now(),
         ]);
     }

@@ -640,7 +640,18 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
     Route::get('/arms', function () {
         return view('admin.arms.index', [
-            'listings' => ArmsListing::latest('featured_at')->paginate(25),
+            'listings' => ArmsListing::query()
+                ->orderByDesc('is_featured')
+                ->orderByDesc('featured_at')
+                ->orderByDesc('id')
+                ->paginate(25),
+            'stats' => [
+                'active' => ArmsListing::whereIn('status', ['active', 'reduced'])->count(),
+                'featured' => ArmsListing::where('is_featured', true)->whereIn('status', ['active', 'reduced'])->count(),
+                'sold' => ArmsListing::where('status', 'sold')->count(),
+                'archived' => ArmsListing::where('status', 'archived')->count(),
+                'enquiries' => ArmsEnquiry::count(),
+            ],
         ]);
     })->name('arms');
 
@@ -670,12 +681,11 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             }
         }
 
-        $isReduced = ! empty($validated['original_price']) && $validated['original_price'] > $validated['price'];
-
         ArmsListing::create([
             ...\Illuminate\Support\Arr::except($validated, ['images']),
             'images' => $imagePaths,
-            'status' => $isReduced ? 'reduced' : 'active',
+            'status' => 'active',
+            'is_featured' => false,
             'featured_at' => now(),
             'created_by' => auth()->id(),
         ]);
@@ -743,11 +753,10 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'images' => $currentImages,
         ];
 
-        // Keep status in sync with the price for live listings; never override
-        // terminal sold/archived states from an edit.
+        // Live listings stay active — price drops are expressed via
+        // original_price, and featuring/archiving/sold are all manual actions.
         if (in_array($listing->status, ['active', 'reduced'], true)) {
-            $isReduced = ! empty($validated['original_price']) && $validated['original_price'] > $validated['price'];
-            $updateData['status'] = $isReduced ? 'reduced' : 'active';
+            $updateData['status'] = 'active';
         }
 
         $listing->update($updateData);
@@ -769,8 +778,20 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     Route::post('/arms/{listing}/feature', function (ArmsListing $listing) {
         $listing->feature();
 
-        return back()->with('success', 'Listing re-featured.');
+        return back()->with('success', 'Listing featured — it will appear at the top of the stock grid.');
     })->name('arms.feature');
+
+    Route::post('/arms/{listing}/unfeature', function (ArmsListing $listing) {
+        $listing->unfeature();
+
+        return back()->with('success', 'Listing unfeatured.');
+    })->name('arms.unfeature');
+
+    Route::post('/arms/{listing}/restore', function (ArmsListing $listing) {
+        $listing->restore();
+
+        return back()->with('success', 'Listing restored to the stock grid.');
+    })->name('arms.restore');
 
     Route::post('/arms/{listing}/archive', function (ArmsListing $listing) {
         $listing->archive();

@@ -12,29 +12,30 @@
     <div class="stat-grid" style="margin-bottom: 24px;">
         <div class="card stat-card">
             <div class="stat-label">Active</div>
-            <div class="stat-value" style="color: #34d399;">{{ $listings->where('status', 'active')->count() }}</div>
+            <div class="stat-value" style="color: #34d399;">{{ $stats['active'] }}</div>
         </div>
         <div class="card stat-card">
-            <div class="stat-label">Reduced</div>
-            <div class="stat-value" style="color: #f59e0b;">{{ $listings->where('status', 'reduced')->count() }}</div>
+            <div class="stat-label">Featured</div>
+            <div class="stat-value" style="color: #F58220;">{{ $stats['featured'] }}</div>
         </div>
         <div class="card stat-card">
             <div class="stat-label">Sold</div>
-            <div class="stat-value" style="color: #ef4444;">{{ $listings->where('status', 'sold')->count() }}</div>
+            <div class="stat-value" style="color: #ef4444;">{{ $stats['sold'] }}</div>
         </div>
         <div class="card stat-card">
             <div class="stat-label">Archived</div>
-            <div class="stat-value" style="color: rgba(255,255,255,0.3);">{{ $listings->where('status', 'archived')->count() }}</div>
+            <div class="stat-value" style="color: rgba(255,255,255,0.3);">{{ $stats['archived'] }}</div>
         </div>
         <div class="card stat-card">
             <div class="stat-label">Total Enquiries</div>
-            <div class="stat-value">{{ \App\Models\ArmsEnquiry::count() }}</div>
+            <div class="stat-value">{{ $stats['enquiries'] }}</div>
         </div>
     </div>
 
     <div class="card">
         <div class="card-header">
             <h2>All Listings</h2>
+            <p style="font-size: 12px; color: rgba(255,255,255,0.35); margin: 4px 0 0; font-weight: 400;">Featured listings pin to the top of the public stock grid. Archive and sold are manual — nothing auto-expires.</p>
         </div>
         @if($listings->isEmpty())
             <div class="card-body" style="text-align: center; padding: 48px 20px;">
@@ -77,10 +78,8 @@
                             </td>
                             <td>
                                 <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-                                    @if($listing->status === 'active')
+                                    @if(in_array($listing->status, ['active', 'reduced'], true))
                                         <span class="badge badge-green">Active</span>
-                                    @elseif($listing->status === 'reduced')
-                                        <span class="badge badge-orange">Reduced</span>
                                     @elseif($listing->status === 'sold')
                                         <span class="badge" style="background: rgba(239,68,68,0.18); color: #ef4444;">Sold</span>
                                     @else
@@ -91,19 +90,34 @@
                                     @endif
                                 </div>
                             </td>
-                            <td>{{ $listing->featured_at?->format('d M Y') ?? '—' }}</td>
+                            <td>
+                                @if($listing->is_featured && in_array($listing->status, ['active', 'reduced'], true))
+                                    <span class="badge badge-orange">Featured</span>
+                                    @if($listing->featured_at)
+                                        <div style="font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 3px;">{{ $listing->featured_at->format('d M Y') }}</div>
+                                    @endif
+                                @else
+                                    <span style="color: rgba(255,255,255,0.25);">—</span>
+                                @endif
+                            </td>
                             <td>{{ $listing->enquiries()->count() }}</td>
                             <td style="text-align: right;">
-                                <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                <div style="display: flex; gap: 6px; justify-content: flex-end; flex-wrap: wrap;">
                                     <a href="{{ route('admin.arms.edit', $listing) }}" class="btn btn-secondary btn-sm">Edit</a>
                                     <a href="{{ route('admin.arms.card', $listing) }}" class="btn btn-secondary btn-sm" title="Download a WhatsApp Status card">Card</a>
 
-                                    @if($listing->status === 'archived' || $listing->status === 'sold')
-                                        <form method="POST" action="{{ route('admin.arms.feature', $listing) }}" style="display:inline;">
-                                            @csrf
-                                            <button type="submit" class="btn btn-primary btn-sm">Re-feature</button>
-                                        </form>
-                                    @else
+                                    @if(in_array($listing->status, ['active', 'reduced'], true))
+                                        @if($listing->is_featured)
+                                            <form method="POST" action="{{ route('admin.arms.unfeature', $listing) }}" style="display:inline;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-secondary btn-sm">Unfeature</button>
+                                            </form>
+                                        @else
+                                            <form method="POST" action="{{ route('admin.arms.feature', $listing) }}" style="display:inline;">
+                                                @csrf
+                                                <button type="submit" class="btn btn-primary btn-sm">Feature</button>
+                                            </form>
+                                        @endif
                                         <form method="POST" action="{{ route('admin.arms.sold', $listing) }}" style="display:inline;" onsubmit="return confirm('Mark this listing as sold? Its page stays live with a Sold state, but it leaves the grid and sitemap.')">
                                             @csrf
                                             <button type="submit" class="btn btn-secondary btn-sm">Mark Sold</button>
@@ -111,6 +125,15 @@
                                         <form method="POST" action="{{ route('admin.arms.archive', $listing) }}" style="display:inline;">
                                             @csrf
                                             <button type="submit" class="btn btn-secondary btn-sm">Archive</button>
+                                        </form>
+                                    @else
+                                        <form method="POST" action="{{ route('admin.arms.restore', $listing) }}" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-secondary btn-sm">Restore</button>
+                                        </form>
+                                        <form method="POST" action="{{ route('admin.arms.feature', $listing) }}" style="display:inline;">
+                                            @csrf
+                                            <button type="submit" class="btn btn-primary btn-sm">Feature</button>
                                         </form>
                                     @endif
 
