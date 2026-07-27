@@ -38,38 +38,63 @@ class IntakeService
                 'notes'        => $validated['notes']        ?? null,
             ]);
 
-            foreach ($validated['items'] as $index => $itemData) {
-                $item = StorageItem::create([
-                    'storage_agreement_id' => $agreement->id,
-                    'register_book_id'     => $itemData['register_book_id'],
-                    'page'                 => $itemData['page'],
-                    'position'             => $itemData['position'],
-                    'shelf'                => strtoupper($itemData['shelf']),
-                    'tag_colour'           => strtoupper($itemData['tag_colour']),
-                    'tag_number'           => (int) $itemData['tag_number'],
-                    'firearm_make'         => $itemData['firearm_make'],
-                    'cartridge'            => $itemData['cartridge'],
-                    'serial_number'        => $itemData['serial_number'],
-                    'firearm_type'         => $itemData['firearm_type'],
-                    'action_type'          => $itemData['action_type'],
-                    'condition_notes'      => $itemData['condition_notes'] ?? null,
-                    'date_in'              => $itemData['date_in'],
-                    'status'               => StorageItem::STATUS_IN_CUSTODY,
-                ]);
-
-                CustodyEvent::create([
-                    'storage_item_id' => $item->id,
-                    'user_id'         => $request->user()->id,
-                    'event_type'      => CustodyEvent::TYPE_INTAKE,
-                    'notes'           => 'Received into safe custody. Tag '.$item->tag_ref.', register '.$item->register_ref.'.',
-                    'occurred_at'     => now(),
-                ]);
-
-                $this->attachFiles($request, $index, $item);
-            }
+            $this->createItems($agreement, $validated['items'], $request);
 
             return $agreement;
         });
+    }
+
+    /**
+     * Append further firearms to an agreement that already exists. Same
+     * transaction guarantee as a fresh intake: either every firearm in the
+     * batch lands on the register with its intake event, or none does.
+     *
+     * @param  array<int, array<string, mixed>>  $items
+     * @return int  How many firearms were booked in.
+     */
+    public function addItems(StorageAgreement $agreement, array $items, Request $request): int
+    {
+        return DB::transaction(function () use ($agreement, $items, $request) {
+            $this->createItems($agreement, $items, $request);
+
+            return count($items);
+        });
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $items
+     */
+    private function createItems(StorageAgreement $agreement, array $items, Request $request): void
+    {
+        foreach ($items as $index => $itemData) {
+            $item = StorageItem::create([
+                'storage_agreement_id' => $agreement->id,
+                'register_book_id'     => $itemData['register_book_id'],
+                'page'                 => $itemData['page'],
+                'position'             => $itemData['position'],
+                'shelf'                => strtoupper($itemData['shelf']),
+                'tag_colour'           => strtoupper($itemData['tag_colour']),
+                'tag_number'           => (int) $itemData['tag_number'],
+                'firearm_make'         => $itemData['firearm_make'],
+                'cartridge'            => $itemData['cartridge'],
+                'serial_number'        => $itemData['serial_number'],
+                'firearm_type'         => $itemData['firearm_type'],
+                'action_type'          => $itemData['action_type'],
+                'condition_notes'      => $itemData['condition_notes'] ?? null,
+                'date_in'              => $itemData['date_in'],
+                'status'               => StorageItem::STATUS_IN_CUSTODY,
+            ]);
+
+            CustodyEvent::create([
+                'storage_item_id' => $item->id,
+                'user_id'         => $request->user()->id,
+                'event_type'      => CustodyEvent::TYPE_INTAKE,
+                'notes'           => 'Received into safe custody. Tag '.$item->tag_ref.', register '.$item->register_ref.'.',
+                'occurred_at'     => now(),
+            ]);
+
+            $this->attachFiles($request, $index, $item);
+        }
     }
 
     /**

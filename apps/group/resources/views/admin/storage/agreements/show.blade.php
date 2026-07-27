@@ -31,7 +31,10 @@
     </div>
 
     <div class="card" style="margin-top: 24px;">
-        <div class="card-header"><h2>Firearms ({{ $agreement->items->count() }})</h2></div>
+        <div class="card-header">
+            <h2>Firearms ({{ $agreement->items->count() }})</h2>
+            <a class="btn btn-primary btn-sm" href="{{ route('admin.storage.agreements.items.create', $agreement) }}">+ Add firearm</a>
+        </div>
         <div class="card-body" style="padding: 0;">
             <table>
                 <thead>

@@ -1181,7 +1181,9 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         Route::get('/self/create', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'create'])->name('self.create');
         Route::post('/self', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'store'])->name('self.store');
 
-        Route::get('/agreements/{agreement}', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'show'])->name('agreements.show');
+                Route::get('/agreements/{agreement}', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'show'])->name('agreements.show');
+                Route::get('/agreements/{agreement}/items/create', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'addItems'])->name('agreements.items.create');
+                Route::post('/agreements/{agreement}/items', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'storeItems'])->name('agreements.items.store');
 
         Route::get('/items/{item}', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'show'])->name('items.show');
         Route::post('/items/{item}/events', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'storeEvent'])->name('items.events.store');
