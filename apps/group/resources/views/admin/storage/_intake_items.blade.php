@@ -8,7 +8,10 @@
 --}}
 
 @php
-    // Alpine-friendly JSON of type => actions.
+    // Alpine-friendly JSON of type => actions. Must be printed with {{ }} and
+    // not {!! !!} — this lands inside a double-quoted x-data attribute, so the
+    // JSON's own double quotes have to be escaped as &quot; or the first one
+    // closes the attribute and Alpine never initialises the repeater.
     $typeMapJson = json_encode(collect($firearmTypes)->mapWithKeys(fn ($v, $k) => [$k => $v['actions']])->all());
 @endphp
 
@@ -29,7 +32,7 @@
             condition_notes: '',
             date_in: '{{ now()->format('Y-m-d') }}',
         },
-        types: {!! $typeMapJson !!}
+        types: {{ $typeMapJson }}
     })"
 >
     <div class="card-header">
