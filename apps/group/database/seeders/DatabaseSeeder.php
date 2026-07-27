@@ -20,5 +20,7 @@ class DatabaseSeeder extends Seeder
                 'role' => User::ROLE_DEVELOPER,
             ],
         );
+
+        $this->call(StorageModuleSeeder::class);
     }
 }

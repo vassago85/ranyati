@@ -1130,6 +1130,40 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         return back()->with('success', 'Member deleted.');
     })->name('users.members.delete');
+
+    // ── Storage (safe custody) ─────────────────────────────────
+    // Real controllers under App\Http\Controllers\Admin\Storage\* rather
+    // than more closures — the storage module has enough surface area
+    // (intake, custody events, R2 uploads, PDF labels, register print)
+    // that keeping it as an inline closure block would drown web.php.
+    Route::prefix('storage')->name('storage.')->group(function () {
+        Route::get('/', \App\Http\Controllers\Admin\Storage\DashboardController::class)->name('dashboard');
+
+        Route::get('/settings', [\App\Http\Controllers\Admin\Storage\SettingsController::class, 'edit'])->name('settings');
+        Route::post('/settings', [\App\Http\Controllers\Admin\Storage\SettingsController::class, 'save'])->name('settings.save');
+        Route::post('/settings/test-connection', [\App\Http\Controllers\Admin\Storage\SettingsController::class, 'testConnection'])->name('settings.test');
+
+        Route::get('/estates', [\App\Http\Controllers\Admin\Storage\EstatesController::class, 'index'])->name('estates');
+        Route::get('/estates/create', [\App\Http\Controllers\Admin\Storage\EstatesController::class, 'create'])->name('estates.create');
+        Route::post('/estates', [\App\Http\Controllers\Admin\Storage\EstatesController::class, 'store'])->name('estates.store');
+
+        Route::get('/self', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'index'])->name('self');
+        Route::get('/self/create', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'create'])->name('self.create');
+        Route::post('/self', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'store'])->name('self.store');
+
+        Route::get('/agreements/{agreement}', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'show'])->name('agreements.show');
+
+        Route::get('/items/{item}', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'show'])->name('items.show');
+        Route::post('/items/{item}/events', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'storeEvent'])->name('items.events.store');
+        Route::get('/items/{item}/collect', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'collectForm'])->name('items.collect.form');
+        Route::post('/items/{item}/collect', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'collect'])->name('items.collect');
+        Route::get('/items/{item}/files/{file}/download', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'downloadFile'])->name('items.files.download');
+        Route::get('/items/{item}/label', [\App\Http\Controllers\Admin\Storage\LabelController::class, 'show'])->name('items.label');
+
+        Route::get('/log', \App\Http\Controllers\Admin\Storage\LogController::class)->name('log');
+        Route::get('/register/{book}', [\App\Http\Controllers\Admin\Storage\RegisterController::class, 'show'])->name('register.show');
+        Route::get('/search', \App\Http\Controllers\Admin\Storage\SearchController::class)->name('search');
+    });
 });
 
 require __DIR__.'/status-tracker.php';
