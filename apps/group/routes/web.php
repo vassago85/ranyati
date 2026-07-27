@@ -10,6 +10,7 @@ use App\Models\ArmsListing;
 use App\Models\Document;
 use App\Models\MotivationEnquiry;
 use App\Models\QuestionnaireResponse;
+use App\Support\AdminAreas;
 use App\Support\QuestionnaireRegistry;
 use App\Models\Setting;
 use App\Models\User;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 Route::get('/', function () {
     $host = request()->getHost();
@@ -451,9 +453,13 @@ Route::post('/enquire', function (Request $request) {
 // ── Admin ──────────────────────────────────────────────────────
 
 Route::get('/admin/login', function () {
-    if (Auth::check()) {
-        return redirect()->route('admin.dashboard');
+    /** @var User|null $user */
+    $user = Auth::user();
+
+    if ($user) {
+        return redirect()->to($user->adminLandingUrl());
     }
+
     return view('admin.login');
 })->name('admin.login');
 
@@ -474,7 +480,7 @@ Route::post('/admin/login', function (Request $request) {
 
     $request->session()->regenerate();
 
-    return redirect()->route('admin.dashboard');
+    return redirect()->to($request->user()->adminLandingUrl());
 })->name('admin.login.submit');
 
 Route::post('/admin/logout', function (Request $request) {
@@ -486,6 +492,30 @@ Route::post('/admin/logout', function (Request $request) {
 })->name('admin.logout');
 
 Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
+
+    // Post-login area chooser. Deliberately never auto-redirects, even when
+    // the user has a saved default — this is also the "switch area" screen
+    // and must stay reachable as a way to change or clear that default.
+    Route::get('/choose', function (Request $request) {
+        return view('admin.choose', [
+            'areas' => AdminAreas::available(),
+            'current' => $request->user()->default_admin_area,
+        ]);
+    })->name('choose');
+
+    Route::post('/choose', function (Request $request) {
+        $validated = $request->validate([
+            'area' => ['required', 'string', Rule::in(AdminAreas::validKeys())],
+        ]);
+
+        // Unticking "remember" clears any previously saved default, so this
+        // screen doubles as the way to go back to being asked every login.
+        $request->user()->update([
+            'default_admin_area' => $request->boolean('remember_area') ? $validated['area'] : null,
+        ]);
+
+        return redirect()->to(AdminAreas::urlFor($validated['area']));
+    })->name('choose.submit');
 
     Route::get('/', function () {
         $total = MotivationEnquiry::count();

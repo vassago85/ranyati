@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\AdminAreas;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -30,6 +31,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'default_admin_area',
     ];
 
     protected $hidden = [
@@ -63,6 +65,30 @@ class User extends Authenticatable
     public function isClient(): bool
     {
         return $this->role === self::ROLE_CLIENT;
+    }
+
+    /**
+     * The admin area this user has chosen to land in after signing in, or
+     * null when they should be shown the chooser. A preference pointing at
+     * an area whose routes are no longer registered resolves to null rather
+     * than stranding the user on a dead route.
+     *
+     * @return array{key: string, label: string, tagline: string, route: string, accent: string, icon: string}|null
+     */
+    public function defaultAdminArea(): ?array
+    {
+        return AdminAreas::find($this->default_admin_area);
+    }
+
+    /**
+     * Where to send this user immediately after authenticating: straight into
+     * their saved area, or the chooser when they have not picked one.
+     */
+    public function adminLandingUrl(): string
+    {
+        $area = $this->defaultAdminArea();
+
+        return $area ? route($area['route']) : route('admin.choose');
     }
 
     public function firearmApplications(): HasMany
