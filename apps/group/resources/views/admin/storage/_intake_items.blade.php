@@ -13,25 +13,41 @@
     // JSON's own double quotes have to be escaped as &quot; or the first one
     // closes the attribute and Alpine never initialises the repeater.
     $typeMapJson = json_encode(collect($firearmTypes)->mapWithKeys(fn ($v, $k) => [$k => $v['actions']])->all());
+
+    $itemTemplate = [
+        'register_book_id' => $book?->id,
+        'page'             => $nextSlot['page'] ?? 1,
+        'position'         => $nextSlot['position'] ?? 1,
+        'shelf'            => '',
+        'tag_colour'       => '',
+        'tag_number'       => '',
+        'firearm_make'     => '',
+        'cartridge'        => '',
+        'serial_number'    => '',
+        'firearm_type'     => '',
+        'action_type'      => '',
+        'condition_notes'  => '',
+        'date_in'          => now()->format('Y-m-d'),
+    ];
+
+    // Re-seed the repeater from old input after a failed submit. Without this
+    // the rows rebuild from the blank template, so one bad field throws away
+    // everything the operator captured for every firearm in the batch.
+    // File inputs can't be repopulated, hence intersecting against the
+    // template's own keys.
+    $oldItems = old('items');
+    $initialItems = is_array($oldItems) && $oldItems !== []
+        ? array_values(array_map(
+            fn ($row) => array_merge($itemTemplate, is_array($row) ? array_intersect_key($row, $itemTemplate) : []),
+            $oldItems,
+        ))
+        : [$itemTemplate];
 @endphp
 
 <div class="card" style="margin-top: 24px;"
      x-data="intakeItems({
-        template: {
-            register_book_id: {{ $book?->id ?? 'null' }},
-            page: {{ $nextSlot['page'] ?? 1 }},
-            position: {{ $nextSlot['position'] ?? 1 }},
-            shelf: '',
-            tag_colour: '',
-            tag_number: '',
-            firearm_make: '',
-            cartridge: '',
-            serial_number: '',
-            firearm_type: '',
-            action_type: '',
-            condition_notes: '',
-            date_in: '{{ now()->format('Y-m-d') }}',
-        },
+        template: {{ json_encode($itemTemplate) }},
+        initial: {{ json_encode($initialItems) }},
         types: {{ $typeMapJson }}
     })"
 >
@@ -202,7 +218,9 @@
         return {
             template: config.template,
             types: config.types,
-            items: [ Object.assign({}, config.template) ],
+            items: (Array.isArray(config.initial) && config.initial.length)
+                ? config.initial
+                : [ Object.assign({}, config.template) ],
             add() {
                 const t = Object.assign({}, this.template);
                 // Auto-advance the register slot suggestion so the operator

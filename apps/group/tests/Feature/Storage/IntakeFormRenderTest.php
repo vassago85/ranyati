@@ -3,6 +3,7 @@
 namespace Tests\Feature\Storage;
 
 use App\Models\RegisterBook;
+use App\Models\StorageAgreement;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -97,6 +98,52 @@ class IntakeFormRenderTest extends TestCase
         foreach (['page', 'position', 'shelf', 'tag_colour', 'tag_number', 'firearm_make', 'cartridge', 'serial_number', 'firearm_type', 'action_type', 'date_in'] as $field) {
             $response->assertSee("items[' + index + '][{$field}]", false);
         }
+    }
+
+    public function test_failed_submit_repopulates_every_captured_firearm_row(): void
+    {
+        $admin = $this->admin();
+        $book = RegisterBook::where('code', 'S01')->firstOrFail();
+
+        $item = [
+            'register_book_id' => $book->id,
+            'page' => 2, 'position' => 3,
+            'shelf' => 'JK', 'tag_colour' => 'P', 'tag_number' => 300,
+            'firearm_make' => 'Beretta',
+            'cartridge' => '12 Gauge',
+            'serial_number' => 'KEEP-ME-001',
+            'firearm_type' => 'shotgun',
+            // action_type deliberately omitted to force a validation failure.
+            'date_in' => now()->toDateString(),
+        ];
+
+        $this->actingAs($admin)
+            ->from('/admin/storage/self/create')
+            ->post('/admin/storage/self', [
+                'type' => StorageAgreement::TYPE_SELF_STORAGE,
+                'client_name' => 'P.J. Smith',
+                'email' => 'pj@example.com',
+                'storage_rate' => '100.00',
+                'items' => [
+                    $item,
+                    array_replace($item, [
+                        'position' => 4,
+                        'tag_number' => 301,
+                        'serial_number' => 'KEEP-ME-002',
+                    ]),
+                ],
+            ])
+            ->assertSessionHasErrors();
+
+        $html = $this->actingAs($admin)
+            ->get('/admin/storage/self/create')
+            ->assertOk()
+            ->getContent();
+
+        // Both rows must come back populated, not reset to a blank template.
+        $this->assertStringContainsString('KEEP-ME-001', $html);
+        $this->assertStringContainsString('KEEP-ME-002', $html);
+        $this->assertStringContainsString('Beretta', $html);
     }
 
     public function test_intake_pages_expose_every_firearm_type_and_its_actions(): void
