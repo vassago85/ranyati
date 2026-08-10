@@ -533,10 +533,25 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         ]);
     })->name('dashboard');
 
-    Route::get('/enquiries', function () {
+    Route::get('/enquiries', function (Request $request) {
+        $filter = $request->query('filter');
+        $query = MotivationEnquiry::latest();
+
+        if ($filter === 'unread') {
+            $query->whereNull('read_at');
+        } elseif ($filter === 'read') {
+            $query->whereNotNull('read_at');
+        } elseif ($filter === 'month') {
+            $query->whereMonth('created_at', now()->month)
+                ->whereYear('created_at', now()->year);
+        }
+
         return view('admin.enquiries', [
-            'enquiries' => MotivationEnquiry::latest()->paginate(25),
+            'enquiries' => $query->paginate(25)->withQueryString(),
             'unreadCount' => MotivationEnquiry::whereNull('read_at')->count(),
+            'readCount' => MotivationEnquiry::whereNotNull('read_at')->count(),
+            'totalCount' => MotivationEnquiry::count(),
+            'activeFilter' => in_array($filter, ['unread', 'read', 'month'], true) ? $filter : null,
         ]);
     })->name('enquiries');
 

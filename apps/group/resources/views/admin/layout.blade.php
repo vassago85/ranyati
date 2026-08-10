@@ -196,8 +196,9 @@
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 6px;
             padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
-            border: none; cursor: pointer; transition: all 0.2s;
+            border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap;
         }
+        .btn svg { width: 16px; height: 16px; flex-shrink: 0; }
         .btn-primary {
             background: linear-gradient(135deg, #F58220 0%, #d46f16 100%); color: #fff;
             box-shadow: 0 2px 8px -2px rgba(245,130,32,0.4);
@@ -248,6 +249,51 @@
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .dot-orange { background: #F58220; }
         .dot-green { background: #34d399; }
+
+        /* ---------- Dashboard UX helpers ---------- */
+        .page-head {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+        }
+        .page-head .greeting { font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+        .page-head .greeting span { color: #F58220; }
+        .page-head .subtle { font-size: 13px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+
+        .quick-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+        .quick-tile {
+            display: flex; align-items: center; gap: 10px; padding: 11px 15px; border-radius: 10px;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 600;
+            transition: background .15s, color .15s, border-color .15s, transform .15s;
+        }
+        .quick-tile:hover { background: rgba(255,255,255,0.08); color: #fff; transform: translateY(-1px); border-color: rgba(255,255,255,0.16); }
+        .quick-tile svg { width: 18px; height: 18px; color: #F58220; flex-shrink: 0; }
+
+        /* Clickable stat cards */
+        a.stat-card { display: block; color: inherit; text-decoration: none; transition: transform .15s, border-color .15s, box-shadow .15s; }
+        a.stat-card:hover { transform: translateY(-2px); border-color: rgba(245,130,32,0.3); box-shadow: 0 10px 28px -14px rgba(0,0,0,0.7); }
+        .stat-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+        .stat-icon { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.06); flex-shrink: 0; }
+        .stat-icon svg { width: 18px; height: 18px; }
+        .stat-arrow { color: rgba(255,255,255,0.2); transition: color .15s, transform .15s; }
+        .stat-icon svg, .stat-arrow svg { width: 18px; height: 18px; }
+        a.stat-card:hover .stat-arrow { color: #F58220; transform: translateX(2px); }
+        .stat-trend { margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.4); display: flex; align-items: center; gap: 5px; }
+
+        /* Clickable table rows */
+        tr.row-link { cursor: pointer; }
+        tr.row-link:hover td { background: rgba(245,130,32,0.05); }
+
+        /* Filter tabs */
+        .filter-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+        .filter-tab {
+            display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 7px;
+            font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); transition: background .15s, color .15s;
+        }
+        .filter-tab:hover { color: rgba(255,255,255,0.85); }
+        .filter-tab.active { background: rgba(245,130,32,0.14); color: #F58220; }
+        .filter-tab .count { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+        .filter-tab.active .count { background: rgba(245,130,32,0.2); color: #F58220; }
 
     </style>
 </head>

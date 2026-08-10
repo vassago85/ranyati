@@ -13,6 +13,33 @@
     </a>
 </div>
 
+@if ($applications->isNotEmpty())
+    @php
+        $total = $applications->count();
+        $finalised = $applications->filter(fn ($a) => \App\Models\FirearmApplication::isTerminalStatus($a->status))->count();
+        $paused = $applications->filter(fn ($a) => ! $a->monitoring_enabled && ! \App\Models\FirearmApplication::isTerminalStatus($a->status))->count();
+        $active = $total - $finalised - $paused;
+    @endphp
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <div class="card px-4 py-4">
+            <div class="text-2xl font-bold text-white">{{ $total }}</div>
+            <div class="text-xs text-white/45 mt-0.5">Tracked</div>
+        </div>
+        <div class="card px-4 py-4">
+            <div class="text-2xl font-bold text-orange-400">{{ $active }}</div>
+            <div class="text-xs text-white/45 mt-0.5">Actively monitored</div>
+        </div>
+        <div class="card px-4 py-4">
+            <div class="text-2xl font-bold text-emerald-400">{{ $finalised }}</div>
+            <div class="text-xs text-white/45 mt-0.5">Finalised</div>
+        </div>
+        <div class="card px-4 py-4">
+            <div class="text-2xl font-bold text-white/60">{{ $paused }}</div>
+            <div class="text-xs text-white/45 mt-0.5">Paused</div>
+        </div>
+    </div>
+@endif
+
 @if ($applications->isEmpty())
     <div class="card p-8 text-center">
         <p class="text-white/60 mb-4">You have not added any applications yet.</p>
