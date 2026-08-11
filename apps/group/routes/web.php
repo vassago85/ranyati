@@ -534,8 +534,27 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     })->name('dashboard');
 
     Route::get('/enquiries', function (Request $request) {
+        $allowedFilters = ['unread', 'read', 'month', 'needs_reply', ...MotivationEnquiry::statusKeys()];
         $filter = $request->query('filter');
-        $query = MotivationEnquiry::latest();
+        $filter = in_array($filter, $allowedFilters, true) ? $filter : null;
+
+        $allowedSorts = ['created_at', 'replied_at', 'status', 'name'];
+        $sort = in_array($request->query('sort'), $allowedSorts, true) ? $request->query('sort') : 'created_at';
+        $direction = $request->query('direction') === 'asc' ? 'asc' : 'desc';
+
+        $q = trim((string) $request->query('q', ''));
+
+        $query = MotivationEnquiry::query();
+
+        if ($q !== '') {
+            $query->where(function ($sub) use ($q) {
+                $like = '%'.$q.'%';
+                $sub->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('phone', 'like', $like)
+                    ->orWhere('membership_number', 'like', $like);
+            });
+        }
 
         if ($filter === 'unread') {
             $query->whereNull('read_at');
@@ -544,14 +563,29 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         } elseif ($filter === 'month') {
             $query->whereMonth('created_at', now()->month)
                 ->whereYear('created_at', now()->year);
+        } elseif ($filter === 'needs_reply') {
+            $query->whereNull('replied_at')
+                ->where('status', '!=', MotivationEnquiry::STATUS_CLOSED);
+        } elseif (in_array($filter, MotivationEnquiry::statusKeys(), true)) {
+            $query->where('status', $filter);
         }
+
+        // Sort by chosen column, then id desc as the tiebreaker so consistent
+        // ordering across pages.
+        $query->orderBy($sort, $direction)->orderByDesc('id');
 
         return view('admin.enquiries', [
             'enquiries' => $query->paginate(25)->withQueryString(),
             'unreadCount' => MotivationEnquiry::whereNull('read_at')->count(),
             'readCount' => MotivationEnquiry::whereNotNull('read_at')->count(),
             'totalCount' => MotivationEnquiry::count(),
-            'activeFilter' => in_array($filter, ['unread', 'read', 'month'], true) ? $filter : null,
+            'needsReplyCount' => MotivationEnquiry::whereNull('replied_at')
+                ->where('status', '!=', MotivationEnquiry::STATUS_CLOSED)
+                ->count(),
+            'activeFilter' => $filter,
+            'sort' => $sort,
+            'direction' => $direction,
+            'q' => $q,
         ]);
     })->name('enquiries');
 
@@ -574,6 +608,28 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         return back()->with('success', 'All enquiries marked as read.');
     })->name('enquiries.mark-all-read');
+
+    Route::post('/enquiries/{enquiry}/status', function (Request $request, MotivationEnquiry $enquiry) {
+        $validated = $request->validate([
+            'status' => ['required', 'string', Rule::in(MotivationEnquiry::statusKeys())],
+        ]);
+
+        $enquiry->update(['status' => $validated['status']]);
+
+        return back()->with('success', 'Status updated to '.MotivationEnquiry::statusLabels()[$validated['status']].'.');
+    })->name('enquiries.status');
+
+    Route::post('/enquiries/{enquiry}/mark-replied', function (MotivationEnquiry $enquiry) {
+        $enquiry->update(['replied_at' => now()]);
+
+        return back()->with('success', 'Reply logged. This enquiry is no longer marked as needing a reply.');
+    })->name('enquiries.mark-replied');
+
+    Route::post('/enquiries/{enquiry}/clear-replied', function (MotivationEnquiry $enquiry) {
+        $enquiry->update(['replied_at' => null]);
+
+        return back()->with('success', 'Reply marker cleared — the enquiry is back in the "needs reply" queue.');
+    })->name('enquiries.clear-replied');
 
     Route::delete('/enquiries/{enquiry}', function (MotivationEnquiry $enquiry) {
         $enquiry->delete();
@@ -683,20 +739,72 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
     // ── Arms Listings Management ────────────────────────────────
 
-    Route::get('/arms', function () {
-        return view('admin.arms.index', [
-            'listings' => ArmsListing::query()
-                ->orderByDesc('is_featured')
+    Route::get('/arms', function (Request $request) {
+        $allowedFilters = ['active', 'featured', 'sold', 'archived', 'reduced'];
+        $filter = in_array($request->query('filter'), $allowedFilters, true) ? $request->query('filter') : null;
+
+        $allowedSorts = ['created_at', 'price', 'status', 'title', 'enquiries_count'];
+        $sort = in_array($request->query('sort'), $allowedSorts, true) ? $request->query('sort') : null;
+        $direction = $request->query('direction') === 'asc' ? 'asc' : 'desc';
+
+        $q = trim((string) $request->query('q', ''));
+
+        $query = ArmsListing::query()->withCount('enquiries');
+
+        if ($q !== '') {
+            $query->where(function ($sub) use ($q) {
+                $like = '%'.$q.'%';
+                $sub->where('title', 'like', $like)
+                    ->orWhere('make', 'like', $like)
+                    ->orWhere('model', 'like', $like)
+                    ->orWhere('calibre', 'like', $like);
+            });
+        }
+
+        switch ($filter) {
+            case 'active':
+                $query->whereIn('status', ['active', 'reduced']);
+                break;
+            case 'featured':
+                $query->where('is_featured', true)->whereIn('status', ['active', 'reduced']);
+                break;
+            case 'sold':
+                $query->where('status', 'sold');
+                break;
+            case 'archived':
+                $query->where('status', 'archived');
+                break;
+            case 'reduced':
+                $query->where('status', 'reduced')
+                    ->orWhere(function ($sub) {
+                        $sub->whereNotNull('original_price')->whereColumn('original_price', '>', 'price');
+                    });
+                break;
+        }
+
+        if ($sort) {
+            $query->orderBy($sort, $direction)->orderByDesc('id');
+        } else {
+            // Default: featured pinned to top, matching the public grid ordering.
+            $query->orderByDesc('is_featured')
                 ->orderByDesc('featured_at')
-                ->orderByDesc('id')
-                ->paginate(25),
+                ->orderByDesc('id');
+        }
+
+        return view('admin.arms.index', [
+            'listings' => $query->paginate(25)->withQueryString(),
             'stats' => [
                 'active' => ArmsListing::whereIn('status', ['active', 'reduced'])->count(),
                 'featured' => ArmsListing::where('is_featured', true)->whereIn('status', ['active', 'reduced'])->count(),
                 'sold' => ArmsListing::where('status', 'sold')->count(),
                 'archived' => ArmsListing::where('status', 'archived')->count(),
                 'enquiries' => ArmsEnquiry::count(),
+                'total' => ArmsListing::count(),
             ],
+            'activeFilter' => $filter,
+            'sort' => $sort,
+            'direction' => $direction,
+            'q' => $q,
         ]);
     })->name('arms');
 
@@ -850,12 +958,84 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         return back()->with('success', 'Listing marked as sold. Its page stays live (200) with a Sold state.');
     })->name('arms.sold');
 
+    Route::post('/arms/{listing}/duplicate', function (ArmsListing $listing) {
+        // Photos: copy the underlying files so deleting either listing later
+        // doesn't yank images from the other. `Storage::copy` is a no-op if
+        // the source is already missing (skipped) so a partial gallery still
+        // duplicates gracefully.
+        $copiedImages = [];
+        foreach ($listing->images ?? [] as $source) {
+            if (! is_string($source) || $source === '') {
+                continue;
+            }
+
+            try {
+                if (! Storage::disk('public')->exists($source)) {
+                    continue;
+                }
+
+                $ext = pathinfo($source, PATHINFO_EXTENSION) ?: 'jpg';
+                $destination = 'arms/'.\Illuminate\Support\Str::random(40).'.'.$ext;
+
+                Storage::disk('public')->copy($source, $destination);
+                $copiedImages[] = $destination;
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning('Duplicate: failed to copy image', [
+                    'listing_id' => $listing->id,
+                    'source' => $source,
+                    'error' => $e->getMessage(),
+                ]);
+            }
+        }
+
+        $copy = $listing->replicate(['slug', 'is_featured', 'featured_at', 'archived_at']);
+        $copy->title = trim($listing->title.' (copy)');
+        $copy->images = $copiedImages;
+        $copy->status = 'active';
+        $copy->is_featured = false;
+        $copy->featured_at = now();
+        $copy->archived_at = null;
+        $copy->created_by = auth()->id() ?? $listing->created_by;
+        $copy->save(); // saving() hook regenerates the slug.
+
+        return redirect()
+            ->route('admin.arms.edit', $copy)
+            ->with('success', 'Duplicated — review the details and save when you\'re ready.');
+    })->name('arms.duplicate');
+
     // ── Arms Enquiries ─────────────────────────────────────────
 
-    Route::get('/arms/enquiries', function () {
+    Route::get('/arms/enquiries', function (Request $request) {
+        $filter = in_array($request->query('filter'), ['unread', 'read'], true)
+            ? $request->query('filter')
+            : null;
+        $q = trim((string) $request->query('q', ''));
+
+        $query = ArmsEnquiry::with('listing');
+
+        if ($q !== '') {
+            $query->where(function ($sub) use ($q) {
+                $like = '%'.$q.'%';
+                $sub->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('phone', 'like', $like)
+                    ->orWhere('message', 'like', $like);
+            });
+        }
+
+        if ($filter === 'unread') {
+            $query->whereNull('read_at');
+        } elseif ($filter === 'read') {
+            $query->whereNotNull('read_at');
+        }
+
         return view('admin.arms.enquiries', [
-            'enquiries' => ArmsEnquiry::with('listing')->latest()->paginate(25),
+            'enquiries' => $query->latest()->paginate(25)->withQueryString(),
             'unreadCount' => ArmsEnquiry::whereNull('read_at')->count(),
+            'readCount' => ArmsEnquiry::whereNotNull('read_at')->count(),
+            'totalCount' => ArmsEnquiry::count(),
+            'activeFilter' => $filter,
+            'q' => $q,
         ]);
     })->name('arms.enquiries');
 

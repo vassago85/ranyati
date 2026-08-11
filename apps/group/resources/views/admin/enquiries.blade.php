@@ -10,22 +10,63 @@
     @endif
 @endsection
 
+@php
+    // Helper: build a URL that keeps current search + filter but flips sort direction.
+    $sortLink = function (string $column) use ($sort, $direction, $activeFilter, $q) {
+        $nextDirection = ($sort === $column && $direction === 'desc') ? 'asc' : 'desc';
+        return route('admin.enquiries', array_filter([
+            'filter' => $activeFilter,
+            'q' => $q ?: null,
+            'sort' => $column,
+            'direction' => $nextDirection,
+        ]));
+    };
+    $sortIndicator = function (string $column) use ($sort, $direction) {
+        if ($sort !== $column) return '';
+        return $direction === 'desc' ? ' ↓' : ' ↑';
+    };
+    $statusLabels = \App\Models\MotivationEnquiry::statusLabels();
+@endphp
+
 @section('content')
-    <div style="margin-bottom: 20px;">
-        <div class="filter-tabs">
-            <a href="{{ route('admin.enquiries') }}" class="filter-tab {{ ($activeFilter ?? null) === null ? 'active' : '' }}">
-                All <span class="count">{{ $totalCount ?? $enquiries->total() }}</span>
+    <div style="margin-bottom: 20px; display:flex; flex-direction:column; gap:12px;">
+        <div class="filter-tabs" style="flex-wrap:wrap;">
+            <a href="{{ route('admin.enquiries', array_filter(['q' => $q ?: null])) }}" class="filter-tab {{ $activeFilter === null ? 'active' : '' }}">
+                All <span class="count">{{ $totalCount }}</span>
             </a>
-            <a href="{{ route('admin.enquiries', ['filter' => 'unread']) }}" class="filter-tab {{ ($activeFilter ?? null) === 'unread' ? 'active' : '' }}">
+            <a href="{{ route('admin.enquiries', array_filter(['filter' => 'needs_reply', 'q' => $q ?: null])) }}" class="filter-tab {{ $activeFilter === 'needs_reply' ? 'active' : '' }}">
+                Needs reply <span class="count">{{ $needsReplyCount }}</span>
+            </a>
+            <a href="{{ route('admin.enquiries', array_filter(['filter' => 'unread', 'q' => $q ?: null])) }}" class="filter-tab {{ $activeFilter === 'unread' ? 'active' : '' }}">
                 <span class="dot dot-orange"></span> Unread <span class="count">{{ $unreadCount }}</span>
             </a>
-            <a href="{{ route('admin.enquiries', ['filter' => 'read']) }}" class="filter-tab {{ ($activeFilter ?? null) === 'read' ? 'active' : '' }}">
-                <span class="dot dot-green"></span> Read <span class="count">{{ $readCount ?? 0 }}</span>
+            <a href="{{ route('admin.enquiries', array_filter(['filter' => 'read', 'q' => $q ?: null])) }}" class="filter-tab {{ $activeFilter === 'read' ? 'active' : '' }}">
+                <span class="dot dot-green"></span> Read <span class="count">{{ $readCount }}</span>
             </a>
-            <a href="{{ route('admin.enquiries', ['filter' => 'month']) }}" class="filter-tab {{ ($activeFilter ?? null) === 'month' ? 'active' : '' }}">
+            <a href="{{ route('admin.enquiries', array_filter(['filter' => 'month', 'q' => $q ?: null])) }}" class="filter-tab {{ $activeFilter === 'month' ? 'active' : '' }}">
                 This month
             </a>
+            @foreach($statusLabels as $key => $label)
+                <a href="{{ route('admin.enquiries', array_filter(['filter' => $key, 'q' => $q ?: null])) }}" class="filter-tab {{ $activeFilter === $key ? 'active' : '' }}">
+                    {{ $label }}
+                </a>
+            @endforeach
         </div>
+
+        <form method="GET" action="{{ route('admin.enquiries') }}" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            @if($activeFilter)
+                <input type="hidden" name="filter" value="{{ $activeFilter }}">
+            @endif
+            @if($sort !== 'created_at')
+                <input type="hidden" name="sort" value="{{ $sort }}">
+                <input type="hidden" name="direction" value="{{ $direction }}">
+            @endif
+            <input type="search" name="q" value="{{ $q }}" placeholder="Search name, email, phone, membership…" class="form-input" style="max-width: 340px;">
+            <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+            @if($q !== '')
+                <a href="{{ route('admin.enquiries', array_filter(['filter' => $activeFilter])) }}" class="btn btn-secondary btn-sm">Clear</a>
+            @endif
+        </form>
     </div>
 
     <div class="card">
@@ -33,12 +74,17 @@
             <div class="card-body" style="text-align: center; padding: 64px 20px;">
                 <svg style="width:48px;height:48px;color:rgba(255,255,255,0.08);margin:0 auto 16px;" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
                 <p style="font-size: 14px; color: rgba(255,255,255,0.3);">
-                    @switch($activeFilter ?? null)
-                        @case('unread') Nothing unread — you're all caught up. @break
-                        @case('read') No read enquiries yet. @break
-                        @case('month') No enquiries this month yet. @break
-                        @default No enquiries yet.
-                    @endswitch
+                    @if($q !== '')
+                        No enquiries match "{{ $q }}".
+                    @else
+                        @switch($activeFilter)
+                            @case('unread') Nothing unread — you're all caught up. @break
+                            @case('read') No read enquiries yet. @break
+                            @case('month') No enquiries this month yet. @break
+                            @case('needs_reply') Nothing waiting for a reply — nicely done. @break
+                            @default No enquiries yet.
+                        @endswitch
+                    @endif
                 </p>
             </div>
         @else
@@ -46,13 +92,15 @@
                 <thead>
                     <tr>
                         <th style="width:8px;"></th>
-                        <th>Name</th>
+                        <th><a href="{{ $sortLink('name') }}" style="color:inherit;">Name{!! $sortIndicator('name') !!}</a></th>
                         <th>Email</th>
                         <th>Type</th>
                         <th>Purpose</th>
                         <th>Services</th>
+                        <th><a href="{{ $sortLink('status') }}" style="color:inherit;">Status{!! $sortIndicator('status') !!}</a></th>
+                        <th>Reply</th>
                         <th>Source</th>
-                        <th>Date</th>
+                        <th><a href="{{ $sortLink('created_at') }}" style="color:inherit;">Date{!! $sortIndicator('created_at') !!}</a></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -84,6 +132,19 @@
                                     <span class="badge badge-orange" title="R{{ number_format($svcTotal, 0, '.', ',') }} estimated">{{ count($svcResolved) }} &middot; R{{ number_format($svcTotal, 0, '.', ',') }}</span>
                                 @else
                                     <span style="color:rgba(255,255,255,0.25);">—</span>
+                                @endif
+                            </td>
+                            <td>
+                                @php $sLabel = $statusLabels[$enquiry->status] ?? ucfirst($enquiry->status); @endphp
+                                <span class="badge {{ $enquiry->status === \App\Models\MotivationEnquiry::STATUS_CLOSED ? 'badge-zinc' : 'badge-blue' }}">{{ $sLabel }}</span>
+                            </td>
+                            <td style="white-space:nowrap;">
+                                @if($enquiry->replied_at)
+                                    <span class="badge badge-green" title="Replied {{ $enquiry->replied_at->format('d M Y H:i') }}">Replied</span>
+                                @elseif($enquiry->status === \App\Models\MotivationEnquiry::STATUS_CLOSED)
+                                    <span style="color:rgba(255,255,255,0.25);">—</span>
+                                @else
+                                    <span class="badge badge-orange">Needs reply</span>
                                 @endif
                             </td>
                             <td>

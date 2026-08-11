@@ -11,11 +11,42 @@
 @endsection
 
 @section('content')
+    <div style="margin-bottom: 16px; display:flex; flex-direction:column; gap:12px;">
+        <div class="filter-tabs" style="flex-wrap:wrap;">
+            <a href="{{ route('admin.arms.enquiries', array_filter(['q' => $q ?: null])) }}" class="filter-tab {{ ($activeFilter ?? null) === null ? 'active' : '' }}">
+                All <span class="count">{{ $totalCount }}</span>
+            </a>
+            <a href="{{ route('admin.arms.enquiries', array_filter(['filter' => 'unread', 'q' => $q ?: null])) }}" class="filter-tab {{ ($activeFilter ?? null) === 'unread' ? 'active' : '' }}">
+                <span class="dot dot-orange"></span> Unread <span class="count">{{ $unreadCount }}</span>
+            </a>
+            <a href="{{ route('admin.arms.enquiries', array_filter(['filter' => 'read', 'q' => $q ?: null])) }}" class="filter-tab {{ ($activeFilter ?? null) === 'read' ? 'active' : '' }}">
+                <span class="dot dot-green"></span> Read <span class="count">{{ $readCount }}</span>
+            </a>
+        </div>
+
+        <form method="GET" action="{{ route('admin.arms.enquiries') }}" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            @if($activeFilter)
+                <input type="hidden" name="filter" value="{{ $activeFilter }}">
+            @endif
+            <input type="search" name="q" value="{{ $q }}" placeholder="Search name, email, phone, message…" class="form-input" style="max-width: 340px;">
+            <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+            @if($q !== '')
+                <a href="{{ route('admin.arms.enquiries', array_filter(['filter' => $activeFilter])) }}" class="btn btn-secondary btn-sm">Clear</a>
+            @endif
+        </form>
+    </div>
+
     <div class="card">
         @if($enquiries->isEmpty())
             <div class="card-body" style="text-align: center; padding: 64px 20px;">
                 <svg style="width:48px;height:48px;color:rgba(255,255,255,0.08);margin:0 auto 16px;" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>
-                <p style="font-size: 14px; color: rgba(255,255,255,0.3);">No arms enquiries yet.</p>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.3);">
+                    @if($q !== '')
+                        No arms enquiries match "{{ $q }}".
+                    @else
+                        No arms enquiries yet.
+                    @endif
+                </p>
             </div>
         @else
             <div style="display: flex; flex-direction: column; gap: 1px; background: rgba(255,255,255,0.02);">

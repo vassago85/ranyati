@@ -18,12 +18,19 @@
         <div class="card">
             <div class="card-header">
                 <h2>Enquiry Details</h2>
-                <div style="display:flex;align-items:center;gap:8px;">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
                     @if(!$enquiry->read_at)
                         <span class="badge badge-orange">Unread</span>
                     @else
                         <span class="badge badge-green">Read {{ $enquiry->read_at->diffForHumans() }}</span>
                     @endif
+                    @if($enquiry->replied_at)
+                        <span class="badge badge-blue" title="Reply logged {{ $enquiry->replied_at->format('d M Y H:i') }}">Replied {{ $enquiry->replied_at->diffForHumans() }}</span>
+                    @else
+                        <span class="badge badge-orange" title="No reply has been logged for this enquiry">Needs reply</span>
+                    @endif
+                    @php $statusLabel = \App\Models\MotivationEnquiry::statusLabels()[$enquiry->status] ?? ucfirst($enquiry->status); @endphp
+                    <span class="badge {{ $enquiry->status === \App\Models\MotivationEnquiry::STATUS_CLOSED ? 'badge-zinc' : 'badge-blue' }}">{{ $statusLabel }}</span>
                 </div>
             </div>
             <div class="card-body">
@@ -130,19 +137,72 @@
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header"><h2>Actions</h2></div>
-                <div class="card-body" style="display:flex;flex-direction:column;gap:8px;">
-                    <a href="mailto:{{ $enquiry->email }}?subject=Re: Motivation Enquiry" class="btn btn-primary" style="width:100%;">
+            @php
+                $templates = \App\Support\EnquiryReplyTemplates::all();
+                $defaultKey = \App\Support\EnquiryReplyTemplates::TEMPLATE_ACKNOWLEDGEMENT;
+                $mailtoUrls = collect($templates)
+                    ->mapWithKeys(fn ($tpl) => [$tpl['key'] => \App\Support\EnquiryReplyTemplates::mailtoUrl($enquiry, $tpl['key'])])
+                    ->all();
+            @endphp
+
+            <div class="card" x-data="{ template: '{{ $defaultKey }}', mailto: @js($mailtoUrls) }">
+                <div class="card-header"><h2>Reply</h2></div>
+                <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+                    <div>
+                        <label class="form-label" style="margin-bottom:4px;">Template</label>
+                        <select class="form-input" x-model="template">
+                            @foreach($templates as $tpl)
+                                <option value="{{ $tpl['key'] }}">{{ $tpl['label'] }}</option>
+                            @endforeach
+                        </select>
+                        <div class="form-hint">Pre-fills the subject and body with the details on this enquiry so you're not retyping context.</div>
+                    </div>
+
+                    <a :href="mailto[template]" class="btn btn-primary" style="width:100%;">
                         <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
-                        Reply via Email
+                        Open reply in email
                     </a>
+
+                    @if($enquiry->replied_at)
+                        <form method="POST" action="{{ route('admin.enquiries.clear-replied', $enquiry) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-secondary" style="width:100%;">Clear reply marker</button>
+                        </form>
+                        <div class="form-hint" style="margin-top:-4px;">Reply logged {{ $enquiry->replied_at->format('d M Y \a\t H:i') }}.</div>
+                    @else
+                        <form method="POST" action="{{ route('admin.enquiries.mark-replied', $enquiry) }}">
+                            @csrf
+                            <button type="submit" class="btn btn-secondary" style="width:100%;">Log reply sent</button>
+                        </form>
+                        <div class="form-hint" style="margin-top:-4px;">Click after you've sent the email so this enquiry drops out of the "needs reply" queue.</div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h2>Workflow</h2></div>
+                <div class="card-body" style="display:flex;flex-direction:column;gap:12px;">
+                    <form method="POST" action="{{ route('admin.enquiries.status', $enquiry) }}" style="display:flex;flex-direction:column;gap:8px;">
+                        @csrf
+                        <label class="form-label" style="margin-bottom:0;">Status</label>
+                        <select name="status" class="form-input" onchange="this.form.submit()">
+                            @foreach(\App\Models\MotivationEnquiry::statusLabels() as $key => $label)
+                                <option value="{{ $key }}" @selected($enquiry->status === $key)>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <noscript>
+                            <button type="submit" class="btn btn-secondary btn-sm" style="width:100%;margin-top:6px;">Update status</button>
+                        </noscript>
+                        <div class="form-hint">New → In progress → Awaiting docs → Closed. Closed enquiries drop out of the "needs reply" queue automatically.</div>
+                    </form>
+
                     @if($enquiry->phone)
                     <a href="tel:{{ $enquiry->phone }}" class="btn btn-secondary" style="width:100%;">
                         <svg style="width:14px;height:14px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"/></svg>
-                        Call
+                        Call {{ $enquiry->phone }}
                     </a>
                     @endif
+
                     @if(!$enquiry->read_at)
                     <form method="POST" action="{{ route('admin.enquiries.toggle-read', $enquiry) }}">
                         @csrf
