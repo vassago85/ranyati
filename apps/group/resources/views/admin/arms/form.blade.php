@@ -14,6 +14,32 @@
 @endphp
 
 @section('content')
+    {{-- Scoped responsive styles. The admin layout doesn't ship a @stack for
+         head, so we inline the block here. The outer grid + the two inner
+         field rows all collapse to a single column at the same 1024px
+         breakpoint the sidebar uses, and the Live-preview card is hidden on
+         mobile where it would otherwise squeeze the actual form into an
+         unusable ~170px sliver. --}}
+    <style>
+        .listing-form-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .listing-form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .listing-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+        @media (max-width: 1023px) {
+            .listing-form-layout { grid-template-columns: 1fr; }
+            .listing-form-preview { display: none; }
+        }
+        @media (max-width: 640px) {
+            .listing-form-row-2,
+            .listing-form-row-3 { grid-template-columns: 1fr; gap: 0; }
+        }
+    </style>
+
     @if($listing)
         {{-- Quick-action toolbar: same status verbs as the listings index but
              within reach of the edit form so operators don't round-trip. --}}
@@ -98,7 +124,7 @@
             descriptionLong: @js((string) old('description_long', $listing?->description_long ?? '')),
         })"
         x-init="init()"
-        style="display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 20px; align-items: flex-start;"
+        class="listing-form-layout"
     >
         <div class="card">
             <div class="card-header">
@@ -131,7 +157,7 @@
                         @error('title') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div class="listing-form-row-2">
                         <div class="form-group">
                             <label class="form-label">Selling Price <span style="color:#ef4444;">*</span></label>
                             <div style="position:relative;">
@@ -152,7 +178,7 @@
                         </div>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                    <div class="listing-form-row-3">
                         <div class="form-group">
                             <label class="form-label">Make <span style="color:#ef4444;">*</span></label>
                             <input type="text" name="make" list="arms-makes" class="form-input" x-model="make" placeholder="e.g. Glock" required>
@@ -224,8 +250,9 @@
 
         {{-- Live preview: a compact mirror of the public card so operators
              can catch copy-paste artifacts (stray characters, half-typed
-             titles) before saving. Reads from the shared listingForm state. --}}
-        <div class="card" style="position: sticky; top: 96px;">
+             titles) before saving. Reads from the shared listingForm state.
+             Hidden on <1024px viewports so it doesn't crush the form. --}}
+        <div class="card listing-form-preview" style="position: sticky; top: 96px;">
             <div class="card-header">
                 <h2>Live preview</h2>
             </div>
