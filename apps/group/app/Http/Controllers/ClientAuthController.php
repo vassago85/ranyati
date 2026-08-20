@@ -68,6 +68,12 @@ class ClientAuthController extends Controller
 
     public function register(Request $request): RedirectResponse
     {
+        // Honeypot: real users never see/fill "website". Bots that do are
+        // dropped silently — no account, no verification email, no tip-off.
+        if ($request->filled('website')) {
+            return redirect()->route('account.register');
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
