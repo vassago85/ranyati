@@ -1228,6 +1228,55 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             ->with('success', 'Questionnaire submitted and saved.');
     })->name('questionnaires.submit');
 
+    // ── Motivation builder & requests ──────────────────────────
+    Route::prefix('application-types')->name('application-types.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'store'])->name('store');
+        Route::get('/{applicationType}/edit', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'edit'])->name('edit');
+        Route::put('/{applicationType}', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'update'])->name('update');
+        Route::delete('/{applicationType}', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'destroy'])->name('destroy');
+        Route::post('/{applicationType}/clone', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'clone'])->name('clone');
+
+        Route::post('/assets', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'uploadAsset'])->name('assets.upload');
+        Route::delete('/assets/{asset}', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'destroyAsset'])->name('assets.destroy');
+    });
+
+    Route::prefix('motivation-members')->name('motivation-members.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'store'])->name('store');
+        Route::get('/{motivationMember}', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'show'])->name('show');
+        Route::get('/{motivationMember}/profile', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'editProfile'])->name('profile.edit');
+        Route::post('/{motivationMember}/profile', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/{motivationMember}/motivations', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'startMotivation'])->name('motivations.start');
+    });
+
+    Route::prefix('motivation-requests')->name('motivation-requests.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'index'])->name('index');
+        Route::get('/{motivation}', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'show'])->name('show');
+        Route::get('/{motivation}/edit', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'editOnBehalf'])->name('edit');
+        Route::post('/{motivation}/answers', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'updateAnswers'])->name('answers');
+        Route::post('/{motivation}/documents', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'uploadDocumentOnBehalf'])->name('documents.upload');
+        Route::delete('/{motivation}/documents/{document}', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'deleteDocument'])->name('documents.delete');
+        Route::post('/{motivation}/submit-on-behalf', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'submitOnBehalf'])->name('submit-on-behalf');
+        Route::get('/{motivation}/poa', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'downloadPoa'])->name('poa');
+        Route::post('/{motivation}/verify', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'verify'])->name('verify');
+        Route::post('/{motivation}/request-changes', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'requestChanges'])->name('request-changes');
+        Route::post('/{motivation}/regenerate', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'regenerate'])->name('regenerate');
+        Route::get('/{motivation}/book', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'downloadBook'])->name('book');
+        Route::post('/{motivation}/documents/{document}/check', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'checkDocument'])->name('documents.check');
+        Route::get('/{motivation}/documents/{document}', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'viewDocument'])->name('documents.view');
+        Route::post('/{motivation}/endorsement', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'uploadEndorsement'])->name('endorsement');
+        Route::post('/{motivation}/ready', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markReady'])->name('ready');
+        Route::post('/{motivation}/printed', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markPrinted'])->name('printed');
+        Route::post('/{motivation}/invoice', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'uploadInvoice'])->name('invoice');
+        Route::post('/{motivation}/paid', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markPaid'])->name('paid');
+        Route::post('/{motivation}/ready-for-collection', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markReadyForCollection'])->name('ready-for-collection');
+        Route::post('/{motivation}/shipped', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markShipped'])->name('shipped');
+        Route::post('/{motivation}/completed', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markCompleted'])->name('completed');
+    });
+
     // ── User Management (developer & owner only) ───────────────
 
     Route::get('/users', function () {

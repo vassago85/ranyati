@@ -21,7 +21,10 @@ RUN apk add --no-cache \
     zip \
     unzip \
     oniguruma-dev \
-    icu-dev
+    icu-dev \
+    # ghostscript rewrites PDF 1.5+ uploads that FPDI can't import directly
+    # when assembling the motivation book
+    ghostscript
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN install-php-extensions \

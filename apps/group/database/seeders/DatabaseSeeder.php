@@ -22,5 +22,6 @@ class DatabaseSeeder extends Seeder
         );
 
         $this->call(StorageModuleSeeder::class);
+        $this->call(MotivationTypesSeeder::class);
     }
 }

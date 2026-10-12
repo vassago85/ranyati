@@ -14,3 +14,9 @@ Thumbs.db
 .env.production
 
 # Laravel app-level ignores are handled by apps/group/.gitignore
+
+# Local scratch directories used to mine reference client motivations
+# (contains PII — names, SA ID numbers, physical addresses, firearm
+# serial numbers). Never commit.
+/_motivation_src/
+/_motivation_extracts/

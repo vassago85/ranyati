@@ -7,6 +7,7 @@ use App\Support\AdminAreas;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -94,6 +95,16 @@ class User extends Authenticatable
     public function firearmApplications(): HasMany
     {
         return $this->hasMany(FirearmApplication::class);
+    }
+
+    public function clientProfile(): HasOne
+    {
+        return $this->hasOne(ClientProfile::class);
+    }
+
+    public function motivationRequests(): HasMany
+    {
+        return $this->hasMany(MotivationRequest::class);
     }
 
     public function getRoleLabelAttribute(): string
