@@ -67,7 +67,9 @@
     @case('yes_no_list')
         <div class="space-y-1.5">
             @foreach ($field['items'] ?? [] as $item)
-                @php($itemValue = is_array($value) ? ($value[$item['name']] ?? null) : null)
+                @php
+                    $itemValue = is_array($value) ? ($value[$item['name']] ?? null) : null;
+                @endphp
                 <div class="flex items-center justify-between gap-3 bg-white/5 rounded-lg px-3 py-2">
                     <div class="text-sm text-white/80">{{ $item['label'] }}</div>
                     <div class="flex gap-3 text-xs text-white/70">
@@ -84,8 +86,12 @@
         @break
 
     @case('firearms_table')
-        @php($rows = is_array($value) ? array_values($value) : [])
-        @if ($rows === []) @php($rows = [[]]) @endif
+        @php
+            $rows = is_array($value) ? array_values($value) : [];
+            if ($rows === []) {
+                $rows = [[]];
+            }
+        @endphp
         <div x-data='{ rows: @json($rows) }' class="space-y-2">
             <template x-for="(row, index) in rows" :key="index">
                 <div class="grid grid-cols-2 sm:grid-cols-6 gap-2 items-end bg-white/5 rounded-lg p-3">

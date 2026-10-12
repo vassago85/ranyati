@@ -4,7 +4,9 @@
     @foreach ($items as $item)
         @switch($item['kind'])
             @case('heading')
-                @php($level = max(1, min(3, (int) $item['level'])))
+                @php
+                    $level = max(1, min(3, (int) $item['level']));
+                @endphp
                 @if ($level === 1)
                     <h1>{!! nl2br(e($item['text'])) !!}</h1>
                 @elseif ($level === 2)

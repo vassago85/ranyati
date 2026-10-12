@@ -44,7 +44,9 @@
             @if (! $profile || $profile->missingRequired() !== [])
                 <p style="color:rgba(255,255,255,.5);font-size:13px;">Complete the profile first.</p>
             @else
-                @php($hasPrevious = $member->motivationRequests->whereNotNull('submitted_at')->isNotEmpty())
+                @php
+                    $hasPrevious = $member->motivationRequests->whereNotNull('submitted_at')->isNotEmpty();
+                @endphp
                 <form method="POST" action="{{ route('admin.motivation-members.motivations.start', $member) }}" style="display:grid;gap:8px;">
                     @csrf
                     <select name="application_type_id" class="form-input" required>

@@ -1,4 +1,6 @@
-@php($p = $profile)
+@php
+    $p = $profile;
+@endphp
 
 @if (! empty($includeAccountEmail))
     <div class="card" style="margin-bottom:16px;">

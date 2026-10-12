@@ -82,7 +82,9 @@
     <div class="card-header"><h2>Supporting documents</h2></div>
     <div class="card-body">
         @foreach ($requirements as $kind => $req)
-            @php($docs = $uploadedByKind[$kind] ?? collect())
+            @php
+                $docs = $uploadedByKind[$kind] ?? collect();
+            @endphp
             <div style="border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:12px;margin-bottom:10px;">
                 <div style="display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:8px;">
                     <div>

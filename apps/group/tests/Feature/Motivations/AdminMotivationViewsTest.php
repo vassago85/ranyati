@@ -187,4 +187,67 @@ class AdminMotivationViewsTest extends TestCase
             ->assertSee('Upload invoice')
             ->assertSee('Record payment');
     }
+
+    /**
+     * Guards against the Blade `@php(short)` + `@php...@endphp` (block)
+     * mix bug which collapsed the member profile pages — the non-greedy
+     * `storePhpBlocks` regex grabs from the short form to the first
+     * `@endphp` and swallows every directive in between into one
+     * malformed `<?php(... ?>` block.
+     */
+    public function test_admin_member_pages_render(): void
+    {
+        $admin = $this->admin();
+        $member = $this->member();
+
+        $this->actingAs($admin)
+            ->get(route('admin.motivation-members.index'))
+            ->assertOk();
+
+        $this->actingAs($admin)
+            ->get(route('admin.motivation-members.show', $member))
+            ->assertOk();
+
+        $this->actingAs($admin)
+            ->get(route('admin.motivation-members.profile.edit', $member))
+            ->assertOk()
+            ->assertSee('Personal particulars');
+
+        $this->actingAs($admin)
+            ->get(route('admin.motivation-members.create'))
+            ->assertOk()
+            ->assertSee('Personal particulars');
+    }
+
+    public function test_member_motivation_pages_render(): void
+    {
+        $member = $this->member();
+        $type = $this->simpleType();
+
+        $this->actingAs($member)
+            ->get(route('account.motivations.index'))
+            ->assertOk();
+
+        $this->actingAs($member)
+            ->get(route('account.profile.edit'))
+            ->assertOk();
+
+        $this->actingAs($member)
+            ->get(route('account.motivations.create'))
+            ->assertOk();
+
+        $motivation = $member->motivationRequests()->create([
+            'application_type_id' => $type->id,
+            'status' => MotivationRequest::STATUS_DRAFT,
+            'answers' => [],
+        ]);
+
+        $this->actingAs($member)
+            ->get(route('account.motivations.edit', $motivation))
+            ->assertOk();
+
+        $this->actingAs($member)
+            ->get(route('account.motivations.show', $motivation))
+            ->assertOk();
+    }
 }

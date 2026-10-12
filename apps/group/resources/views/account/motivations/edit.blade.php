@@ -94,9 +94,13 @@
         <p class="text-white/50 text-sm mb-4">Upload clear photos or scans. PDFs, JPG and PNG are accepted. Maximum {{ (int) config('motivations.max_upload_kb') / 1024 }} MB per file.</p>
 
         <div class="space-y-4">
-            @php($uploadedByKind = $motivation->documents->groupBy('kind'))
+            @php
+                $uploadedByKind = $motivation->documents->groupBy('kind');
+            @endphp
             @foreach ($requirements as $kind => $req)
-                @php($docs = $uploadedByKind[$kind] ?? collect())
+                @php
+                    $docs = $uploadedByKind[$kind] ?? collect();
+                @endphp
                 <div class="border border-white/5 rounded-xl p-5">
                     <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
                         <div>
