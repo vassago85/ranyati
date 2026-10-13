@@ -75,6 +75,22 @@ class ClientProfile extends Model
     }
 
     /**
+     * Format a 13-digit SA ID as `YYMMDD SSSS CC A` — the spacing used on
+     * the running header of a printed firearm motivation.
+     */
+    public static function formatSaIdNumber(?string $idNumber): ?string
+    {
+        $digits = preg_replace('/\D/', '', (string) $idNumber);
+        if (strlen($digits) !== 13) {
+            $raw = trim((string) $idNumber);
+
+            return $raw !== '' ? $raw : null;
+        }
+
+        return substr($digits, 0, 6).' '.substr($digits, 6, 4).' '.substr($digits, 10, 2).' '.substr($digits, 12, 1);
+    }
+
+    /**
      * Age derived from the YYMMDD prefix of a South African ID number.
      */
     public static function ageFromIdNumber(?string $idNumber): ?int
@@ -121,6 +137,7 @@ class ClientProfile extends Model
     {
         $data['full_name'] = trim(($data['full_names'] ?? '').' '.($data['surname'] ?? ''));
         $data['age'] = self::ageFromIdNumber($data['id_number'] ?? null);
+        $data['id_number_spaced'] = self::formatSaIdNumber($data['id_number'] ?? null);
 
         return $data;
     }

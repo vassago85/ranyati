@@ -92,6 +92,7 @@ class Placeholders
         }
         $profile['profile.full_name'] = 'Full name (names + surname)';
         $profile['profile.age'] = 'Age (from ID number)';
+        $profile['profile.id_number_spaced'] = 'ID number (spaced YYMMDD SSSS CC A)';
 
         $answers = [];
         $firearm = [];

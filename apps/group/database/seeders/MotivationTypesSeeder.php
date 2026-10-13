@@ -22,6 +22,8 @@ class MotivationTypesSeeder extends Seeder
         foreach ($this->types() as $sort => $def) {
             $this->seed($sort, $def);
         }
+
+        $this->call(OnePageMotivationTemplateSeeder::class);
     }
 
     /**
