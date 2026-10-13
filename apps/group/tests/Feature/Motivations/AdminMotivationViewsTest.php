@@ -163,6 +163,45 @@ class AdminMotivationViewsTest extends TestCase
             ->assertSee('On behalf of');
     }
 
+    public function test_admin_edit_on_behalf_loads_questionnaire_styles_and_alpine_once(): void
+    {
+        $admin = $this->admin();
+        $member = $this->member();
+        $type = ApplicationType::firstOrCreate(
+            ['slug' => 'admin-view-firearms'],
+            [
+                'name' => 'Firearms type',
+                'category' => 'sport',
+                'is_active' => true,
+                'has_motivation' => true,
+                'questions' => [[
+                    'key' => 'firearm_details', 'title' => 'Firearm details', 'fields' => [
+                        ['name' => 'firearms', 'label' => 'Firearms', 'type' => 'firearms_table', 'required' => true],
+                    ],
+                ]],
+                'document_requirements' => [],
+            ],
+        );
+
+        $motivation = $member->motivationRequests()->create([
+            'application_type_id' => $type->id,
+            'status' => MotivationRequest::STATUS_DRAFT,
+            'answers' => ['firearms' => [['type' => 'Rifle', 'make' => 'Tikka', 'model' => 'T3x', 'calibre' => '.308 Winchester', 'action' => 'Bolt action', 'serial' => 'ABC123']]],
+        ]);
+
+        $html = $this->actingAs($admin)
+            ->get(route('admin.motivation-requests.edit', $motivation))
+            ->assertOk()
+            ->assertSee('admin-questionnaire', false)
+            ->assertSee('Tikka')
+            ->getContent();
+
+        $this->assertMatchesRegularExpression('#<link[^>]+admin-questionnaire[^>]*\.css#', $html);
+        $this->assertSame(1, substr_count($html, 'alpinejs@3'));
+        $this->assertSame(1, substr_count($html, 'id="firearm-reference"'));
+        $this->assertStringContainsString('firearmCombo(row, \'make\')', $html);
+    }
+
     public function test_admin_fulfilment_card_appears_once_invoice_eligible(): void
     {
         // Specifically guards the fulfilment UI, which was invisible for

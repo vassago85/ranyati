@@ -1,0 +1,20 @@
+/*
+ * Tailwind utilities for the admin "fill on behalf" questionnaire, which
+ * reuses the member portal's Tailwind-styled partials.
+ *
+ * Utilities are deliberately unlayered and preflight is left out: the admin
+ * layout's inline `* { margin: 0; padding: 0 }` reset is unlayered, so it
+ * would beat anything inside `@layer utilities`, and preflight would fight
+ * the admin chrome. Sources are limited to the views that render on this
+ * page so the sheet stays small and can't collide with admin class names.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' source(none);
+
+@source '../views/account/motivations/_field.blade.php';
+@source '../views/admin/motivations/requests/edit.blade.php';
+
+@theme {
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}

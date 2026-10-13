@@ -76,7 +76,12 @@ class MotivationTypesSeeder extends Seeder
             'intro' => trim($hint.' Motivations are firearm- and serial-specific — add every firearm the application covers.'),
             'fields' => [
                 ['name' => 'firearms', 'label' => 'Firearm(s) to be licensed / renewed', 'type' => 'firearms_table', 'required' => true],
-                ['name' => 'shotgun_action_notes', 'label' => 'If any firearm is a shotgun, specify action and choke', 'type' => 'text'],
+                [
+                    'name' => 'shotgun_action_notes',
+                    'label' => 'If any firearm is a shotgun, specify action and choke',
+                    'type' => 'text',
+                    'condition' => ['field' => 'firearms.*.type', 'operator' => 'equals', 'value' => 'Shotgun'],
+                ],
             ],
         ];
     }

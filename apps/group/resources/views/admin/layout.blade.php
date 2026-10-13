@@ -221,17 +221,23 @@
             display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
             letter-spacing: 0.06em; color: rgba(255,255,255,0.4); margin-bottom: 6px;
         }
-        .form-input {
+        /* `.admin-questionnaire .input` covers the member-portal partials
+           reused on admin pages; the extra class outranks their Tailwind
+           padding/size utilities so they match .form-input exactly. */
+        .form-input, .admin-questionnaire .input {
             width: 100%; padding: 10px 14px; border-radius: 8px;
             border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04);
             color: #fff; font-size: 13px; font-family: 'Inter', system-ui, sans-serif;
             outline: none; transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .form-input:focus { border-color: rgba(245,130,32,0.5); box-shadow: 0 0 0 3px rgba(245,130,32,0.1); }
-        .form-input::placeholder { color: rgba(255,255,255,0.2); }
+        .form-input:focus, .admin-questionnaire .input:focus { border-color: rgba(245,130,32,0.5); box-shadow: 0 0 0 3px rgba(245,130,32,0.1); }
+        .form-input::placeholder, .admin-questionnaire .input::placeholder { color: rgba(255,255,255,0.2); }
+        .form-input:disabled, .admin-questionnaire .input:disabled { opacity: 0.5; cursor: not-allowed; }
         .form-hint { margin-top: 4px; font-size: 11px; color: rgba(255,255,255,0.25); }
-        select.form-input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.3)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
-        select.form-input option { background: #0d1424; color: #fff; }
+        select.form-input, .admin-questionnaire select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='rgba(255,255,255,0.3)' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+        select.form-input option, .admin-questionnaire select.input option { background: #0d1424; color: #fff; }
+        .admin-questionnaire textarea.input { resize: vertical; min-height: 96px; }
+        .admin-questionnaire input[type="radio"], .admin-questionnaire input[type="checkbox"] { accent-color: #F58220; }
 
         .alert {
             padding: 12px 16px; border-radius: 8px; font-size: 13px;
@@ -296,6 +302,7 @@
         .filter-tab.active .count { background: rgba(245,130,32,0.2); color: #F58220; }
 
     </style>
+    @stack('head')
 </head>
 <body x-data="{ sidebarOpen: false }" x-effect="document.body.classList.toggle('sidebar-locked', sidebarOpen && window.innerWidth < 1024)" @keydown.escape.window="sidebarOpen = false" @resize.window="if (window.innerWidth >= 1024) sidebarOpen = false">
     <aside class="sidebar" :class="{ 'is-open': sidebarOpen }">

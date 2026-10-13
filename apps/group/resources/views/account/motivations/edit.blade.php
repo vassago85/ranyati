@@ -15,6 +15,7 @@
     $alpineInit = [
         'answers' => (object) $answers,
         'conditions' => [],
+        'firearmsField' => null,
     ];
     foreach ($type->sections() as $section) {
         $alpineInit['conditions']['sections'][$section['key']] = $section['condition'] ?? null;
@@ -23,6 +24,9 @@
                 'section' => $section['key'],
                 'own' => $field['condition'] ?? null,
             ];
+            if (($field['type'] ?? null) === 'firearms_table') {
+                $alpineInit['firearmsField'] ??= $field['name'];
+            }
         }
     }
 @endphp
@@ -62,7 +66,7 @@
         </div>
     @endif
 
-    <section class="card p-6 mb-6" x-data='motivationForm(@json($alpineInit))' x-init="syncVisible()">
+    <section class="card p-6 mb-6" x-data='motivationForm(@json($alpineInit))' x-init="$nextTick(() => syncVisible())">
         <h2 class="text-lg font-semibold text-white mb-3">Questionnaire</h2>
 
         <form method="POST" action="{{ route('account.motivations.update', $motivation) }}" class="space-y-6" @input.debounce.500="syncVisible()">
@@ -236,21 +240,26 @@
             syncVisible() {
                 /* Scrape current form values into answers so conditions
                    react immediately to typing/clicking. */
-                const form = this.$el.querySelector('form');
+                const form = this.$root.querySelector('form');
                 const fd = new FormData(form);
                 const answers = {};
                 for (const [key, value] of fd.entries()) {
-                    const match = key.match(/^answers\[([^\]]+)\](?:\[([^\]]+)\])?(?:\[(\d+)\])?/);
+                    const match = key.match(/^answers\[([^\]]+)\](?:\[([^\]]+)\])?(?:\[([^\]]+)\])?/);
                     if (!match) continue;
-                    const [, name, sub] = match;
+                    const [, name, sub, leaf] = match;
                     if (!sub) { answers[name] = value; continue; }
                     answers[name] = answers[name] || {};
-                    answers[name][sub] = value;
+                    if (!leaf) { answers[name][sub] = value; continue; }
+                    answers[name][sub] = answers[name][sub] || {};
+                    answers[name][sub][leaf] = value;
                 }
                 this.answers = answers;
             },
             context() {
-                return { answers: this.answers };
+                /* Mirrors QuestionSchema::context(), which exposes the
+                   firearms table rows as `firearms` for conditions. */
+                const rows = init.firearmsField ? this.answers[init.firearmsField] : null;
+                return { answers: this.answers, firearms: rows ? Object.values(rows) : [] };
             },
             sectionVisible(key) {
                 return motivationCondition(this.conditions.sections?.[key] || null, this.context());

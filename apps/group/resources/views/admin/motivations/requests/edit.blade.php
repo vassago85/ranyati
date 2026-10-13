@@ -9,7 +9,7 @@
 
     $answers = $motivation->answers ?? [];
     $firearmTypeOptions = QuestionSchema::firearmTypeOptions();
-    $alpineInit = ['answers' => (object) $answers, 'conditions' => ['sections' => [], 'fields' => []]];
+    $alpineInit = ['answers' => (object) $answers, 'conditions' => ['sections' => [], 'fields' => []], 'firearmsField' => null];
     foreach ($type->sections() as $section) {
         $alpineInit['conditions']['sections'][$section['key']] = $section['condition'] ?? null;
         foreach ($section['fields'] ?? [] as $field) {
@@ -17,10 +17,17 @@
                 'section' => $section['key'],
                 'own' => $field['condition'] ?? null,
             ];
+            if (($field['type'] ?? null) === 'firearms_table') {
+                $alpineInit['firearmsField'] ??= $field['name'];
+            }
         }
     }
     $uploadedByKind = $motivation->documents->groupBy('kind');
 @endphp
+
+@push('head')
+    @vite('resources/css/admin-questionnaire.css')
+@endpush
 
 @section('content')
 <div style="margin-bottom:16px;">
@@ -53,7 +60,7 @@
     </div>
 @endif
 
-<div class="card" style="margin-bottom:16px;" x-data='motivationForm(@json($alpineInit))' x-init="syncVisible()">
+<div class="card admin-questionnaire" style="margin-bottom:16px;" x-data='motivationForm(@json($alpineInit))' x-init="$nextTick(() => syncVisible())">
     <div class="card-header"><h2>Questionnaire</h2></div>
     <div class="card-body">
         <form method="POST" action="{{ route('admin.motivation-requests.answers', $motivation) }}" @input.debounce.500="syncVisible()">
@@ -157,7 +164,6 @@
     </div>
 </div>
 
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
 <script>
     function motivationCondition(cond, context) {
         if (!cond) return true;
@@ -191,20 +197,25 @@
             answers: init.answers || {},
             conditions: init.conditions || {},
             syncVisible() {
-                const form = this.$el.querySelector('form');
+                const form = this.$root.querySelector('form');
                 const fd = new FormData(form);
                 const answers = {};
                 for (const [key, value] of fd.entries()) {
-                    const match = key.match(/^answers\[([^\]]+)\](?:\[([^\]]+)\])?(?:\[(\d+)\])?/);
+                    const match = key.match(/^answers\[([^\]]+)\](?:\[([^\]]+)\])?(?:\[([^\]]+)\])?/);
                     if (!match) continue;
-                    const [, name, sub] = match;
+                    const [, name, sub, leaf] = match;
                     if (!sub) { answers[name] = value; continue; }
                     answers[name] = answers[name] || {};
-                    answers[name][sub] = value;
+                    if (!leaf) { answers[name][sub] = value; continue; }
+                    answers[name][sub] = answers[name][sub] || {};
+                    answers[name][sub][leaf] = value;
                 }
                 this.answers = answers;
             },
-            context() { return { answers: this.answers }; },
+            context() {
+                const rows = init.firearmsField ? this.answers[init.firearmsField] : null;
+                return { answers: this.answers, firearms: rows ? Object.values(rows) : [] };
+            },
             sectionVisible(key) { return motivationCondition(this.conditions.sections?.[key] || null, this.context()); },
             fieldVisible(name) {
                 const info = this.conditions.fields?.[name];

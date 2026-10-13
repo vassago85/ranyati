@@ -250,18 +250,31 @@ class QuestionSchema
      * @param  array<int, array<string, mixed>>  $sections
      * @param  array<string, mixed>  $answers
      * @param  array<string, mixed>  $context
-     * @return array<int, string> Labels of visible required fields that are blank.
+     * @return array<int, string> Labels of visible required fields that are blank, plus firearm rows without a serial.
      */
     public static function missingRequired(array $sections, array $answers, array $context): array
     {
         $missing = [];
 
         foreach (self::fields($sections) as $field) {
-            if (! ($field['required'] ?? false) || ! self::isVisible($field, $context)) {
+            if (! self::isVisible($field, $context)) {
                 continue;
             }
 
             $value = $answers[$field['name']] ?? null;
+
+            if (($field['type'] ?? null) === 'firearms_table' && is_array($value)) {
+                foreach (array_values($value) as $i => $row) {
+                    if (is_array($row) && blank($row['serial'] ?? null)) {
+                        $missing[] = $field['label'].': serial number for firearm '.($i + 1);
+                    }
+                }
+            }
+
+            if (! ($field['required'] ?? false)) {
+                continue;
+            }
+
             $blank = match ($field['type'] ?? 'text') {
                 'checkbox' => $value !== true,
                 'yes_no_list' => ! is_array($value) || array_filter($value) === [],
