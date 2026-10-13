@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class StorageAgreement extends Model
 {
     public const TYPE_DECEASED_ESTATE = 'deceased_estate';
-    public const TYPE_SELF_STORAGE    = 'self_storage';
+
+    public const TYPE_SELF_STORAGE = 'self_storage';
 
     protected $fillable = [
         'type',

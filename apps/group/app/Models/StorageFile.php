@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class StorageFile extends Model
 {
     public const KIND_LICENCE = 'licence';
-    public const KIND_PHOTO   = 'photo';
-    public const KIND_OTHER   = 'other';
+
+    public const KIND_PHOTO = 'photo';
+
+    public const KIND_OTHER = 'other';
 
     protected $fillable = ['storage_item_id', 'kind', 'disk', 'path', 'original_name'];
 

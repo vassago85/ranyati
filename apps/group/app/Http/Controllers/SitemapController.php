@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ArmsListing;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\View;
@@ -22,22 +23,22 @@ class SitemapController extends Controller
 
         $entries = match (true) {
             str_starts_with($host, 'motivations.') => $this->motivationsEntries(),
-            str_starts_with($host, 'storage.')     => $this->storageEntries(),
-            str_starts_with($host, 'arms.')        => $this->armsEntries(),
-            default                                 => $this->apexEntries(),
+            str_starts_with($host, 'storage.') => $this->storageEntries(),
+            str_starts_with($host, 'arms.') => $this->armsEntries(),
+            default => $this->apexEntries(),
         };
 
-        $xml  = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'."\n";
 
         foreach ($entries as $entry) {
-            $loc        = $base . $entry['path'];
-            $lastmod    = $entry['lastmod'] ?? date('Y-m-d');
+            $loc = $base.$entry['path'];
+            $lastmod = $entry['lastmod'] ?? date('Y-m-d');
             $changefreq = $entry['changefreq'] ?? 'monthly';
-            $priority   = $entry['priority'] ?? '0.5';
+            $priority = $entry['priority'] ?? '0.5';
 
             $xml .= "  <url>\n";
-            $xml .= "    <loc>".htmlspecialchars($loc, ENT_XML1)."</loc>\n";
+            $xml .= '    <loc>'.htmlspecialchars($loc, ENT_XML1)."</loc>\n";
             $xml .= "    <lastmod>{$lastmod}</lastmod>\n";
             $xml .= "    <changefreq>{$changefreq}</changefreq>\n";
             $xml .= "    <priority>{$priority}</priority>\n";
@@ -47,7 +48,7 @@ class SitemapController extends Controller
         $xml .= '</urlset>'."\n";
 
         return response($xml, 200, [
-            'Content-Type'  => 'application/xml; charset=UTF-8',
+            'Content-Type' => 'application/xml; charset=UTF-8',
             'Cache-Control' => 'public, max-age=3600',
         ]);
     }
@@ -61,10 +62,10 @@ class SitemapController extends Controller
     {
         $known = [
             'motivations.ranyati.co.za' => 'https://motivations.ranyati.co.za',
-            'storage.ranyati.co.za'     => 'https://storage.ranyati.co.za',
-            'arms.ranyati.co.za'        => 'https://arms.ranyati.co.za',
-            'ranyati.co.za'             => 'https://ranyati.co.za',
-            'www.ranyati.co.za'         => 'https://ranyati.co.za',
+            'storage.ranyati.co.za' => 'https://storage.ranyati.co.za',
+            'arms.ranyati.co.za' => 'https://arms.ranyati.co.za',
+            'ranyati.co.za' => 'https://ranyati.co.za',
+            'www.ranyati.co.za' => 'https://ranyati.co.za',
         ];
 
         return $known[$host] ?? rtrim(request()->getSchemeAndHttpHost(), '/');
@@ -76,16 +77,16 @@ class SitemapController extends Controller
             ['path' => '/',                                         'view' => 'motivations',                                  'priority' => '1.0', 'changefreq' => 'weekly'],
             ['path' => '/enquire',                                  'view' => 'enquire',                                      'priority' => '0.9', 'changefreq' => 'monthly'],
             ['path' => '/firearm-motivation-letter',                'view' => 'seo.motivations.firearm-motivation-letter',    'priority' => '0.9', 'changefreq' => 'monthly'],
-            ['path' => '/firearm-licence-motivation-self-defence',  'view' => 'seo.motivations.self-defence',                 'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/firearm-licence-motivation-sport-shooting','view' => 'seo.motivations.sport-shooting',               'priority' => '0.85','changefreq' => 'monthly'],
+            ['path' => '/firearm-licence-motivation-self-defence',  'view' => 'seo.motivations.self-defence',                 'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/firearm-licence-motivation-sport-shooting', 'view' => 'seo.motivations.sport-shooting',               'priority' => '0.85', 'changefreq' => 'monthly'],
             ['path' => '/prs-shooting-south-africa',                'view' => 'seo.motivations.prs-shooting',                 'priority' => '0.8', 'changefreq' => 'monthly'],
-            ['path' => '/firearm-licence-motivation-hunting',       'view' => 'seo.motivations.hunting',                      'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/firearm-licence-renewal-south-africa',     'view' => 'seo.motivations.renewal',                      'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/firearm-licence-appeal-south-africa',      'view' => 'seo.motivations.appeal',                       'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/faq',                                      'view' => 'seo.motivations.faq',                          'priority' => '0.85','changefreq' => 'weekly'],
+            ['path' => '/firearm-licence-motivation-hunting',       'view' => 'seo.motivations.hunting',                      'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/firearm-licence-renewal-south-africa',     'view' => 'seo.motivations.renewal',                      'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/firearm-licence-appeal-south-africa',      'view' => 'seo.motivations.appeal',                       'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/faq',                                      'view' => 'seo.motivations.faq',                          'priority' => '0.85', 'changefreq' => 'weekly'],
             ['path' => '/resources',                                'view' => 'resources.motivations.index',                  'priority' => '0.9', 'changefreq' => 'weekly'],
             ['path' => '/resources/about',                          'view' => 'resources.motivations.about',                  'priority' => '0.8', 'changefreq' => 'monthly'],
-            ['path' => '/resources/firearm-licence-process',        'view' => 'resources.motivations.firearm-licence-process','priority' => '0.8', 'changefreq' => 'monthly'],
+            ['path' => '/resources/firearm-licence-process',        'view' => 'resources.motivations.firearm-licence-process', 'priority' => '0.8', 'changefreq' => 'monthly'],
             ['path' => '/resources/firearms-control-act',           'view' => 'resources.motivations.firearms-control-act',   'priority' => '0.8', 'changefreq' => 'monthly'],
             ['path' => '/resources/services',                       'view' => 'resources.motivations.services',               'priority' => '0.8', 'changefreq' => 'monthly'],
             ['path' => '/resources/faq',                            'view' => 'resources.motivations.faq',                    'priority' => '0.8', 'changefreq' => 'weekly'],
@@ -99,14 +100,14 @@ class SitemapController extends Controller
     {
         $map = [
             ['path' => '/',                                            'view' => 'storage-landing',               'priority' => '1.0', 'changefreq' => 'monthly'],
-            ['path' => '/firearm-storage-pretoria',                    'view' => 'seo.storage.pretoria',          'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/long-term-firearm-storage-south-africa',      'view' => 'seo.storage.long-term',         'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/temporary-firearm-storage',                   'view' => 'seo.storage.temporary',         'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/secure-firearm-storage-faq',                  'view' => 'seo.storage.faq',               'priority' => '0.85','changefreq' => 'weekly'],
+            ['path' => '/firearm-storage-pretoria',                    'view' => 'seo.storage.pretoria',          'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/long-term-firearm-storage-south-africa',      'view' => 'seo.storage.long-term',         'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/temporary-firearm-storage',                   'view' => 'seo.storage.temporary',         'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/secure-firearm-storage-faq',                  'view' => 'seo.storage.faq',               'priority' => '0.85', 'changefreq' => 'weekly'],
             ['path' => '/resources',                                   'view' => 'resources.storage.index',       'priority' => '0.9', 'changefreq' => 'weekly'],
             ['path' => '/resources/about',                             'view' => 'resources.storage.about',       'priority' => '0.8', 'changefreq' => 'monthly'],
-            ['path' => '/resources/safe-custody',                      'view' => 'resources.storage.safe-custody','priority' => '0.8', 'changefreq' => 'monthly'],
-            ['path' => '/resources/fca-requirements',                  'view' => 'resources.storage.fca-requirements','priority' => '0.8', 'changefreq' => 'monthly'],
+            ['path' => '/resources/safe-custody',                      'view' => 'resources.storage.safe-custody', 'priority' => '0.8', 'changefreq' => 'monthly'],
+            ['path' => '/resources/fca-requirements',                  'view' => 'resources.storage.fca-requirements', 'priority' => '0.8', 'changefreq' => 'monthly'],
             ['path' => '/resources/faq',                               'view' => 'resources.storage.faq',         'priority' => '0.8', 'changefreq' => 'weekly'],
         ];
 
@@ -123,7 +124,7 @@ class SitemapController extends Controller
         // can discover, crawl, and re-crawl them as stock changes. `lastmod`
         // mirrors the listing's updated_at so re-priced / re-described listings
         // get re-crawled promptly.
-        $listings = \App\Models\ArmsListing::query()
+        $listings = ArmsListing::query()
             ->visible()
             ->whereNotNull('slug')
             ->orderByDesc('updated_at')
@@ -131,10 +132,10 @@ class SitemapController extends Controller
 
         foreach ($listings as $listing) {
             $entries[] = [
-                'path'       => '/listings/'.$listing->slug,
-                'priority'   => '0.8',
+                'path' => '/listings/'.$listing->slug,
+                'priority' => '0.8',
                 'changefreq' => 'weekly',
-                'lastmod'    => optional($listing->updated_at)->toDateString() ?? date('Y-m-d'),
+                'lastmod' => optional($listing->updated_at)->toDateString() ?? date('Y-m-d'),
             ];
         }
 
@@ -147,9 +148,9 @@ class SitemapController extends Controller
             ['path' => '/',         'view' => 'welcome',       'priority' => '1.0', 'changefreq' => 'monthly'],
             ['path' => '/about',    'view' => 'seo.about',     'priority' => '0.9', 'changefreq' => 'monthly'],
             ['path' => '/services', 'view' => 'seo.services',  'priority' => '0.9', 'changefreq' => 'monthly'],
-            ['path' => '/contact',  'view' => 'seo.contact',   'priority' => '0.85','changefreq' => 'monthly'],
-            ['path' => '/faq',      'view' => 'seo.faq',       'priority' => '0.85','changefreq' => 'weekly'],
-            ['path' => '/guides',   'view' => 'seo.guides',    'priority' => '0.85','changefreq' => 'weekly'],
+            ['path' => '/contact',  'view' => 'seo.contact',   'priority' => '0.85', 'changefreq' => 'monthly'],
+            ['path' => '/faq',      'view' => 'seo.faq',       'priority' => '0.85', 'changefreq' => 'weekly'],
+            ['path' => '/guides',   'view' => 'seo.guides',    'priority' => '0.85', 'changefreq' => 'weekly'],
         ];
 
         return $this->resolveLastmod($map);
@@ -177,10 +178,10 @@ class SitemapController extends Controller
             }
 
             return [
-                'path'       => $entry['path'],
-                'priority'   => $entry['priority']   ?? '0.5',
+                'path' => $entry['path'],
+                'priority' => $entry['priority'] ?? '0.5',
                 'changefreq' => $entry['changefreq'] ?? 'monthly',
-                'lastmod'    => $lastmod ?? date('Y-m-d'),
+                'lastmod' => $lastmod ?? date('Y-m-d'),
             ];
         }, $entries);
     }

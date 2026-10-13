@@ -15,6 +15,7 @@ use App\Support\Motivations\QuestionSchema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class MotivationRequestController extends Controller
 {
@@ -139,7 +140,7 @@ class MotivationRequestController extends Controller
         $motivation->loadMissing(['applicationType.blocks', 'documents']);
 
         $validated = $request->validate([
-            'delivery_method' => ['required', \Illuminate\Validation\Rule::in(array_keys(MotivationRequest::DELIVERY_METHODS))],
+            'delivery_method' => ['required', Rule::in(array_keys(MotivationRequest::DELIVERY_METHODS))],
         ]);
 
         $missingAnswers = $motivation->missingAnswers();

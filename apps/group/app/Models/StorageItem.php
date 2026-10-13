@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Setting;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +11,8 @@ use Illuminate\Support\Carbon;
 class StorageItem extends Model
 {
     public const STATUS_IN_CUSTODY = 'in_custody';
-    public const STATUS_RELEASED   = 'released';
+
+    public const STATUS_RELEASED = 'released';
 
     protected $fillable = [
         'storage_agreement_id',
@@ -142,7 +142,7 @@ class StorageItem extends Model
     {
         $asOf = $asOf ?? now();
         $dateIn = Carbon::parse($this->date_in)->startOfDay();
-        $end    = Carbon::parse($asOf)->startOfDay();
+        $end = Carbon::parse($asOf)->startOfDay();
 
         if ($end->lessThan($dateIn)) {
             return 0;

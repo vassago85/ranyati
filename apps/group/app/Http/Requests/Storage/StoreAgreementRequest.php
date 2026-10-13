@@ -26,24 +26,24 @@ class StoreAgreementRequest extends StorageItemsRequest
     public function rules(): array
     {
         $isEstate = $this->agreementType() === StorageAgreement::TYPE_DECEASED_ESTATE;
-        $isSelf   = $this->agreementType() === StorageAgreement::TYPE_SELF_STORAGE;
+        $isSelf = $this->agreementType() === StorageAgreement::TYPE_SELF_STORAGE;
 
         return array_merge([
-            'type'  => ['required', Rule::in([StorageAgreement::TYPE_DECEASED_ESTATE, StorageAgreement::TYPE_SELF_STORAGE])],
+            'type' => ['required', Rule::in([StorageAgreement::TYPE_DECEASED_ESTATE, StorageAgreement::TYPE_SELF_STORAGE])],
             'notes' => ['nullable', 'string', 'max:5000'],
 
             // Estate fields
             'estate_late' => [$isEstate ? 'required' : 'nullable', 'string', 'max:255'],
-            'bank'        => ['nullable', 'string', 'max:255', function ($attr, $value, $fail) {
+            'bank' => ['nullable', 'string', 'max:255', function ($attr, $value, $fail) {
                 if (! SaBanks::isValid($value)) {
                     $fail('Selected bank is not on the supported list.');
                 }
             }],
-            'attorneys'   => ['nullable', 'string', 'max:255'],
+            'attorneys' => ['nullable', 'string', 'max:255'],
 
             // Self-storage fields
-            'client_name'  => [$isSelf ? 'required' : 'nullable', 'string', 'max:255'],
-            'email'        => [$isSelf ? 'required' : 'nullable', 'email', 'max:255'],
+            'client_name' => [$isSelf ? 'required' : 'nullable', 'string', 'max:255'],
+            'email' => [$isSelf ? 'required' : 'nullable', 'email', 'max:255'],
             'storage_rate' => [$isSelf ? 'required' : 'nullable', 'numeric', 'min:0', 'max:99999.99'],
         ], $this->itemRules());
     }

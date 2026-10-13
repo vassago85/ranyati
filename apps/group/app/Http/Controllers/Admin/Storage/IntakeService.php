@@ -7,7 +7,6 @@ use App\Models\StorageAgreement;
 use App\Models\StorageFile;
 use App\Models\StorageItem;
 use App\Support\CustodyDisk;
-use App\Support\ImageOptimizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -27,15 +26,15 @@ class IntakeService
     {
         return DB::transaction(function () use ($validated, $request) {
             $agreement = StorageAgreement::create([
-                'type'         => $validated['type'],
-                'status'       => 'active',
-                'estate_late'  => $validated['estate_late']  ?? null,
-                'bank'         => $validated['bank']         ?? null,
-                'attorneys'    => $validated['attorneys']    ?? null,
-                'client_name'  => $validated['client_name']  ?? null,
-                'email'        => $validated['email']        ?? null,
+                'type' => $validated['type'],
+                'status' => 'active',
+                'estate_late' => $validated['estate_late'] ?? null,
+                'bank' => $validated['bank'] ?? null,
+                'attorneys' => $validated['attorneys'] ?? null,
+                'client_name' => $validated['client_name'] ?? null,
+                'email' => $validated['email'] ?? null,
                 'storage_rate' => $validated['storage_rate'] ?? null,
-                'notes'        => $validated['notes']        ?? null,
+                'notes' => $validated['notes'] ?? null,
             ]);
 
             $this->createItems($agreement, $validated['items'], $request);
@@ -50,7 +49,7 @@ class IntakeService
      * batch lands on the register with its intake event, or none does.
      *
      * @param  array<int, array<string, mixed>>  $items
-     * @return int  How many firearms were booked in.
+     * @return int How many firearms were booked in.
      */
     public function addItems(StorageAgreement $agreement, array $items, Request $request): int
     {
@@ -69,28 +68,28 @@ class IntakeService
         foreach ($items as $index => $itemData) {
             $item = StorageItem::create([
                 'storage_agreement_id' => $agreement->id,
-                'register_book_id'     => $itemData['register_book_id'],
-                'page'                 => $itemData['page'],
-                'position'             => $itemData['position'],
-                'shelf'                => strtoupper($itemData['shelf']),
-                'tag_colour'           => strtoupper($itemData['tag_colour']),
-                'tag_number'           => (int) $itemData['tag_number'],
-                'firearm_make'         => $itemData['firearm_make'],
-                'cartridge'            => $itemData['cartridge'],
-                'serial_number'        => $itemData['serial_number'],
-                'firearm_type'         => $itemData['firearm_type'],
-                'action_type'          => $itemData['action_type'],
-                'condition_notes'      => $itemData['condition_notes'] ?? null,
-                'date_in'              => $itemData['date_in'],
-                'status'               => StorageItem::STATUS_IN_CUSTODY,
+                'register_book_id' => $itemData['register_book_id'],
+                'page' => $itemData['page'],
+                'position' => $itemData['position'],
+                'shelf' => strtoupper($itemData['shelf']),
+                'tag_colour' => strtoupper($itemData['tag_colour']),
+                'tag_number' => (int) $itemData['tag_number'],
+                'firearm_make' => $itemData['firearm_make'],
+                'cartridge' => $itemData['cartridge'],
+                'serial_number' => $itemData['serial_number'],
+                'firearm_type' => $itemData['firearm_type'],
+                'action_type' => $itemData['action_type'],
+                'condition_notes' => $itemData['condition_notes'] ?? null,
+                'date_in' => $itemData['date_in'],
+                'status' => StorageItem::STATUS_IN_CUSTODY,
             ]);
 
             CustodyEvent::create([
                 'storage_item_id' => $item->id,
-                'user_id'         => $request->user()->id,
-                'event_type'      => CustodyEvent::TYPE_INTAKE,
-                'notes'           => 'Received into safe custody. Tag '.$item->tag_ref.', register '.$item->register_ref.'.',
-                'occurred_at'     => now(),
+                'user_id' => $request->user()->id,
+                'event_type' => CustodyEvent::TYPE_INTAKE,
+                'notes' => 'Received into safe custody. Tag '.$item->tag_ref.', register '.$item->register_ref.'.',
+                'occurred_at' => now(),
             ]);
 
             $this->attachFiles($request, $index, $item);
@@ -120,16 +119,16 @@ class IntakeService
 
                     StorageFile::create([
                         'storage_item_id' => $item->id,
-                        'kind'            => StorageFile::KIND_PHOTO,
-                        'disk'            => 'custody',
-                        'path'            => $path,
-                        'original_name'   => $photo->getClientOriginalName(),
+                        'kind' => StorageFile::KIND_PHOTO,
+                        'disk' => 'custody',
+                        'path' => $path,
+                        'original_name' => $photo->getClientOriginalName(),
                     ]);
                 } catch (\Throwable $e) {
                     logger()->warning('Storage intake photo upload failed', [
                         'item_id' => $item->id,
-                        'index'   => $index,
-                        'error'   => $e->getMessage(),
+                        'index' => $index,
+                        'error' => $e->getMessage(),
                     ]);
                 }
             }
@@ -144,16 +143,16 @@ class IntakeService
 
                 StorageFile::create([
                     'storage_item_id' => $item->id,
-                    'kind'            => StorageFile::KIND_LICENCE,
-                    'disk'            => 'custody',
-                    'path'            => $path,
-                    'original_name'   => $licence->getClientOriginalName(),
+                    'kind' => StorageFile::KIND_LICENCE,
+                    'disk' => 'custody',
+                    'path' => $path,
+                    'original_name' => $licence->getClientOriginalName(),
                 ]);
             } catch (\Throwable $e) {
                 logger()->warning('Storage intake licence upload failed', [
                     'item_id' => $item->id,
-                    'index'   => $index,
-                    'error'   => $e->getMessage(),
+                    'index' => $index,
+                    'error' => $e->getMessage(),
                 ]);
             }
         }

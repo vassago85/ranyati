@@ -33,14 +33,14 @@ class RobotsController extends Controller
         }
 
         return response($body, 200, [
-            'Content-Type'  => 'text/plain; charset=UTF-8',
+            'Content-Type' => 'text/plain; charset=UTF-8',
             'Cache-Control' => 'public, max-age=3600',
         ]);
     }
 
     private function motivationsBody(): string
     {
-        return <<<TXT
+        return <<<'TXT'
 # Ranyati Motivations — professional firearm licence motivation letters
 # Operated by Ranyati Firearm Motivations (Pty) Ltd / Ranyati Group
 # https://motivations.ranyati.co.za
@@ -79,7 +79,7 @@ TXT;
 
     private function storageBody(): string
     {
-        return <<<TXT
+        return <<<'TXT'
 # Ranyati Storage — secure firearm storage, Pretoria
 # Operated by Ranyati Firearm Motivations (Pty) Ltd / Ranyati Group
 # https://storage.ranyati.co.za
@@ -106,7 +106,7 @@ TXT;
 
     private function armsBody(): string
     {
-        return <<<TXT
+        return <<<'TXT'
 # Ranyati Arms — quality used firearms for sale in Pretoria, Gauteng
 # Operated by Ranyati Firearm Motivations (Pty) Ltd / Ranyati Group
 # https://arms.ranyati.co.za
@@ -142,7 +142,7 @@ TXT;
 
     private function apexBody(): string
     {
-        return <<<TXT
+        return <<<'TXT'
 # Ranyati Group — parent brand
 # Operated by Ranyati Firearm Motivations (Pty) Ltd
 # https://ranyati.co.za

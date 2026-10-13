@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -91,7 +90,7 @@ class ArmsListing extends Model
         $images = $this->images ?? [];
 
         return count($images) > 0
-            ? asset('storage/' . $images[0])
+            ? asset('storage/'.$images[0])
             : asset('ranyati-icon.png');
     }
 

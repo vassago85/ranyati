@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Mail\FirearmStatusChanged;
 use App\Models\FirearmApplication;
-use App\Models\FirearmApplicationCheck;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 

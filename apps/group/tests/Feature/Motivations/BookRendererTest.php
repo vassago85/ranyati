@@ -8,7 +8,6 @@ use App\Models\MotivationDocument;
 use App\Models\MotivationRequest;
 use App\Models\User;
 use App\Support\Motivations\BookRenderer;
-use App\Support\Motivations\DocumentKinds;
 use App\Support\Motivations\PdfMerger;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;

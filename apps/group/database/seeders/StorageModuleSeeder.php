@@ -18,20 +18,20 @@ class StorageModuleSeeder extends Seeder
         RegisterBook::updateOrCreate(
             ['code' => 'D01'],
             [
-                'type'               => 'deceased_estate',
-                'pages'              => 101,
+                'type' => 'deceased_estate',
+                'pages' => 101,
                 'positions_per_page' => 26,
-                'status'             => 'open',
+                'status' => 'open',
             ],
         );
 
         RegisterBook::updateOrCreate(
             ['code' => 'S01'],
             [
-                'type'               => 'self_storage',
-                'pages'              => 101,
+                'type' => 'self_storage',
+                'pages' => 101,
                 'positions_per_page' => 26,
-                'status'             => 'open',
+                'status' => 'open',
             ],
         );
 

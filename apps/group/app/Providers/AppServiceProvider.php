@@ -2,8 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\MotivationLetter;
+use App\Models\MotivationTemplate;
 use App\Models\Setting;
+use App\Policies\MotivationTemplatePolicy;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
@@ -22,6 +26,14 @@ class AppServiceProvider extends ServiceProvider
         }
 
         $this->loadMailSettingsFromDatabase();
+        $this->registerPolicies();
+    }
+
+    private function registerPolicies(): void
+    {
+        Gate::policy(MotivationTemplate::class, MotivationTemplatePolicy::class);
+        // Reuse the template policy for letter edit/finalise authorisation.
+        Gate::policy(MotivationLetter::class, MotivationTemplatePolicy::class);
     }
 
     private function loadMailSettingsFromDatabase(): void

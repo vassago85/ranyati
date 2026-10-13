@@ -10,7 +10,6 @@ use App\Models\User;
 use App\Support\Motivations\PreviousMotivationData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -53,7 +52,7 @@ class MotivationMemberController extends Controller
     public function create()
     {
         return view('admin.motivations.members.create', [
-            'profile' => new ClientProfile(),
+            'profile' => new ClientProfile,
         ]);
     }
 

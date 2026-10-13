@@ -8,7 +8,6 @@ use App\Models\ClientProfile;
 use App\Models\MotivationDocument;
 use App\Models\MotivationRequest;
 use App\Models\User;
-use App\Support\Motivations\DocumentKinds;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
@@ -27,7 +26,7 @@ class MotivationWalkInTest extends TestCase
         Mail::fake();
     }
 
-    private function admin(string $email = null): User
+    private function admin(?string $email = null): User
     {
         $u = User::create([
             'name' => 'Admin',

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class AgentDocsController extends Controller
@@ -19,7 +18,7 @@ class AgentDocsController extends Controller
         $body = view('agent.llms')->render();
 
         return response($body, 200, [
-            'Content-Type'  => 'text/plain; charset=UTF-8',
+            'Content-Type' => 'text/plain; charset=UTF-8',
             'Cache-Control' => 'public, max-age=600',
         ]);
     }
@@ -35,7 +34,7 @@ class AgentDocsController extends Controller
         $body = view('agent.about-md')->render();
 
         return response($body, 200, [
-            'Content-Type'  => 'text/markdown; charset=UTF-8',
+            'Content-Type' => 'text/markdown; charset=UTF-8',
             'Cache-Control' => 'public, max-age=600',
         ]);
     }
@@ -51,7 +50,7 @@ class AgentDocsController extends Controller
         $body = view('agent.services-md')->render();
 
         return response($body, 200, [
-            'Content-Type'  => 'text/markdown; charset=UTF-8',
+            'Content-Type' => 'text/markdown; charset=UTF-8',
             'Cache-Control' => 'public, max-age=600',
         ]);
     }
@@ -67,7 +66,7 @@ class AgentDocsController extends Controller
         $body = view('agent.faq-md')->render();
 
         return response($body, 200, [
-            'Content-Type'  => 'text/markdown; charset=UTF-8',
+            'Content-Type' => 'text/markdown; charset=UTF-8',
             'Cache-Control' => 'public, max-age=600',
         ]);
     }

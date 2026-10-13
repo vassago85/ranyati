@@ -18,7 +18,7 @@ class BatchAnalytics
     public function batchesOverview(): Collection
     {
         $digits = $this->digitsExpression();
-        $expr = "SUBSTR($digits, 1, ".FirearmApplication::BATCH_KEY_LENGTH.")";
+        $expr = "SUBSTR($digits, 1, ".FirearmApplication::BATCH_KEY_LENGTH.')';
 
         return FirearmApplication::query()
             ->select([

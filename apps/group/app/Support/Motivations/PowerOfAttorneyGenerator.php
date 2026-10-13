@@ -4,6 +4,7 @@ namespace App\Support\Motivations;
 
 use App\Models\MotivationRequest;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Pre-filled Power of Attorney page the member downloads, prints, signs and
@@ -11,7 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
  */
 class PowerOfAttorneyGenerator
 {
-    public static function stream(MotivationRequest $request): \Symfony\Component\HttpFoundation\Response
+    public static function stream(MotivationRequest $request): Response
     {
         $pdf = Pdf::loadView('motivations.poa', [
             'request' => $request,
@@ -23,7 +24,7 @@ class PowerOfAttorneyGenerator
         return $pdf->download($filename);
     }
 
-    public static function reference(MotivationRequest $request): \Symfony\Component\HttpFoundation\Response
+    public static function reference(MotivationRequest $request): Response
     {
         $pdf = Pdf::loadView('motivations.reference-letter', [
             'request' => $request,

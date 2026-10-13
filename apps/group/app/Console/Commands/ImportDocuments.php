@@ -16,7 +16,7 @@ class ImportDocuments extends Command
 
     public function handle(): int
     {
-        $source = rtrim($this->argument('source'), "/\\");
+        $source = rtrim($this->argument('source'), '/\\');
         $category = $this->option('category');
 
         if (! is_dir($source)) {

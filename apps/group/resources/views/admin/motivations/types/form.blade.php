@@ -24,13 +24,23 @@
         'operators' => ConditionEvaluator::OPERATORS,
         'unaryOps' => ConditionEvaluator::UNARY,
         'dateRules' => BookSchema::DATE_RULES,
+        'templateLibrary' => $templateLibrary,
+        'attachedTemplates' => $attachedTemplates,
     ];
 @endphp
 
 @section('content')
-<form method="POST" action="{{ $action }}" x-data='typeBuilder(@json($initial))'>
+<form id="type-form" method="POST" action="{{ $action }}" x-data='typeBuilder(@json($initial))'>
     @csrf
     @if ($type->exists) @method('PUT') @endif
+
+    {{-- Hidden inputs placed up here so they stay inside the outer <form> even
+         when nested asset upload/delete <form> tags later in the markup are
+         parsed by the browser as sibling forms. --}}
+    <input type="hidden" name="questions_json" :value="JSON.stringify(sections)">
+    <input type="hidden" name="requirements_json" :value="JSON.stringify(requirements)">
+    <input type="hidden" name="blocks_json" :value="JSON.stringify(blocks)">
+    <input type="hidden" name="templates_json" :value="JSON.stringify(templates)">
 
     <div class="card" style="margin-bottom:16px;">
         <div class="card-body">
@@ -64,7 +74,7 @@
                 <label style="color:rgba(255,255,255,.7);font-size:13px;display:inline-flex;align-items:center;gap:8px;">
                     <input type="hidden" name="has_motivation" value="0">
                     <input type="checkbox" name="has_motivation" value="1" @checked(old('has_motivation', $type->has_motivation))>
-                    Produces a motivation letter
+                    Produces a firearm motivation
                 </label>
                 <label style="color:rgba(255,255,255,.7);font-size:13px;display:inline-flex;align-items:center;gap:8px;">
                     <input type="hidden" name="is_active" value="0">
@@ -78,7 +88,8 @@
     <div style="display:flex;gap:8px;margin-bottom:16px;" class="filter-tabs">
         <button type="button" class="filter-tab" :class="tab === 'questions' && 'active'" @click="tab = 'questions'">Questions</button>
         <button type="button" class="filter-tab" :class="tab === 'documents' && 'active'" @click="tab = 'documents'">Documents</button>
-        <button type="button" class="filter-tab" :class="tab === 'book' && 'active'" @click="tab = 'book'">Book layout</button>
+        <button type="button" class="filter-tab" :class="tab === 'templates' && 'active'" @click="tab = 'templates'">Templates</button>
+        <button type="button" class="filter-tab" :class="tab === 'book' && 'active'" @click="tab = 'book'" title="Legacy raw block editor — new work should use Templates">Legacy book</button>
         <button type="button" class="filter-tab" :class="tab === 'assets' && 'active'" @click="tab = 'assets'">Assets</button>
     </div>
 
@@ -230,9 +241,74 @@
         </div>
     </div>
 
+    <!-- Templates tab -->
+    <div x-show="tab === 'templates'" class="card" style="margin-bottom:16px;">
+        <div class="card-body">
+            <p style="color:rgba(255,255,255,.6);font-size:13px;margin-bottom:12px;">
+                Attach one or more motivation templates to this application type. On each new motivation request the first attached template whose condition passes is used; if none has a condition that passes, the default is used.
+            </p>
+
+            <template x-if="templates.length === 0">
+                <div style="padding:24px;text-align:center;background:rgba(245,130,32,0.06);border:1px dashed rgba(245,130,32,0.3);border-radius:10px;color:rgba(255,255,255,.6);font-size:13px;">
+                    No templates attached yet. Pick one from the library below.
+                </div>
+            </template>
+
+            <template x-for="(row, idx) in templates" :key="row.template_id">
+                <div style="border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <strong style="color:#fff;" x-text="templateName(row.template_id)"></strong>
+                        <span class="status-badge" :class="'is-'+templateStatus(row.template_id)"
+                              style="padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;"
+                              :style="templateStatus(row.template_id) === 'published' ? 'background:rgba(34,197,94,0.14);color:#86efac;' : 'background:rgba(245,130,32,0.14);color:#F58220;'"
+                              x-text="templateStatus(row.template_id)"></span>
+                        <template x-if="!templatePublished(row.template_id)">
+                            <span style="color:#fca5a5;font-size:11px;">⚠ No published version — motivations cannot be generated yet.</span>
+                        </template>
+                        <div style="flex:1;"></div>
+                        <label style="font-size:12px;color:rgba(255,255,255,.7);display:inline-flex;align-items:center;gap:6px;">
+                            <input type="radio" name="template_default_pick" :checked="row.is_default" @change="setDefault(idx)">
+                            Default
+                        </label>
+                        <button type="button" class="btn btn-sm btn-secondary" @click="moveTemplate(idx, -1)" :disabled="idx === 0">▲</button>
+                        <button type="button" class="btn btn-sm btn-secondary" @click="moveTemplate(idx, 1)" :disabled="idx === templates.length - 1">▼</button>
+                        <a :href="templateEditUrl(row.template_id)" target="_blank" class="btn btn-sm btn-secondary">Open editor ↗</a>
+                        <button type="button" class="btn btn-sm btn-danger" @click="detachTemplate(idx)">Detach</button>
+                    </div>
+                    <div style="margin-top:8px;">
+                        <div style="font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">
+                            Use this template when
+                            <span style="text-transform:none;letter-spacing:0;color:rgba(255,255,255,.4);">(leave blank to always consider — the default is used when no conditions match)</span>
+                        </div>
+                        @include('admin.motivations.types._condition-editor', ['target' => 'row.condition'])
+                    </div>
+                </div>
+            </template>
+
+            <div style="margin-top:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px;">
+                <div style="font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Attach from library</div>
+                <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end;">
+                    <select class="form-input" x-model.number="pickTemplateId">
+                        <option :value="0">— choose a template —</option>
+                        <template x-for="t in availableLibrary()" :key="t.id">
+                            <option :value="t.id" x-text="t.name + ' · ' + t.category_label + (t.has_published ? '' : ' · draft only')"></option>
+                        </template>
+                    </select>
+                    <button type="button" class="btn btn-primary btn-sm" @click="attachTemplate()">Attach</button>
+                </div>
+                <div style="font-size:12px;color:rgba(255,255,255,.4);margin-top:6px;">
+                    Can't see the one you want? <a href="{{ route('admin.motivation-templates.create') }}" target="_blank" style="color:#F58220;">Create a new template ↗</a>.
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Book layout tab -->
     <div x-show="tab === 'book'" class="card" style="margin-bottom:16px;">
         <div class="card-body">
+            <div style="padding:10px;margin-bottom:12px;background:rgba(245,130,32,0.08);border:1px solid rgba(245,130,32,0.3);border-radius:8px;color:#F58220;font-size:12px;">
+                <strong>Legacy editor.</strong> New work should happen in <a href="#" @click.prevent="tab = 'templates'" style="color:#F58220;text-decoration:underline;">Templates</a>. The blocks saved here only run when no template is attached.
+            </div>
             <template x-for="(block, bIdx) in blocks" :key="bIdx">
                 <div style="border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:8px;">
                     <div style="display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:end;">
@@ -367,44 +443,83 @@
             </p>
             <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:12px;">
                 @foreach ($assets as $asset)
+                    @php($deleteFormId = 'asset-delete-'.$asset->id)
                     <div style="background:rgba(255,255,255,.04);border-radius:10px;padding:10px;">
                         <img src="{{ $asset->url() }}" alt="" style="max-width:100%;max-height:120px;border-radius:6px;">
                         <div style="color:#fff;font-size:12px;margin-top:6px;">{{ $asset->name }}</div>
-                        <form method="POST" action="{{ route('admin.application-types.assets.destroy', $asset) }}" style="margin-top:6px;" onsubmit="return confirm('Delete this asset?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-danger">Delete</button>
-                        </form>
+                        {{-- Submit via the sibling <form> below (which lives OUTSIDE the main form). --}}
+                        <button type="submit" form="{{ $deleteFormId }}" class="btn btn-sm btn-danger" style="margin-top:6px;">Delete</button>
                     </div>
                 @endforeach
             </div>
-            <form method="POST" action="{{ route('admin.application-types.assets.upload') }}" enctype="multipart/form-data">
-                @csrf
-                <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:8px;align-items:end;">
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="name" class="form-input" required>
-                    </div>
-                    <div class="form-group" style="margin-bottom:0;">
-                        <label class="form-label">File (JPG or PNG)</label>
-                        <input type="file" name="file" accept=".jpg,.jpeg,.png" required class="form-input">
-                    </div>
-                    <button class="btn btn-primary">Upload</button>
+            {{-- Fields bound to the OUTSIDE asset-upload <form> via form="asset-upload-form" so their
+                 required/validation attributes don't block the main form's submit. --}}
+            <div style="display:grid;grid-template-columns:1fr 2fr auto;gap:8px;align-items:end;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-input" required form="asset-upload-form">
                 </div>
-            </form>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">File (JPG or PNG)</label>
+                    <input type="file" name="file" accept=".jpg,.jpeg,.png" required class="form-input" form="asset-upload-form">
+                </div>
+                <button type="submit" form="asset-upload-form" class="btn btn-primary">Upload</button>
+            </div>
         </div>
     </div>
 
-    <input type="hidden" name="questions_json" :value="JSON.stringify(sections)">
-    <input type="hidden" name="requirements_json" :value="JSON.stringify(requirements)">
-    <input type="hidden" name="blocks_json" :value="JSON.stringify(blocks)">
-
     <div style="display:flex;gap:8px;">
-        <button type="submit" class="btn btn-primary">Save application type</button>
+        <button type="submit" form="type-form" class="btn btn-primary">Save application type</button>
         <a href="{{ route('admin.application-types.index') }}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 
+{{-- Sibling forms for the asset upload/delete — kept OUTSIDE the main <form> so their
+     nested-form parsing can't tear the main form apart, and so their required inputs
+     don't participate in the main form's submit validation. --}}
+<form id="asset-upload-form" method="POST" action="{{ route('admin.application-types.assets.upload') }}" enctype="multipart/form-data" style="display:none;">
+    @csrf
+</form>
+@foreach ($assets as $asset)
+    <form id="asset-delete-{{ $asset->id }}" method="POST" action="{{ route('admin.application-types.assets.destroy', $asset) }}" style="display:none;" onsubmit="return confirm('Delete this asset?')">
+        @csrf @method('DELETE')
+    </form>
+@endforeach
+
 <script>
+// Lifted out of the Alpine component so they can be called from the data initializer,
+// where `this` does not yet point at the component.
+function __hydrateField(f) {
+    return {
+        name: f.name || '',
+        label: f.label || '',
+        type: f.type || 'text',
+        required: !!f.required,
+        hint: f.hint || '',
+        condition: f.condition || null,
+        options: f.options || [],
+        optionsText: (f.options || []).join('\n'),
+        items: (f.items || []).map(i => ({ name: i.name || '', label: i.label || '', sentence: i.sentence || '' })),
+    };
+}
+function __hydrateRequirement(r, documentKinds) {
+    return {
+        kind: r.kind || Object.keys(documentKinds || {})[0] || 'other',
+        label: r.label || '',
+        hint: r.hint || '',
+        required: !!r.required,
+        min_count: r.min_count || 1,
+        has_reference_number: !!r.has_reference_number,
+        date_rule: r.date_rule || '',
+        max_age_days: r.max_age_days || 90,
+        condition: r.condition || null,
+    };
+}
+function __hydrateSettings(kind, s) {
+    const base = { title: '', subtitle: '', body: '', text: '', level: 1, asset_id: 0, width: 60, align: 'center', caption: '', field: '', intro: '', outro: '', as_list: false, kinds: [], divider_title: '' };
+    return Object.assign(base, s);
+}
+
 function typeBuilder(init) {
     return {
         tab: 'questions',
@@ -418,56 +533,72 @@ function typeBuilder(init) {
         placeholderCatalogue: init.placeholderCatalogue,
         conditionFields: init.conditionFields,
         assets: init.assets,
+        templateLibrary: init.templateLibrary || [],
+        templates: (init.attachedTemplates || []).map(r => ({
+            template_id: r.template_id,
+            is_default: !!r.is_default,
+            sort: r.sort || 0,
+            condition: r.condition || null,
+        })),
+        pickTemplateId: 0,
+
+        // Helpers for the Templates tab
+        templateName(id) { return (this.templateLibrary.find(t => t.id === id) || {}).name || '(removed template #'+id+')'; },
+        templateStatus(id) { return (this.templateLibrary.find(t => t.id === id) || {}).status || 'draft'; },
+        templatePublished(id) { return !!(this.templateLibrary.find(t => t.id === id) || {}).has_published; },
+        templateEditUrl(id) { return '{{ url('/admin/motivation-templates') }}/'+id+'/edit'; },
+        availableLibrary() {
+            const attached = new Set(this.templates.map(r => r.template_id));
+            return this.templateLibrary.filter(t => !attached.has(t.id));
+        },
+        attachTemplate() {
+            if (!this.pickTemplateId) return;
+            const alreadyDefault = this.templates.some(r => r.is_default);
+            this.templates.push({
+                template_id: this.pickTemplateId,
+                is_default: !alreadyDefault,
+                sort: this.templates.length,
+                condition: null,
+            });
+            this.pickTemplateId = 0;
+        },
+        detachTemplate(idx) {
+            if (!confirm('Detach this template from the application type?')) return;
+            const wasDefault = this.templates[idx].is_default;
+            this.templates.splice(idx, 1);
+            if (wasDefault && this.templates.length > 0) this.templates[0].is_default = true;
+        },
+        setDefault(idx) {
+            this.templates.forEach((r, i) => r.is_default = i === idx);
+        },
+        moveTemplate(idx, dir) {
+            const t = idx + dir;
+            if (t < 0 || t >= this.templates.length) return;
+            const [m] = this.templates.splice(idx, 1);
+            this.templates.splice(t, 0, m);
+        },
 
         sections: (init.sections || []).map(s => ({
             key: s.key || '',
             title: s.title || '',
             intro: s.intro || '',
             condition: s.condition || null,
-            fields: (s.fields || []).map(f => this.hydrateField(f)),
+            fields: (s.fields || []).map(f => __hydrateField(f)),
         })),
-        requirements: (init.requirements || []).map(r => this.hydrateRequirement(r)),
+        requirements: (init.requirements || []).map(r => __hydrateRequirement(r, init.documentKinds)),
         blocks: (init.blocks || []).map(b => ({
             kind: b.kind,
-            settings: this.hydrateSettings(b.kind, b.settings || {}),
+            settings: __hydrateSettings(b.kind, b.settings || {}),
             condition: b.condition || null,
         })),
 
-        hydrateField(f) {
-            const base = {
-                name: f.name || '',
-                label: f.label || '',
-                type: f.type || 'text',
-                required: !!f.required,
-                hint: f.hint || '',
-                condition: f.condition || null,
-                options: f.options || [],
-                optionsText: (f.options || []).join('\n'),
-                items: (f.items || []).map(i => ({ name: i.name || '', label: i.label || '', sentence: i.sentence || '' })),
-            };
-            return base;
-        },
-        hydrateRequirement(r) {
-            return {
-                kind: r.kind || Object.keys(this.documentKinds)[0],
-                label: r.label || '',
-                hint: r.hint || '',
-                required: !!r.required,
-                min_count: r.min_count || 1,
-                has_reference_number: !!r.has_reference_number,
-                date_rule: r.date_rule || '',
-                max_age_days: r.max_age_days || 90,
-                condition: r.condition || null,
-            };
-        },
-        hydrateSettings(kind, s) {
-            const base = { title: '', subtitle: '', body: '', text: '', level: 1, asset_id: 0, width: 60, align: 'center', caption: '', field: '', intro: '', outro: '', as_list: false, kinds: [], divider_title: '' };
-            return Object.assign(base, s);
-        },
+        hydrateField(f) { return __hydrateField(f); },
+        hydrateRequirement(r) { return __hydrateRequirement(r, this.documentKinds); },
+        hydrateSettings(kind, s) { return __hydrateSettings(kind, s); },
 
-        newField() { return this.hydrateField({ type: 'text', items: [], options: [] }); },
-        newRequirement() { return this.hydrateRequirement({}); },
-        newBlock() { return { kind: 'text', settings: this.hydrateSettings('text', {}), condition: null }; },
+        newField() { return __hydrateField({ type: 'text', items: [], options: [] }); },
+        newRequirement() { return __hydrateRequirement({}, this.documentKinds); },
+        newBlock() { return { kind: 'text', settings: __hydrateSettings('text', {}), condition: null }; },
         addSection() {
             const n = this.sections.length + 1;
             this.sections.push({ key: 'section_' + n, title: 'Section ' + n, intro: '', condition: null, fields: [] });

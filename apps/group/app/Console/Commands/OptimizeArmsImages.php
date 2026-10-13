@@ -62,6 +62,7 @@ class OptimizeArmsImages extends Command
                     $this->warn("  missing: {$path}");
                     $newPaths[] = $path;
                     $missing++;
+
                     continue;
                 }
 
@@ -72,6 +73,7 @@ class OptimizeArmsImages extends Command
                     $newPaths[] = $path;
                     $totalAfter += $sizeBefore;
                     $skipped++;
+
                     continue;
                 }
 
@@ -83,6 +85,7 @@ class OptimizeArmsImages extends Command
                     ));
                     $newPaths[] = $path;
                     $totalAfter += $sizeBefore;
+
                     continue;
                 }
 
@@ -92,6 +95,7 @@ class OptimizeArmsImages extends Command
                     $this->error("  failed: {$path}  ({$e->getMessage()})");
                     $newPaths[] = $path;
                     $totalAfter += $sizeBefore;
+
                     continue;
                 }
 

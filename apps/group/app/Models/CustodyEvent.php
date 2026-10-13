@@ -17,12 +17,17 @@ use RuntimeException;
  */
 class CustodyEvent extends Model
 {
-    public const TYPE_INTAKE            = 'intake';
-    public const TYPE_INSPECTION        = 'inspection';
+    public const TYPE_INTAKE = 'intake';
+
+    public const TYPE_INSPECTION = 'inspection';
+
     public const TYPE_TRANSFER_INTERNAL = 'transfer_internal';
-    public const TYPE_RELEASE           = 'release';
-    public const TYPE_CORRECTION        = 'correction';
-    public const TYPE_NOTE              = 'note';
+
+    public const TYPE_RELEASE = 'release';
+
+    public const TYPE_CORRECTION = 'correction';
+
+    public const TYPE_NOTE = 'note';
 
     protected $fillable = [
         'storage_item_id',
@@ -50,18 +55,18 @@ class CustodyEvent extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public static function types(): array
     {
         return [
-            self::TYPE_INTAKE            => 'Intake',
-            self::TYPE_INSPECTION        => 'Inspection',
+            self::TYPE_INTAKE => 'Intake',
+            self::TYPE_INSPECTION => 'Inspection',
             self::TYPE_TRANSFER_INTERNAL => 'Internal transfer',
-            self::TYPE_RELEASE           => 'Release',
-            self::TYPE_CORRECTION        => 'Correction',
-            self::TYPE_NOTE              => 'Note',
+            self::TYPE_RELEASE => 'Release',
+            self::TYPE_CORRECTION => 'Correction',
+            self::TYPE_NOTE => 'Note',
         ];
     }
 

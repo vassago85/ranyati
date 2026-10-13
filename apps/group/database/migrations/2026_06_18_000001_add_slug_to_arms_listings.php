@@ -44,7 +44,10 @@ return new class extends Migration
     {
         Schema::table('arms_listings', function (Blueprint $table) {
             if (Schema::hasColumn('arms_listings', 'slug')) {
-                try { $table->dropUnique('arms_listings_slug_unique'); } catch (\Throwable $e) { /* ignore */ }
+                try {
+                    $table->dropUnique('arms_listings_slug_unique');
+                } catch (Throwable $e) { /* ignore */
+                }
                 $table->dropColumn('slug');
             }
         });

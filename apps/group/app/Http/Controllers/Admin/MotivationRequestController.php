@@ -11,6 +11,9 @@ use App\Support\Motivations\DocumentKinds;
 use App\Support\Motivations\MotivationStorage;
 use App\Support\Motivations\PowerOfAttorneyGenerator;
 use App\Support\Motivations\QuestionSchema;
+use App\Support\Motivations\Templates\LetterGenerator;
+use App\Support\Motivations\Templates\TemplateSelector;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -35,9 +38,14 @@ class MotivationRequestController extends Controller
 
     public function show(MotivationRequest $motivation)
     {
-        $motivation->load(['user.clientProfile', 'applicationType.blocks', 'documents.checker', 'verifier', 'approver']);
+        $motivation->load([
+            'user.clientProfile', 'applicationType.blocks', 'applicationType.templates',
+            'documents.checker', 'verifier', 'approver',
+            'letters' => fn ($q) => $q->orderByRaw('firearm_index IS NULL asc')->orderBy('firearm_index'),
+        ]);
 
         $requirements = $motivation->applicableRequirements();
+        $usesTemplates = TemplateSelector::for($motivation) !== null || $motivation->applicationType?->templates->isNotEmpty();
 
         return view('admin.motivations.requests.show', [
             'motivation' => $motivation,
@@ -45,6 +53,8 @@ class MotivationRequestController extends Controller
             'documentsByKind' => $motivation->documents->groupBy('kind'),
             'answersDisplay' => $this->buildAnswersDisplay($motivation),
             'documentKinds' => DocumentKinds::all(),
+            'usesTemplates' => $usesTemplates,
+            'letters' => $motivation->letters,
         ]);
     }
 
@@ -190,6 +200,12 @@ class MotivationRequestController extends Controller
             'blocks_snapshot' => $motivation->applicationType->blockDefinitions(),
         ]);
 
+        // Prefer the new template pipeline when the application type has one
+        // or more templates attached; otherwise fall back to the legacy book.
+        if (TemplateSelector::for($motivation->fresh(['applicationType', 'user.clientProfile', 'documents']))) {
+            return $this->generateLetters($motivation, $request);
+        }
+
         return $this->generateBook($motivation);
     }
 
@@ -208,12 +224,43 @@ class MotivationRequestController extends Controller
         return back()->with('success', 'Changes requested — the member can now update their application.');
     }
 
-    public function regenerate(MotivationRequest $motivation)
+    public function regenerate(Request $request, MotivationRequest $motivation)
     {
+        if (TemplateSelector::for($motivation->fresh(['applicationType', 'user.clientProfile', 'documents']))) {
+            return $this->generateLetters($motivation, $request);
+        }
+
         return $this->generateBook($motivation);
     }
 
-    private function generateBook(MotivationRequest $motivation): \Illuminate\Http\RedirectResponse
+    /**
+     * Generate letters via the new template pipeline. On success, flip the
+     * request status to AWAITING_ENDORSEMENT or VERIFIED based on whether
+     * an endorsement is still needed.
+     */
+    private function generateLetters(MotivationRequest $motivation, Request $request): RedirectResponse
+    {
+        $generator = new LetterGenerator($request->user()->id);
+        $result = $generator->generate($motivation);
+
+        $motivation->update([
+            'status' => $motivation->needsEndorsement()
+                ? MotivationRequest::STATUS_AWAITING_ENDORSEMENT
+                : MotivationRequest::STATUS_VERIFIED,
+        ]);
+
+        $message = count($result['letters']).' motivation(s) generated.';
+        if ($result['missing'] !== []) {
+            $message .= ' Missing placeholders: '.implode(', ', $result['missing']).'.';
+        }
+        if ($result['warnings'] !== []) {
+            return back()->with('error', $message.' '.implode(' ', $result['warnings']));
+        }
+
+        return back()->with('success', $message);
+    }
+
+    private function generateBook(MotivationRequest $motivation): RedirectResponse
     {
         $motivation->loadMissing(['applicationType.blocks', 'documents', 'user.clientProfile']);
 
@@ -308,15 +355,31 @@ class MotivationRequestController extends Controller
             'uploaded_by' => $request->user()->id,
         ]);
 
-        // Regenerate the book now that the endorsement is attached.
-        return $this->generateBook($motivation->fresh(['applicationType.blocks', 'documents', 'user.clientProfile']));
+        $fresh = $motivation->fresh(['applicationType.blocks', 'documents', 'user.clientProfile']);
+
+        // Regenerate using whichever pipeline the type is wired for.
+        if (TemplateSelector::for($fresh)) {
+            return $this->generateLetters($fresh, $request);
+        }
+
+        return $this->generateBook($fresh);
     }
 
     public function markReady(Request $request, MotivationRequest $motivation)
     {
-        $motivation->loadMissing(['documents']);
+        $motivation->loadMissing(['documents', 'letters']);
 
-        if (! $motivation->pdf_path) {
+        $usesTemplates = TemplateSelector::for($motivation->fresh(['applicationType', 'user.clientProfile', 'documents'])) !== null;
+
+        if ($usesTemplates) {
+            if ($motivation->letters->isEmpty()) {
+                return back()->with('error', 'Generate the motivation(s) first.');
+            }
+            $pending = $motivation->letters->filter(fn ($l) => ! $l->isFinal());
+            if ($pending->isNotEmpty()) {
+                return back()->with('error', 'Finalise every motivation first ('.$pending->count().' still in draft).');
+            }
+        } elseif (! $motivation->pdf_path) {
             return back()->with('error', 'Generate the book first.');
         }
 
@@ -484,7 +547,7 @@ class MotivationRequestController extends Controller
         foreach ($motivation->applicationType->sections() as $section) {
             $items = [];
             foreach ($section['fields'] ?? [] as $field) {
-                $visible = \App\Support\Motivations\QuestionSchema::isVisible(
+                $visible = QuestionSchema::isVisible(
                     array_merge($field, ['section_condition' => $section['condition'] ?? null]),
                     $context,
                 );

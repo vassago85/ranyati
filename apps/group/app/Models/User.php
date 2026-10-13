@@ -4,7 +4,6 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Support\AdminAreas;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -16,8 +15,11 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     const ROLE_DEVELOPER = 'developer';
+
     const ROLE_OWNER = 'owner';
+
     const ROLE_ADMIN = 'admin';
+
     const ROLE_CLIENT = 'client';
 
     const ROLES = [

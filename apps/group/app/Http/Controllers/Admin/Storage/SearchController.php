@@ -22,24 +22,23 @@ class SearchController extends Controller
             if (preg_match('/^([A-Za-z]{2})-([A-Za-z])-(\d{1,4})$/', $q, $m)) {
                 $parsed = 'tag';
                 $query->whereRaw('UPPER(shelf) = ?', [strtoupper($m[1])])
-                      ->whereRaw('UPPER(tag_colour) = ?', [strtoupper($m[2])])
-                      ->where('tag_number', (int) $m[3]);
+                    ->whereRaw('UPPER(tag_colour) = ?', [strtoupper($m[2])])
+                    ->where('tag_number', (int) $m[3]);
             }
             // "D01-P045-13" register ref shortcut
             elseif (preg_match('/^([A-Za-z]\d{2})-P?(\d{1,3})-(\d{1,2})$/i', $q, $m)) {
                 $parsed = 'register';
                 $query->whereHas('book', fn ($b) => $b->where('code', strtoupper($m[1])))
-                      ->where('page', (int) $m[2])
-                      ->where('position', (int) $m[3]);
-            }
-            else {
+                    ->where('page', (int) $m[2])
+                    ->where('position', (int) $m[3]);
+            } else {
                 $like = '%'.$q.'%';
                 $query->where(function ($sub) use ($like) {
                     $sub->where('serial_number', 'like', $like)
                         ->orWhereHas('agreement', function ($a) use ($like) {
                             $a->where('client_name', 'like', $like)
-                              ->orWhere('estate_late', 'like', $like)
-                              ->orWhere('email', 'like', $like);
+                                ->orWhere('estate_late', 'like', $like)
+                                ->orWhere('email', 'like', $like);
                         });
                 });
             }

@@ -48,7 +48,7 @@ class PdfMerger
 
                 try {
                     self::appendPdf($pdf, $temp);
-                } catch (CrossReferenceException | PdfParserException | PdfReaderException) {
+                } catch (CrossReferenceException|PdfParserException|PdfReaderException) {
                     $rewritten = self::rewriteWithGhostscript($temp);
                     if ($rewritten === null) {
                         self::addPlaceholderPage($pdf, $segment['label'] ?? 'Unreadable PDF — print separately');

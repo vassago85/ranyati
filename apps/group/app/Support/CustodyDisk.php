@@ -6,6 +6,7 @@ use App\Models\Setting;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use RuntimeException;
 
 /**
@@ -29,10 +30,14 @@ class CustodyDisk
      * settings view, the controller, and this resolver stay in sync.
      */
     public const KEY_ACCOUNT_ID = 'r2.account_id';
+
     public const KEY_ACCESS_KEY = 'r2.access_key';
+
     public const KEY_SECRET_KEY = 'r2.secret_key';
-    public const KEY_BUCKET     = 'r2.bucket';
-    public const KEY_ENDPOINT   = 'r2.endpoint';
+
+    public const KEY_BUCKET = 'r2.bucket';
+
+    public const KEY_ENDPOINT = 'r2.endpoint';
 
     /**
      * Build a Flysystem-backed disk pointing at the configured R2 bucket.
@@ -53,15 +58,15 @@ class CustodyDisk
         }
 
         return Storage::build([
-            'driver'                  => 's3',
-            'key'                     => $config['key'],
-            'secret'                  => $config['secret'],
-            'region'                  => 'auto',
-            'bucket'                  => $config['bucket'],
-            'endpoint'                => $config['endpoint'],
+            'driver' => 's3',
+            'key' => $config['key'],
+            'secret' => $config['secret'],
+            'region' => 'auto',
+            'bucket' => $config['bucket'],
+            'endpoint' => $config['endpoint'],
             'use_path_style_endpoint' => true,
-            'throw'                   => true,
-            'visibility'              => 'private',
+            'throw' => true,
+            'visibility' => 'private',
         ]);
     }
 
@@ -75,10 +80,10 @@ class CustodyDisk
     public static function config(): array
     {
         $accountId = self::setting(self::KEY_ACCOUNT_ID, env('R2_ACCOUNT_ID'));
-        $key       = self::setting(self::KEY_ACCESS_KEY, env('R2_ACCESS_KEY'));
+        $key = self::setting(self::KEY_ACCESS_KEY, env('R2_ACCESS_KEY'));
         $secretRaw = self::setting(self::KEY_SECRET_KEY, null);
-        $bucket    = self::setting(self::KEY_BUCKET,     env('R2_BUCKET'));
-        $endpoint  = self::setting(self::KEY_ENDPOINT,   env('R2_ENDPOINT'));
+        $bucket = self::setting(self::KEY_BUCKET, env('R2_BUCKET'));
+        $endpoint = self::setting(self::KEY_ENDPOINT, env('R2_ENDPOINT'));
 
         // Compose endpoint from account ID if the operator only supplied
         // the ID (Cloudflare R2's standard endpoint pattern).
@@ -100,10 +105,10 @@ class CustodyDisk
 
         return [
             'account_id' => $accountId ?: null,
-            'key'        => $key ?: null,
-            'secret'     => $secret ?: null,
-            'bucket'     => $bucket ?: null,
-            'endpoint'   => $endpoint ?: null,
+            'key' => $key ?: null,
+            'secret' => $secret ?: null,
+            'bucket' => $bucket ?: null,
+            'endpoint' => $endpoint ?: null,
         ];
     }
 
@@ -139,8 +144,8 @@ class CustodyDisk
         $map = [
             self::KEY_ACCOUNT_ID => $input['account_id'] ?? null,
             self::KEY_ACCESS_KEY => $input['access_key'] ?? null,
-            self::KEY_BUCKET     => $input['bucket'] ?? null,
-            self::KEY_ENDPOINT   => $input['endpoint'] ?? null,
+            self::KEY_BUCKET => $input['bucket'] ?? null,
+            self::KEY_ENDPOINT => $input['endpoint'] ?? null,
         ];
 
         foreach ($map as $key => $value) {
@@ -184,7 +189,7 @@ class CustodyDisk
             trim($bookCode) ?: 'unknown',
             $itemId,
             $kind,
-            (string) \Illuminate\Support\Str::uuid(),
+            (string) Str::uuid(),
             ltrim($extension, '.'),
         );
     }

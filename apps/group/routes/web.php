@@ -1,8 +1,27 @@
 <?php
 
+use App\Http\Controllers\Admin\ApplicationTypeController;
+use App\Http\Controllers\Admin\MotivationLetterController;
+use App\Http\Controllers\Admin\MotivationMemberController;
+use App\Http\Controllers\Admin\MotivationRequestController;
+use App\Http\Controllers\Admin\MotivationTemplateController;
+use App\Http\Controllers\Admin\Storage\AgreementsController;
+use App\Http\Controllers\Admin\Storage\DashboardController;
+use App\Http\Controllers\Admin\Storage\EstatesController;
+use App\Http\Controllers\Admin\Storage\ItemsController;
+use App\Http\Controllers\Admin\Storage\LabelController;
+use App\Http\Controllers\Admin\Storage\LogController;
+use App\Http\Controllers\Admin\Storage\RegisterController;
+use App\Http\Controllers\Admin\Storage\SearchController;
+use App\Http\Controllers\Admin\Storage\SelfStorageController;
+use App\Http\Controllers\Admin\Storage\SettingsController;
+use App\Http\Controllers\Admin\TemplateAssetController;
+use App\Http\Controllers\Admin\TemplatePreviewController;
+use App\Http\Controllers\AdminFirearmApplicationsController;
 use App\Http\Controllers\AgentDocsController;
 use App\Http\Controllers\RobotsController;
 use App\Http\Controllers\SitemapController;
+use App\Mail\MotivationEnquiryReceipt;
 use App\Mail\NewArmsEnquiry;
 use App\Mail\NewMotivationEnquiry;
 use App\Models\ArmsEnquiry;
@@ -10,19 +29,24 @@ use App\Models\ArmsListing;
 use App\Models\Document;
 use App\Models\MotivationEnquiry;
 use App\Models\QuestionnaireResponse;
-use App\Support\AdminAreas;
-use App\Support\QuestionnaireRegistry;
 use App\Models\Setting;
 use App\Models\User;
+use App\Support\AdminAreas;
+use App\Support\ImageOptimizer;
+use App\Support\MotivationServices;
+use App\Support\QuestionnaireRegistry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 Route::get('/', function () {
@@ -49,6 +73,7 @@ Route::get('/motivations', function () {
     if (str_starts_with(request()->getHost(), 'motivations.')) {
         return redirect('/', 301);
     }
+
     return view('motivations');
 });
 
@@ -56,6 +81,7 @@ Route::get('/storage', function () {
     if (str_starts_with(request()->getHost(), 'storage.')) {
         return redirect('/', 301);
     }
+
     return view('storage-landing');
 });
 
@@ -98,10 +124,10 @@ Route::get('/robots.txt', RobotsController::class)->name('robots');
 
 // Machine-readable agent documents — Motivations host only (the controller
 // 404s on apex/storage/arms hosts so this content never leaks cross-brand).
-Route::get('/llms.txt',    [AgentDocsController::class, 'llms'])->name('agent.llms');
-Route::get('/about.md',    [AgentDocsController::class, 'aboutMd'])->name('agent.about-md');
+Route::get('/llms.txt', [AgentDocsController::class, 'llms'])->name('agent.llms');
+Route::get('/about.md', [AgentDocsController::class, 'aboutMd'])->name('agent.about-md');
 Route::get('/services.md', [AgentDocsController::class, 'servicesMd'])->name('agent.services-md');
-Route::get('/faq.md',      [AgentDocsController::class, 'faqMd'])->name('agent.faq-md');
+Route::get('/faq.md', [AgentDocsController::class, 'faqMd'])->name('agent.faq-md');
 
 // ── SEO support pages (host-aware; same path may resolve differently per hostname) ──
 
@@ -152,11 +178,11 @@ Route::post('/arms/send-otp', function (Request $request) use ($armsOnly) {
     $request->validate(['email' => 'required|email|max:255']);
 
     $email = strtolower(trim($request->email));
-    $rateLimitKey = 'arms-otp-send:' . $email;
+    $rateLimitKey = 'arms-otp-send:'.$email;
 
     if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
         return response()->json([
-            'error' => 'Too many attempts. Please wait ' . RateLimiter::availableIn($rateLimitKey) . ' seconds.',
+            'error' => 'Too many attempts. Please wait '.RateLimiter::availableIn($rateLimitKey).' seconds.',
         ], 429);
     }
 
@@ -169,7 +195,7 @@ Route::post('/arms/send-otp', function (Request $request) use ($armsOnly) {
         Mail::send('emails.arms-otp-verification', ['code' => $code], function ($message) use ($email) {
             $message->to($email)->subject('Your Verification Code — Ranyati Arms');
         });
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return response()->json(['error' => 'Failed to send verification email. Please try again.'], 500);
     }
 
@@ -210,7 +236,7 @@ Route::post('/listing/{listing:id}/enquire', function (Request $request, ArmsLis
 
     try {
         Mail::send(new NewArmsEnquiry($enquiry));
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
     }
 
     return response()->json(['success' => true, 'message' => 'Thank you! Your enquiry has been sent.']);
@@ -339,11 +365,11 @@ Route::post('/enquire/send-otp', function (Request $request) {
     $request->validate(['email' => 'required|email|max:255']);
 
     $email = strtolower(trim($request->email));
-    $rateLimitKey = 'otp-send:' . $email;
+    $rateLimitKey = 'otp-send:'.$email;
 
     if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
         return response()->json([
-            'error' => 'Too many attempts. Please wait ' . RateLimiter::availableIn($rateLimitKey) . ' seconds.',
+            'error' => 'Too many attempts. Please wait '.RateLimiter::availableIn($rateLimitKey).' seconds.',
         ], 429);
     }
 
@@ -356,7 +382,7 @@ Route::post('/enquire/send-otp', function (Request $request) {
         Mail::send('emails.otp-verification', ['code' => $code], function ($message) use ($email) {
             $message->to($email)->subject('Your Verification Code — Ranyati Motivations');
         });
-    } catch (\Throwable $e) {
+    } catch (Throwable $e) {
         return response()->json(['error' => 'Failed to send verification email. Please try again.'], 500);
     }
 
@@ -375,7 +401,7 @@ Route::post('/enquire', function (Request $request) {
         'saps_station' => 'nullable|required_if:endorsement_type,Renewal|string|max:255',
         'purpose' => 'nullable|string|max:255',
         'services' => 'nullable|array',
-        'services.*' => ['string', 'max:80', \Illuminate\Validation\Rule::in(\App\Support\MotivationServices::validKeys())],
+        'services.*' => ['string', 'max:80', Rule::in(MotivationServices::validKeys())],
         'membership_number' => 'nullable|string|max:100',
         'message' => 'nullable|string|max:2000',
         'source' => 'nullable|string|max:100',
@@ -388,7 +414,7 @@ Route::post('/enquire', function (Request $request) {
     // Defensive: drop any submitted keys not in the current registry so a
     // stale form on the client can never poison the stored enquiry.
     if (! empty($validated['services'])) {
-        $valid = array_flip(\App\Support\MotivationServices::validKeys());
+        $valid = array_flip(MotivationServices::validKeys());
         $validated['services'] = array_values(array_filter(
             $validated['services'],
             fn ($k) => isset($valid[$k]),
@@ -439,9 +465,9 @@ Route::post('/enquire', function (Request $request) {
     // delivery hiccup to a single customer's address must never break the
     // form submission flow or block the staff notification above.
     try {
-        Mail::send(new \App\Mail\MotivationEnquiryReceipt($enquiry));
-    } catch (\Throwable $e) {
-        \Illuminate\Support\Facades\Log::warning('Motivation enquiry customer receipt failed', [
+        Mail::send(new MotivationEnquiryReceipt($enquiry));
+    } catch (Throwable $e) {
+        Log::warning('Motivation enquiry customer receipt failed', [
             'enquiry_id' => $enquiry->id,
             'error' => $e->getMessage(),
         ]);
@@ -475,6 +501,7 @@ Route::post('/admin/login', function (Request $request) {
 
     if (! $request->user()->isAdmin()) {
         Auth::logout();
+
         return back()->withErrors(['email' => 'You do not have admin access.']);
     }
 
@@ -637,23 +664,23 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         return redirect()->route('admin.enquiries')->with('success', 'Enquiry deleted.');
     })->name('enquiries.delete');
 
-    Route::get('/applications', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'index'])
+    Route::get('/applications', [AdminFirearmApplicationsController::class, 'index'])
         ->name('applications');
-    Route::get('/applications/log', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'log'])
+    Route::get('/applications/log', [AdminFirearmApplicationsController::class, 'log'])
         ->name('applications.log');
-    Route::post('/applications/circuit/reset', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'resetCircuit'])
+    Route::post('/applications/circuit/reset', [AdminFirearmApplicationsController::class, 'resetCircuit'])
         ->name('applications.circuit.reset');
-    Route::get('/applications/batches/{batchKey}', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'showBatch'])
+    Route::get('/applications/batches/{batchKey}', [AdminFirearmApplicationsController::class, 'showBatch'])
         ->whereNumber('batchKey')
         ->name('applications.batch');
-    Route::get('/applications/users/{user}', [\App\Http\Controllers\AdminFirearmApplicationsController::class, 'showUser'])
+    Route::get('/applications/users/{user}', [AdminFirearmApplicationsController::class, 'showUser'])
         ->name('applications.user');
 
     Route::get('/settings', function () {
         $keys = ['mail_mailer', 'mailgun_domain', 'mailgun_secret', 'mailgun_endpoint',
-                 'mail_from_name', 'mail_from_address', 'notification_email',
-                 'arms_enquiry_email',
-                 'turnstile_site_key', 'turnstile_secret_key'];
+            'mail_from_name', 'mail_from_address', 'notification_email',
+            'arms_enquiry_email',
+            'turnstile_site_key', 'turnstile_secret_key'];
         $settings = [];
         foreach ($keys as $key) {
             $settings[$key] = Setting::get($key);
@@ -683,13 +710,16 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             $invalid = [];
             foreach ($rawParts as $part) {
                 $part = trim($part);
-                if ($part === '') continue;
+                if ($part === '') {
+                    continue;
+                }
                 if (! filter_var($part, FILTER_VALIDATE_EMAIL)) {
                     $invalid[] = $part;
                 }
             }
             if (! empty($invalid)) {
                 $errors[$field] = $label.': invalid email '.implode(', ', $invalid).'.';
+
                 continue;
             }
             $clean = implode(', ', Setting::parseEmailList($raw));
@@ -701,8 +731,8 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         }
 
         $fields = ['mail_mailer', 'mailgun_domain', 'mailgun_endpoint',
-                   'mail_from_name', 'mail_from_address', 'notification_email',
-                   'arms_enquiry_email', 'turnstile_site_key'];
+            'mail_from_name', 'mail_from_address', 'notification_email',
+            'arms_enquiry_email', 'turnstile_site_key'];
 
         foreach ($fields as $field) {
             if ($request->has($field)) {
@@ -731,9 +761,9 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
                     ->subject('Test Email — Ranyati Motivations');
             });
 
-            return back()->with('success', 'Test email sent to ' . $request->test_email);
-        } catch (\Throwable $e) {
-            return back()->with('error', 'Failed to send test email: ' . $e->getMessage());
+            return back()->with('success', 'Test email sent to '.$request->test_email);
+        } catch (Throwable $e) {
+            return back()->with('error', 'Failed to send test email: '.$e->getMessage());
         }
     })->name('settings.test');
 
@@ -830,12 +860,12 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         $imagePaths = [];
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $imagePaths[] = \App\Support\ImageOptimizer::storeUpload($image, 'arms');
+                $imagePaths[] = ImageOptimizer::storeUpload($image, 'arms');
             }
         }
 
         ArmsListing::create([
-            ...\Illuminate\Support\Arr::except($validated, ['images']),
+            ...Arr::except($validated, ['images']),
             'images' => $imagePaths,
             'status' => 'active',
             'is_featured' => false,
@@ -897,12 +927,12 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-                $currentImages[] = \App\Support\ImageOptimizer::storeUpload($image, 'arms');
+                $currentImages[] = ImageOptimizer::storeUpload($image, 'arms');
             }
         }
 
         $updateData = [
-            ...\Illuminate\Support\Arr::except($validated, ['images', 'remove_images']),
+            ...Arr::except($validated, ['images', 'remove_images']),
             'images' => $currentImages,
         ];
 
@@ -975,12 +1005,12 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
                 }
 
                 $ext = pathinfo($source, PATHINFO_EXTENSION) ?: 'jpg';
-                $destination = 'arms/'.\Illuminate\Support\Str::random(40).'.'.$ext;
+                $destination = 'arms/'.Str::random(40).'.'.$ext;
 
                 Storage::disk('public')->copy($source, $destination);
                 $copiedImages[] = $destination;
-            } catch (\Throwable $e) {
-                \Illuminate\Support\Facades\Log::warning('Duplicate: failed to copy image', [
+            } catch (Throwable $e) {
+                Log::warning('Duplicate: failed to copy image', [
                     'listing_id' => $listing->id,
                     'source' => $source,
                     'error' => $e->getMessage(),
@@ -1229,52 +1259,87 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     })->name('questionnaires.submit');
 
     // ── Motivation builder & requests ──────────────────────────
-    Route::prefix('application-types')->name('application-types.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'index'])->name('index');
-        Route::get('/create', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'create'])->name('create');
-        Route::post('/', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'store'])->name('store');
-        Route::get('/{applicationType}/edit', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'edit'])->name('edit');
-        Route::put('/{applicationType}', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'update'])->name('update');
-        Route::delete('/{applicationType}', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'destroy'])->name('destroy');
-        Route::post('/{applicationType}/clone', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'clone'])->name('clone');
+    Route::prefix('motivation-templates')->name('motivation-templates.')->group(function () {
+        Route::get('/', [MotivationTemplateController::class, 'index'])->name('index');
+        Route::get('/create', [MotivationTemplateController::class, 'create'])->name('create');
+        Route::post('/', [MotivationTemplateController::class, 'store'])->name('store');
+        Route::get('/assets', [TemplateAssetController::class, 'index'])->name('assets.index');
+        Route::post('/assets', [TemplateAssetController::class, 'store'])->name('assets.store');
+        Route::delete('/assets/{asset}', [TemplateAssetController::class, 'destroy'])->name('assets.destroy');
 
-        Route::post('/assets', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'uploadAsset'])->name('assets.upload');
-        Route::delete('/assets/{asset}', [\App\Http\Controllers\Admin\ApplicationTypeController::class, 'destroyAsset'])->name('assets.destroy');
+        Route::get('/{motivationTemplate}/edit', [MotivationTemplateController::class, 'edit'])->name('edit');
+        Route::put('/{motivationTemplate}', [MotivationTemplateController::class, 'update'])->name('update');
+        Route::post('/{motivationTemplate}/autosave', [MotivationTemplateController::class, 'autosave'])->name('autosave');
+        Route::post('/{motivationTemplate}/publish', [MotivationTemplateController::class, 'publish'])->name('publish');
+        Route::post('/{motivationTemplate}/duplicate', [MotivationTemplateController::class, 'duplicate'])->name('duplicate');
+        Route::post('/{motivationTemplate}/archive', [MotivationTemplateController::class, 'archive'])->name('archive');
+        Route::post('/{motivationTemplate}/unarchive', [MotivationTemplateController::class, 'restoreTemplate'])->name('unarchive');
+        Route::delete('/{motivationTemplate}', [MotivationTemplateController::class, 'destroy'])->name('destroy');
+
+        Route::get('/{motivationTemplate}/versions', [MotivationTemplateController::class, 'versions'])->name('versions');
+        Route::post('/{motivationTemplate}/versions/{version}/restore', [MotivationTemplateController::class, 'restore'])->name('versions.restore');
+
+        Route::post('/{motivationTemplate}/preview', [TemplatePreviewController::class, 'store'])->name('preview.store');
+        Route::get('/{motivationTemplate}/preview/{token}', [TemplatePreviewController::class, 'show'])->name('preview.show');
+    });
+
+    Route::prefix('application-types')->name('application-types.')->group(function () {
+        Route::get('/', [ApplicationTypeController::class, 'index'])->name('index');
+        Route::get('/create', [ApplicationTypeController::class, 'create'])->name('create');
+        Route::post('/', [ApplicationTypeController::class, 'store'])->name('store');
+        Route::get('/{applicationType}/edit', [ApplicationTypeController::class, 'edit'])->name('edit');
+        Route::put('/{applicationType}', [ApplicationTypeController::class, 'update'])->name('update');
+        Route::delete('/{applicationType}', [ApplicationTypeController::class, 'destroy'])->name('destroy');
+        Route::post('/{applicationType}/clone', [ApplicationTypeController::class, 'clone'])->name('clone');
+
+        Route::post('/assets', [ApplicationTypeController::class, 'uploadAsset'])->name('assets.upload');
+        Route::delete('/assets/{asset}', [ApplicationTypeController::class, 'destroyAsset'])->name('assets.destroy');
     });
 
     Route::prefix('motivation-members')->name('motivation-members.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'index'])->name('index');
-        Route::get('/create', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'create'])->name('create');
-        Route::post('/', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'store'])->name('store');
-        Route::get('/{motivationMember}', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'show'])->name('show');
-        Route::get('/{motivationMember}/profile', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'editProfile'])->name('profile.edit');
-        Route::post('/{motivationMember}/profile', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'updateProfile'])->name('profile.update');
-        Route::post('/{motivationMember}/motivations', [\App\Http\Controllers\Admin\MotivationMemberController::class, 'startMotivation'])->name('motivations.start');
+        Route::get('/', [MotivationMemberController::class, 'index'])->name('index');
+        Route::get('/create', [MotivationMemberController::class, 'create'])->name('create');
+        Route::post('/', [MotivationMemberController::class, 'store'])->name('store');
+        Route::get('/{motivationMember}', [MotivationMemberController::class, 'show'])->name('show');
+        Route::get('/{motivationMember}/profile', [MotivationMemberController::class, 'editProfile'])->name('profile.edit');
+        Route::post('/{motivationMember}/profile', [MotivationMemberController::class, 'updateProfile'])->name('profile.update');
+        Route::post('/{motivationMember}/motivations', [MotivationMemberController::class, 'startMotivation'])->name('motivations.start');
     });
 
     Route::prefix('motivation-requests')->name('motivation-requests.')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'index'])->name('index');
-        Route::get('/{motivation}', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'show'])->name('show');
-        Route::get('/{motivation}/edit', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'editOnBehalf'])->name('edit');
-        Route::post('/{motivation}/answers', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'updateAnswers'])->name('answers');
-        Route::post('/{motivation}/documents', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'uploadDocumentOnBehalf'])->name('documents.upload');
-        Route::delete('/{motivation}/documents/{document}', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'deleteDocument'])->name('documents.delete');
-        Route::post('/{motivation}/submit-on-behalf', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'submitOnBehalf'])->name('submit-on-behalf');
-        Route::get('/{motivation}/poa', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'downloadPoa'])->name('poa');
-        Route::post('/{motivation}/verify', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'verify'])->name('verify');
-        Route::post('/{motivation}/request-changes', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'requestChanges'])->name('request-changes');
-        Route::post('/{motivation}/regenerate', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'regenerate'])->name('regenerate');
-        Route::get('/{motivation}/book', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'downloadBook'])->name('book');
-        Route::post('/{motivation}/documents/{document}/check', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'checkDocument'])->name('documents.check');
-        Route::get('/{motivation}/documents/{document}', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'viewDocument'])->name('documents.view');
-        Route::post('/{motivation}/endorsement', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'uploadEndorsement'])->name('endorsement');
-        Route::post('/{motivation}/ready', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markReady'])->name('ready');
-        Route::post('/{motivation}/printed', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markPrinted'])->name('printed');
-        Route::post('/{motivation}/invoice', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'uploadInvoice'])->name('invoice');
-        Route::post('/{motivation}/paid', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markPaid'])->name('paid');
-        Route::post('/{motivation}/ready-for-collection', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markReadyForCollection'])->name('ready-for-collection');
-        Route::post('/{motivation}/shipped', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markShipped'])->name('shipped');
-        Route::post('/{motivation}/completed', [\App\Http\Controllers\Admin\MotivationRequestController::class, 'markCompleted'])->name('completed');
+        Route::get('/', [MotivationRequestController::class, 'index'])->name('index');
+        Route::get('/{motivation}', [MotivationRequestController::class, 'show'])->name('show');
+        Route::get('/{motivation}/edit', [MotivationRequestController::class, 'editOnBehalf'])->name('edit');
+        Route::post('/{motivation}/answers', [MotivationRequestController::class, 'updateAnswers'])->name('answers');
+        Route::post('/{motivation}/documents', [MotivationRequestController::class, 'uploadDocumentOnBehalf'])->name('documents.upload');
+        Route::delete('/{motivation}/documents/{document}', [MotivationRequestController::class, 'deleteDocument'])->name('documents.delete');
+        Route::post('/{motivation}/submit-on-behalf', [MotivationRequestController::class, 'submitOnBehalf'])->name('submit-on-behalf');
+        Route::get('/{motivation}/poa', [MotivationRequestController::class, 'downloadPoa'])->name('poa');
+        Route::post('/{motivation}/verify', [MotivationRequestController::class, 'verify'])->name('verify');
+        Route::post('/{motivation}/request-changes', [MotivationRequestController::class, 'requestChanges'])->name('request-changes');
+        Route::post('/{motivation}/regenerate', [MotivationRequestController::class, 'regenerate'])->name('regenerate');
+        Route::get('/{motivation}/book', [MotivationRequestController::class, 'downloadBook'])->name('book');
+        Route::post('/{motivation}/documents/{document}/check', [MotivationRequestController::class, 'checkDocument'])->name('documents.check');
+        Route::get('/{motivation}/documents/{document}', [MotivationRequestController::class, 'viewDocument'])->name('documents.view');
+        Route::post('/{motivation}/endorsement', [MotivationRequestController::class, 'uploadEndorsement'])->name('endorsement');
+
+        // Per-firearm letter actions (new template pipeline).
+        Route::post('/{motivation}/letters/generate', [MotivationLetterController::class, 'generate'])->name('letters.generate');
+        Route::get('/{motivation}/letters/status', [MotivationLetterController::class, 'status'])->name('letters.status');
+        Route::get('/{motivation}/letters/{letter}', [MotivationLetterController::class, 'open'])->name('letters.open');
+        Route::get('/{motivation}/letters/{letter}/download', [MotivationLetterController::class, 'download'])->name('letters.download');
+        Route::post('/{motivation}/letters/{letter}/regenerate', [MotivationLetterController::class, 'regenerate'])->name('letters.regenerate');
+        Route::post('/{motivation}/letters/{letter}/text', [MotivationLetterController::class, 'updateText'])->name('letters.text');
+        Route::post('/{motivation}/letters/{letter}/finalise', [MotivationLetterController::class, 'finalise'])->name('letters.finalise');
+        Route::delete('/{motivation}/letters/{letter}', [MotivationLetterController::class, 'destroy'])->name('letters.destroy');
+
+        Route::post('/{motivation}/ready', [MotivationRequestController::class, 'markReady'])->name('ready');
+        Route::post('/{motivation}/printed', [MotivationRequestController::class, 'markPrinted'])->name('printed');
+        Route::post('/{motivation}/invoice', [MotivationRequestController::class, 'uploadInvoice'])->name('invoice');
+        Route::post('/{motivation}/paid', [MotivationRequestController::class, 'markPaid'])->name('paid');
+        Route::post('/{motivation}/ready-for-collection', [MotivationRequestController::class, 'markReadyForCollection'])->name('ready-for-collection');
+        Route::post('/{motivation}/shipped', [MotivationRequestController::class, 'markShipped'])->name('shipped');
+        Route::post('/{motivation}/completed', [MotivationRequestController::class, 'markCompleted'])->name('completed');
     });
 
     // ── User Management (developer & owner only) ───────────────
@@ -1320,7 +1385,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'role' => "required|in:{$allowed}",
             'password' => 'nullable|string|min:8',
         ]);
@@ -1411,34 +1476,34 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     // (intake, custody events, R2 uploads, PDF labels, register print)
     // that keeping it as an inline closure block would drown web.php.
     Route::prefix('storage')->name('storage.')->group(function () {
-        Route::get('/', \App\Http\Controllers\Admin\Storage\DashboardController::class)->name('dashboard');
+        Route::get('/', DashboardController::class)->name('dashboard');
 
-        Route::get('/settings', [\App\Http\Controllers\Admin\Storage\SettingsController::class, 'edit'])->name('settings');
-        Route::post('/settings', [\App\Http\Controllers\Admin\Storage\SettingsController::class, 'save'])->name('settings.save');
-        Route::post('/settings/test-connection', [\App\Http\Controllers\Admin\Storage\SettingsController::class, 'testConnection'])->name('settings.test');
+        Route::get('/settings', [SettingsController::class, 'edit'])->name('settings');
+        Route::post('/settings', [SettingsController::class, 'save'])->name('settings.save');
+        Route::post('/settings/test-connection', [SettingsController::class, 'testConnection'])->name('settings.test');
 
-        Route::get('/estates', [\App\Http\Controllers\Admin\Storage\EstatesController::class, 'index'])->name('estates');
-        Route::get('/estates/create', [\App\Http\Controllers\Admin\Storage\EstatesController::class, 'create'])->name('estates.create');
-        Route::post('/estates', [\App\Http\Controllers\Admin\Storage\EstatesController::class, 'store'])->name('estates.store');
+        Route::get('/estates', [EstatesController::class, 'index'])->name('estates');
+        Route::get('/estates/create', [EstatesController::class, 'create'])->name('estates.create');
+        Route::post('/estates', [EstatesController::class, 'store'])->name('estates.store');
 
-        Route::get('/self', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'index'])->name('self');
-        Route::get('/self/create', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'create'])->name('self.create');
-        Route::post('/self', [\App\Http\Controllers\Admin\Storage\SelfStorageController::class, 'store'])->name('self.store');
+        Route::get('/self', [SelfStorageController::class, 'index'])->name('self');
+        Route::get('/self/create', [SelfStorageController::class, 'create'])->name('self.create');
+        Route::post('/self', [SelfStorageController::class, 'store'])->name('self.store');
 
-                Route::get('/agreements/{agreement}', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'show'])->name('agreements.show');
-                Route::get('/agreements/{agreement}/items/create', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'addItems'])->name('agreements.items.create');
-                Route::post('/agreements/{agreement}/items', [\App\Http\Controllers\Admin\Storage\AgreementsController::class, 'storeItems'])->name('agreements.items.store');
+        Route::get('/agreements/{agreement}', [AgreementsController::class, 'show'])->name('agreements.show');
+        Route::get('/agreements/{agreement}/items/create', [AgreementsController::class, 'addItems'])->name('agreements.items.create');
+        Route::post('/agreements/{agreement}/items', [AgreementsController::class, 'storeItems'])->name('agreements.items.store');
 
-        Route::get('/items/{item}', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'show'])->name('items.show');
-        Route::post('/items/{item}/events', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'storeEvent'])->name('items.events.store');
-        Route::get('/items/{item}/collect', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'collectForm'])->name('items.collect.form');
-        Route::post('/items/{item}/collect', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'collect'])->name('items.collect');
-        Route::get('/items/{item}/files/{file}/download', [\App\Http\Controllers\Admin\Storage\ItemsController::class, 'downloadFile'])->name('items.files.download');
-        Route::get('/items/{item}/label', [\App\Http\Controllers\Admin\Storage\LabelController::class, 'show'])->name('items.label');
+        Route::get('/items/{item}', [ItemsController::class, 'show'])->name('items.show');
+        Route::post('/items/{item}/events', [ItemsController::class, 'storeEvent'])->name('items.events.store');
+        Route::get('/items/{item}/collect', [ItemsController::class, 'collectForm'])->name('items.collect.form');
+        Route::post('/items/{item}/collect', [ItemsController::class, 'collect'])->name('items.collect');
+        Route::get('/items/{item}/files/{file}/download', [ItemsController::class, 'downloadFile'])->name('items.files.download');
+        Route::get('/items/{item}/label', [LabelController::class, 'show'])->name('items.label');
 
-        Route::get('/log', \App\Http\Controllers\Admin\Storage\LogController::class)->name('log');
-        Route::get('/register/{book}', [\App\Http\Controllers\Admin\Storage\RegisterController::class, 'show'])->name('register.show');
-        Route::get('/search', \App\Http\Controllers\Admin\Storage\SearchController::class)->name('search');
+        Route::get('/log', LogController::class)->name('log');
+        Route::get('/register/{book}', [RegisterController::class, 'show'])->name('register.show');
+        Route::get('/search', SearchController::class)->name('search');
     });
 });
 

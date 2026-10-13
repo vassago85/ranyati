@@ -40,29 +40,29 @@ abstract class StorageItemsRequest extends FormRequest
     protected function itemRules(): array
     {
         $rules = [
-            'items'   => ['required', 'array', 'min:1', 'max:100'],
+            'items' => ['required', 'array', 'min:1', 'max:100'],
             'items.*' => ['array'],
 
             'items.*.register_book_id' => ['required', 'integer', 'exists:register_books,id'],
-            'items.*.page'             => ['required', 'integer', 'min:1', 'max:101'],
-            'items.*.position'         => ['required', 'integer', 'min:1', 'max:26'],
+            'items.*.page' => ['required', 'integer', 'min:1', 'max:101'],
+            'items.*.position' => ['required', 'integer', 'min:1', 'max:26'],
 
-            'items.*.shelf'      => ['required', 'string', 'size:2', 'regex:/^[A-Za-z]{2}$/'],
+            'items.*.shelf' => ['required', 'string', 'size:2', 'regex:/^[A-Za-z]{2}$/'],
             'items.*.tag_colour' => ['required', 'string', 'size:1', 'regex:/^[A-Za-z]$/'],
             'items.*.tag_number' => ['required', 'integer', 'min:1', 'max:1000'],
 
-            'items.*.firearm_make'    => ['required', 'string', 'max:255'],
-            'items.*.cartridge'       => ['required', 'string', 'max:255'],
-            'items.*.serial_number'   => ['required', 'string', 'max:255'],
-            'items.*.firearm_type'    => ['required', Rule::in(FirearmTypes::typeKeys())],
-            'items.*.action_type'     => ['required', 'string', 'max:255'],
+            'items.*.firearm_make' => ['required', 'string', 'max:255'],
+            'items.*.cartridge' => ['required', 'string', 'max:255'],
+            'items.*.serial_number' => ['required', 'string', 'max:255'],
+            'items.*.firearm_type' => ['required', Rule::in(FirearmTypes::typeKeys())],
+            'items.*.action_type' => ['required', 'string', 'max:255'],
             'items.*.condition_notes' => ['nullable', 'string', 'max:2000'],
-            'items.*.date_in'         => ['required', 'date'],
+            'items.*.date_in' => ['required', 'date'],
 
             // Files (optional, per item)
-            'items.*.photos'   => ['nullable', 'array', 'max:10'],
+            'items.*.photos' => ['nullable', 'array', 'max:10'],
             'items.*.photos.*' => ['image', 'max:15360'],
-            'items.*.licence'  => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:15360'],
+            'items.*.licence' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:15360'],
         ];
 
         // If the reference lists were populated from NRAPA we tighten the
@@ -89,7 +89,7 @@ abstract class StorageItemsRequest extends FormRequest
             $agreementType = $this->agreementType();
 
             $slotSeen = [];
-            $tagSeen  = [];
+            $tagSeen = [];
 
             foreach ($items as $i => $item) {
                 if (! is_array($item)) {
@@ -97,8 +97,8 @@ abstract class StorageItemsRequest extends FormRequest
                 }
 
                 // firearm_type + action_type must be consistent
-                $type   = $item['firearm_type'] ?? null;
-                $action = $item['action_type']  ?? null;
+                $type = $item['firearm_type'] ?? null;
+                $action = $item['action_type'] ?? null;
                 if ($type && $action && ! FirearmTypes::isValid($type, $action)) {
                     $v->errors()->add(
                         "items.$i.action_type",

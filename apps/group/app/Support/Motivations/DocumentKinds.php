@@ -11,10 +11,15 @@ namespace App\Support\Motivations;
 class DocumentKinds
 {
     public const POWER_OF_ATTORNEY = 'power_of_attorney';
+
     public const ENDORSEMENT = 'endorsement';
+
     public const REFERENCE = 'reference';
+
     public const INVOICE = 'invoice';
+
     public const PROOF_OF_PAYMENT = 'proof_of_payment';
+
     public const OTHER = 'other';
 
     /**

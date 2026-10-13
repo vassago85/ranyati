@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Middleware\AdminPassword;
+use App\Http\Middleware\EnsureClient;
+use App\Http\Middleware\EnsureClientVerified;
+use App\Http\Middleware\EnsureMotivationsSubdomain;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,13 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
         $middleware->alias([
-            'admin' => \App\Http\Middleware\AdminPassword::class,
-            'client' => \App\Http\Middleware\EnsureClient::class,
-            'client.verified' => \App\Http\Middleware\EnsureClientVerified::class,
-            'motivations' => \App\Http\Middleware\EnsureMotivationsSubdomain::class,
+            'admin' => AdminPassword::class,
+            'client' => EnsureClient::class,
+            'client.verified' => EnsureClientVerified::class,
+            'motivations' => EnsureMotivationsSubdomain::class,
         ]);
         $middleware->web(append: [
-            \App\Http\Middleware\SecurityHeaders::class,
+            SecurityHeaders::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

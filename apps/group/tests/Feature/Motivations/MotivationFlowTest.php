@@ -7,7 +7,6 @@ use App\Models\ClientProfile;
 use App\Models\MotivationDocument;
 use App\Models\MotivationRequest;
 use App\Models\User;
-use App\Support\Motivations\DocumentKinds;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;

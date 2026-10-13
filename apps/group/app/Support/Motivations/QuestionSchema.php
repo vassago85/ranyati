@@ -5,6 +5,7 @@ namespace App\Support\Motivations;
 use App\Models\ApplicationType;
 use App\Support\FirearmTypes;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 /**
  * Field definitions for application-type questionnaires.
@@ -169,7 +170,7 @@ class QuestionSchema
                     break;
                 case 'select':
                 case 'radio':
-                    $rules[$key] = ['nullable', 'string', \Illuminate\Validation\Rule::in($options)];
+                    $rules[$key] = ['nullable', 'string', Rule::in($options)];
                     break;
                 case 'checkbox':
                     $rules[$key] = ['nullable'];

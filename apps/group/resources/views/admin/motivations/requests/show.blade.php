@@ -155,26 +155,103 @@
     </div>
 </div>
 
+@if ($usesTemplates ?? false)
+<div class="card" style="margin-bottom:16px;">
+    <div class="card-header"><h2>Firearm motivations</h2></div>
+    <div class="card-body">
+        @if (($letters ?? collect())->isEmpty())
+            <p style="color:rgba(255,255,255,.6);font-size:13px;">
+                No motivations generated yet. Confirm the details above to generate a firearm motivation per listed firearm from the attached template.
+            </p>
+        @else
+            <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
+                <thead>
+                    <tr style="color:rgba(255,255,255,.4);font-size:11px;text-transform:uppercase;letter-spacing:.08em;">
+                        <th style="text-align:left;padding:4px 8px;">Motivation</th>
+                        <th style="text-align:left;padding:4px 8px;">Status</th>
+                        <th style="text-align:left;padding:4px 8px;">Issues</th>
+                        <th style="text-align:right;padding:4px 8px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($letters as $letter)
+                        <tr style="border-top:1px solid rgba(255,255,255,.06);">
+                            <td style="padding:6px 8px;color:#fff;font-size:13px;">{{ $letter->label() }}</td>
+                            <td style="padding:6px 8px;">
+                                <span style="padding:2px 8px;border-radius:999px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;{{ $letter->isFinal() ? 'background:rgba(34,197,94,0.14);color:#86efac;' : 'background:rgba(245,130,32,0.14);color:#F58220;' }}">
+                                    {{ $letter->statusLabel() }}
+                                </span>
+                                @if ($letter->generation_status === \App\Models\MotivationLetter::GEN_FAILED)
+                                    <span style="color:#fca5a5;font-size:11px;">failed</span>
+                                @endif
+                            </td>
+                            <td style="padding:6px 8px;font-size:11px;color:rgba(255,255,255,.5);">
+                                @if (!empty($letter->missing))
+                                    Missing: {{ implode(', ', $letter->missing) }}<br>
+                                @endif
+                                @if (!empty($letter->warnings))
+                                    {{ implode('; ', $letter->warnings) }}
+                                @endif
+                                @if ($letter->error)
+                                    <span style="color:#fca5a5;">{{ $letter->error }}</span>
+                                @endif
+                            </td>
+                            <td style="padding:6px 8px;text-align:right;white-space:nowrap;">
+                                @if ($letter->pdf_path)
+                                    <a href="{{ route('admin.motivation-requests.letters.open', [$motivation, $letter]) }}" target="_blank" class="btn btn-sm btn-secondary">Open</a>
+                                    <a href="{{ route('admin.motivation-requests.letters.download', [$motivation, $letter]) }}" class="btn btn-sm btn-secondary">Download</a>
+                                @endif
+                                @if ($letter->isDraft())
+                                    <form method="POST" action="{{ route('admin.motivation-requests.letters.regenerate', [$motivation, $letter]) }}" style="display:inline;">
+                                        @csrf <button class="btn btn-sm btn-secondary">Regenerate</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.motivation-requests.letters.finalise', [$motivation, $letter]) }}" style="display:inline;">
+                                        @csrf <button class="btn btn-sm btn-primary">Finalise</button>
+                                    </form>
+                                    <form method="POST" action="{{ route('admin.motivation-requests.letters.destroy', [$motivation, $letter]) }}" style="display:inline;" onsubmit="return confirm('Delete this motivation draft?')">
+                                        @csrf @method('DELETE') <button class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div style="color:rgba(255,255,255,.5);font-size:12px;">
+                @php $drafts = $letters->where('status', 'draft')->count(); $finals = $letters->where('status', 'final')->count(); @endphp
+                {{ $letters->count() }} motivation(s): {{ $drafts }} draft, {{ $finals }} final. All must be finalised before marking ready to print.
+            </div>
+        @endif
+    </div>
+</div>
+@endif
+
 <div class="card" style="margin-bottom:16px;">
     <div class="card-header"><h2>Actions</h2></div>
     <div class="card-body" style="display:flex;flex-wrap:wrap;gap:8px;">
         @if ($isSubmitted)
             <form method="POST" action="{{ route('admin.motivation-requests.verify', $motivation) }}">
-                @csrf <button class="btn btn-primary">Confirm details &amp; generate book</button>
+                @csrf <button class="btn btn-primary">Confirm details &amp; generate {{ ($usesTemplates ?? false) ? 'motivations' : 'book' }}</button>
             </form>
         @endif
 
         @if ($motivation->status !== MotivationRequest::STATUS_PRINTED)
             <form method="POST" action="{{ route('admin.motivation-requests.regenerate', $motivation) }}">
-                @csrf <button class="btn btn-secondary">Regenerate book</button>
+                @csrf <button class="btn btn-secondary">Regenerate {{ ($usesTemplates ?? false) ? 'motivations' : 'book' }}</button>
             </form>
         @endif
 
-        @if ($motivation->pdf_path)
+        @if (! ($usesTemplates ?? false) && $motivation->pdf_path)
             <a href="{{ route('admin.motivation-requests.book', $motivation) }}" class="btn btn-primary">Download book PDF</a>
         @endif
 
-        @if ($isVerified && $motivation->pdf_path)
+        @php
+            $canMarkReady = ($usesTemplates ?? false)
+                ? ($isVerified && $letters->isNotEmpty() && $letters->every(fn ($l) => $l->isFinal()))
+                : ($isVerified && $motivation->pdf_path);
+        @endphp
+
+        @if ($canMarkReady)
             <form method="POST" action="{{ route('admin.motivation-requests.ready', $motivation) }}" onsubmit="return {{ $allChecked ? 'true' : "confirm('Some documents haven\\'t been checked yet — mark ready anyway?')" }}">
                 @csrf <button class="btn btn-primary">Mark ready to print</button>
             </form>

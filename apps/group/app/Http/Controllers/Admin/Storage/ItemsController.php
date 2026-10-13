@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Admin\Storage;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Storage\CollectRequest;
+use App\Mail\StorageCollectionConfirmation;
 use App\Models\CustodyEvent;
+use App\Models\StorageFile;
 use App\Models\StorageItem;
-use App\Support\CustodyDisk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -46,13 +47,13 @@ class ItemsController extends Controller
             $item->update(['status' => StorageItem::STATUS_RELEASED]);
 
             CustodyEvent::create([
-                'storage_item_id'       => $item->id,
-                'user_id'               => $request->user()->id,
-                'event_type'            => CustodyEvent::TYPE_RELEASE,
-                'notes'                 => $data['notes'] ?? null,
-                'released_to_name'      => $data['released_to_name'],
+                'storage_item_id' => $item->id,
+                'user_id' => $request->user()->id,
+                'event_type' => CustodyEvent::TYPE_RELEASE,
+                'notes' => $data['notes'] ?? null,
+                'released_to_name' => $data['released_to_name'],
                 'released_to_id_number' => $data['released_to_id_number'],
-                'occurred_at'           => now(),
+                'occurred_at' => now(),
             ]);
         });
 
@@ -60,7 +61,7 @@ class ItemsController extends Controller
         // v1. Wrapped so mail delivery hiccups never undo the release.
         if ($item->agreement?->isSelfStorage() && $item->agreement?->email) {
             try {
-                Mail::send(new \App\Mail\StorageCollectionConfirmation(
+                Mail::send(new StorageCollectionConfirmation(
                     item: $item->fresh(['agreement', 'book']),
                     collectedByName: $data['released_to_name'],
                     collectedByIdNumber: $data['released_to_id_number'],
@@ -69,7 +70,7 @@ class ItemsController extends Controller
             } catch (\Throwable $e) {
                 Log::warning('Storage collection confirmation email failed', [
                     'item_id' => $item->id,
-                    'error'   => $e->getMessage(),
+                    'error' => $e->getMessage(),
                 ]);
             }
         }
@@ -94,7 +95,7 @@ class ItemsController extends Controller
                 CustodyEvent::TYPE_CORRECTION,
                 CustodyEvent::TYPE_NOTE,
             ])],
-            'notes'   => ['required', 'string', 'max:2000'],
+            'notes' => ['required', 'string', 'max:2000'],
             'old_tag' => ['nullable', 'string', 'max:20'],
             'new_tag' => ['nullable', 'string', 'max:20'],
         ]);
@@ -102,12 +103,12 @@ class ItemsController extends Controller
         DB::transaction(function () use ($item, $validated, $request) {
             CustodyEvent::create([
                 'storage_item_id' => $item->id,
-                'user_id'         => $request->user()->id,
-                'event_type'      => $validated['event_type'],
-                'notes'           => $validated['notes'],
-                'old_tag'         => $validated['old_tag'] ?? null,
-                'new_tag'         => $validated['new_tag'] ?? null,
-                'occurred_at'     => now(),
+                'user_id' => $request->user()->id,
+                'event_type' => $validated['event_type'],
+                'notes' => $validated['notes'],
+                'old_tag' => $validated['old_tag'] ?? null,
+                'new_tag' => $validated['new_tag'] ?? null,
+                'occurred_at' => now(),
             ]);
 
             // If the event is a physical-tag transfer the item's tag
@@ -117,7 +118,7 @@ class ItemsController extends Controller
                 && ! empty($validated['new_tag'])
                 && preg_match('/^([A-Za-z]{2})-([A-Za-z])-(\d{1,4})$/', $validated['new_tag'], $m)) {
                 $item->update([
-                    'shelf'      => strtoupper($m[1]),
+                    'shelf' => strtoupper($m[1]),
                     'tag_colour' => strtoupper($m[2]),
                     'tag_number' => (int) $m[3],
                 ]);
@@ -132,7 +133,7 @@ class ItemsController extends Controller
      * private, so all downloads go through this admin-only route with a
      * short-lived signed URL.
      */
-    public function downloadFile(StorageItem $item, \App\Models\StorageFile $file)
+    public function downloadFile(StorageItem $item, StorageFile $file)
     {
         abort_unless($file->storage_item_id === $item->id, 404);
 

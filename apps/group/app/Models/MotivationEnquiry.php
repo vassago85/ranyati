@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class MotivationEnquiry extends Model
 {
     public const STATUS_NEW = 'new';
+
     public const STATUS_IN_PROGRESS = 'in_progress';
+
     public const STATUS_AWAITING_DOCS = 'awaiting_docs';
+
     public const STATUS_CLOSED = 'closed';
 
     /**

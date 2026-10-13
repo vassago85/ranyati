@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -94,7 +95,7 @@ class ClientProfile extends Model
         $year = $yy > $currentYy ? 1900 + $yy : 2000 + $yy;
 
         try {
-            return \Carbon\Carbon::create($year, $mm, $dd)->age;
+            return Carbon::create($year, $mm, $dd)->age;
         } catch (\Throwable) {
             return null;
         }

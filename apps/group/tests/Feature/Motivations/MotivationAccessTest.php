@@ -8,6 +8,7 @@ use App\Models\MotivationRequest;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -87,7 +88,7 @@ class MotivationAccessTest extends TestCase
     public function test_members_cannot_download_the_book(): void
     {
         // No account-side route exposes the book — only admins can get it.
-        $this->assertFalse(\Illuminate\Support\Facades\Route::has('account.motivations.book'));
+        $this->assertFalse(Route::has('account.motivations.book'));
     }
 
     public function test_submit_blocks_when_required_answers_or_documents_are_missing(): void

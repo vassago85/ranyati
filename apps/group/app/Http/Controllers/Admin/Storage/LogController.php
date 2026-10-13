@@ -34,8 +34,8 @@ class LogController extends Controller
 
         return view('admin.storage.log', [
             'events' => $events,
-            'books'  => RegisterBook::orderBy('code')->get(),
-            'types'  => CustodyEvent::types(),
+            'books' => RegisterBook::orderBy('code')->get(),
+            'types' => CustodyEvent::types(),
             'filters' => $request->only(['book', 'type', 'from', 'to']),
         ]);
     }

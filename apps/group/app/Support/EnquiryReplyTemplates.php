@@ -19,8 +19,11 @@ use App\Models\MotivationEnquiry;
 class EnquiryReplyTemplates
 {
     public const TEMPLATE_ACKNOWLEDGEMENT = 'acknowledgement';
+
     public const TEMPLATE_RENEWAL = 'renewal';
+
     public const TEMPLATE_REQUEST_DOCS = 'request_docs';
+
     public const TEMPLATE_QUOTE = 'quote';
 
     /**
@@ -92,25 +95,25 @@ class EnquiryReplyTemplates
     public static function contextBody(MotivationEnquiry $enquiry): string
     {
         $lines = [];
-        $lines[] = 'Hi ' . trim($enquiry->name ?: 'there') . ',';
+        $lines[] = 'Hi '.trim($enquiry->name ?: 'there').',';
         $lines[] = '';
         $lines[] = 'Thanks for your enquiry. Here is a quick summary of what you sent us so we\'re on the same page:';
         $lines[] = '';
 
         if (! empty($enquiry->endorsement_type)) {
-            $lines[] = '  • Endorsement type: ' . $enquiry->endorsement_type;
+            $lines[] = '  • Endorsement type: '.$enquiry->endorsement_type;
         }
 
         if (! empty($enquiry->purpose)) {
-            $lines[] = '  • Purpose: ' . $enquiry->purpose;
+            $lines[] = '  • Purpose: '.$enquiry->purpose;
         }
 
         if (! empty($enquiry->saps_station)) {
-            $lines[] = '  • SAPS station: ' . $enquiry->saps_station;
+            $lines[] = '  • SAPS station: '.$enquiry->saps_station;
         }
 
         if (! empty($enquiry->membership_number)) {
-            $lines[] = '  • NRAPA membership: ' . $enquiry->membership_number;
+            $lines[] = '  • NRAPA membership: '.$enquiry->membership_number;
         }
 
         $services = MotivationServices::resolve($enquiry->services ?? []);
@@ -118,12 +121,12 @@ class EnquiryReplyTemplates
             $lines[] = '';
             $lines[] = 'Services requested:';
             foreach ($services as $svc) {
-                $lines[] = '  • ' . $svc['label'] . ' — R' . number_format($svc['price'], 0, '.', ',');
+                $lines[] = '  • '.$svc['label'].' — R'.number_format($svc['price'], 0, '.', ',');
             }
 
             $total = MotivationServices::total($enquiry->services ?? []);
             $lines[] = '';
-            $lines[] = 'Estimated total: R' . number_format($total, 0, '.', ',');
+            $lines[] = 'Estimated total: R'.number_format($total, 0, '.', ',');
             $lines[] = '(Indicative — final pricing confirmed by our office.)';
         }
 
@@ -140,7 +143,7 @@ class EnquiryReplyTemplates
         $context = self::contextBody($enquiry);
         $extra = self::templateExtras($templateKey);
 
-        return $context . "\n\n" . $extra;
+        return $context."\n\n".$extra;
     }
 
     /**
@@ -152,7 +155,7 @@ class EnquiryReplyTemplates
 
         switch ($key) {
             case self::TEMPLATE_RENEWAL:
-                return <<<TEXT
+                return <<<'TEXT'
 For your renewal, please send us the following as soon as possible so we can start on your motivation:
 
   • A copy of the licence you're renewing (both sides).
@@ -168,7 +171,7 @@ Ranyati Firearm Motivations
 TEXT;
 
             case self::TEMPLATE_REQUEST_DOCS:
-                return <<<TEXT
+                return <<<'TEXT'
 Before we can finalise your motivation, we still need a few supporting documents from you:
 
   • A clear copy of your ID (both sides).
@@ -201,7 +204,7 @@ TEXT;
 
             case self::TEMPLATE_ACKNOWLEDGEMENT:
             default:
-                return <<<TEXT
+                return <<<'TEXT'
 We've received your enquiry and one of our team will be in touch shortly to confirm final pricing and walk you through what we'll need from you next. Standard motivations turn around in 7–10 working days; expedited (24 or 72 hour) options are available if you're in a rush.
 
 If anything above looks wrong, just reply to this email and we'll update it.
@@ -225,6 +228,6 @@ TEXT;
         $subject = rawurlencode($template['subject']);
         $body = rawurlencode(self::body($enquiry, $templateKey));
 
-        return 'mailto:' . $enquiry->email . '?subject=' . $subject . '&body=' . $body;
+        return 'mailto:'.$enquiry->email.'?subject='.$subject.'&body='.$body;
     }
 }

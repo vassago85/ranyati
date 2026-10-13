@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 class MotivationStorage
 {
     public const DISK_CUSTODY = 'custody';
+
     public const DISK_LOCAL = 'local';
 
     public static function defaultDisk(): string

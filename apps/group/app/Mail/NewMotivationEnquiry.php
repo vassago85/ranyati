@@ -20,10 +20,10 @@ class NewMotivationEnquiry extends Mailable
 
     public function envelope(): Envelope
     {
-        $subject = 'New Motivation Enquiry from ' . $this->enquiry->name;
+        $subject = 'New Motivation Enquiry from '.$this->enquiry->name;
 
         if ($this->enquiry->membership_number) {
-            $subject .= ' (NRAPA ' . $this->enquiry->membership_number . ')';
+            $subject .= ' (NRAPA '.$this->enquiry->membership_number.')';
         }
 
         $recipients = Setting::parseEmailList(Setting::get('notification_email'));

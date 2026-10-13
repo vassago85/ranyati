@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Support\Motivations\QuestionSchema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -52,6 +53,20 @@ class ApplicationType extends Model
     public function requests(): HasMany
     {
         return $this->hasMany(MotivationRequest::class);
+    }
+
+    public function templates(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            MotivationTemplate::class,
+            'application_type_template',
+            'application_type_id',
+            'template_id',
+        )
+            ->withPivot(['is_default', 'sort', 'condition'])
+            ->withTimestamps()
+            ->orderBy('application_type_template.sort')
+            ->orderBy('application_type_template.id');
     }
 
     public function categoryLabel(): string

@@ -14,13 +14,13 @@ class SettingsController extends Controller
         $config = CustodyDisk::config();
 
         return view('admin.storage.settings', [
-            'accountId'   => $config['account_id'] ?? '',
-            'accessKey'   => $config['key'] ?? '',
-            'bucket'      => $config['bucket'] ?? '',
-            'endpoint'    => $config['endpoint'] ?? '',
-            'secretMask'  => $this->maskSecret($config['secret'] ?? ''),
+            'accountId' => $config['account_id'] ?? '',
+            'accessKey' => $config['key'] ?? '',
+            'bucket' => $config['bucket'] ?? '',
+            'endpoint' => $config['endpoint'] ?? '',
+            'secretMask' => $this->maskSecret($config['secret'] ?? ''),
             'defaultRate' => (float) Setting::get('storage.default_rate', 100),
-            'configured'  => CustodyDisk::isConfigured(),
+            'configured' => CustodyDisk::isConfigured(),
         ]);
     }
 
@@ -30,16 +30,16 @@ class SettingsController extends Controller
             'r2_account_id' => ['nullable', 'string', 'max:100'],
             'r2_access_key' => ['nullable', 'string', 'max:255'],
             'r2_secret_key' => ['nullable', 'string', 'max:1024'],
-            'r2_bucket'     => ['nullable', 'string', 'max:255'],
-            'r2_endpoint'   => ['nullable', 'string', 'max:255', 'url'],
-            'default_rate'  => ['required', 'numeric', 'min:0', 'max:99999.99'],
+            'r2_bucket' => ['nullable', 'string', 'max:255'],
+            'r2_endpoint' => ['nullable', 'string', 'max:255', 'url'],
+            'default_rate' => ['required', 'numeric', 'min:0', 'max:99999.99'],
         ]);
 
         CustodyDisk::persistNonSecret([
             'account_id' => $validated['r2_account_id'] ?? '',
             'access_key' => $validated['r2_access_key'] ?? '',
-            'bucket'     => $validated['r2_bucket'] ?? '',
-            'endpoint'   => $validated['r2_endpoint'] ?? '',
+            'bucket' => $validated['r2_bucket'] ?? '',
+            'endpoint' => $validated['r2_endpoint'] ?? '',
         ]);
 
         CustodyDisk::persistSecret($validated['r2_secret_key'] ?? null);

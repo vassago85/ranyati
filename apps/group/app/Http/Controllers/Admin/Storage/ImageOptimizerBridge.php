@@ -18,7 +18,8 @@ use Intervention\Image\ImageManager;
 class ImageOptimizerBridge
 {
     public const MAX_EDGE = 1600;
-    public const QUALITY  = 82;
+
+    public const QUALITY = 82;
 
     public static function optimize(UploadedFile $file): string
     {

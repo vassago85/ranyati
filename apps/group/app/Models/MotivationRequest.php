@@ -18,16 +18,27 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class MotivationRequest extends Model
 {
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_SUBMITTED = 'submitted';
+
     public const STATUS_CHANGES_REQUESTED = 'changes_requested';
+
     public const STATUS_VERIFIED = 'verified';
+
     public const STATUS_AWAITING_ENDORSEMENT = 'awaiting_endorsement';
+
     public const STATUS_READY_TO_PRINT = 'ready_to_print';
+
     public const STATUS_PRINTED = 'printed';
+
     public const STATUS_INVOICED = 'invoiced';
+
     public const STATUS_PAID = 'paid';
+
     public const STATUS_READY_FOR_COLLECTION = 'ready_for_collection';
+
     public const STATUS_SHIPPED = 'shipped';
+
     public const STATUS_COMPLETED = 'completed';
 
     public const STATUSES = [
@@ -62,6 +73,7 @@ class MotivationRequest extends Model
     ];
 
     public const DELIVERY_COLLECT = 'collect';
+
     public const DELIVERY_COURIER = 'courier';
 
     public const DELIVERY_METHODS = [
@@ -87,6 +99,7 @@ class MotivationRequest extends Model
     protected $fillable = [
         'user_id',
         'application_type_id',
+        'template_version_id',
         'status',
         'answers',
         'profile_snapshot',
@@ -147,6 +160,16 @@ class MotivationRequest extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(MotivationDocument::class)->orderBy('kind')->orderBy('id');
+    }
+
+    public function letters(): HasMany
+    {
+        return $this->hasMany(MotivationLetter::class)->orderByRaw('firearm_index IS NULL')->orderBy('firearm_index')->orderBy('id');
+    }
+
+    public function templateVersion(): BelongsTo
+    {
+        return $this->belongsTo(MotivationTemplateVersion::class);
     }
 
     public function verifier(): BelongsTo

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Storage;
 
 use App\Models\User;
+use Database\Seeders\StorageModuleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -105,7 +106,7 @@ class ExistingPagesSmokeTest extends TestCase
 
     public function test_admin_storage_dashboard_loads_without_r2_configured(): void
     {
-        $this->seed(\Database\Seeders\StorageModuleSeeder::class);
+        $this->seed(StorageModuleSeeder::class);
 
         $this->actingAs($this->admin())
             ->get('/admin/storage')

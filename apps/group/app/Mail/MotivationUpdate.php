@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\MotivationRequest;
 use App\Support\Motivations\DocumentKinds;
-use App\Support\Motivations\MotivationStorage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -23,13 +22,21 @@ class MotivationUpdate extends Mailable
     use Queueable, SerializesModels;
 
     public const STAGE_SUBMITTED = 'submitted';
+
     public const STAGE_CHANGES_REQUESTED = 'changes_requested';
+
     public const STAGE_INVOICED = 'invoiced';
+
     public const STAGE_PAID = 'paid';
+
     public const STAGE_READY_FOR_COLLECTION = 'ready_for_collection';
+
     public const STAGE_SHIPPED = 'shipped';
+
     public const STAGE_COMPLETED = 'completed';
+
     public const STAGE_NEW_SUBMISSION_INTERNAL = 'new_submission_internal';
+
     public const STAGE_PROOF_OF_PAYMENT_INTERNAL = 'proof_of_payment_internal';
 
     public function __construct(

@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ApplicationType;
-use App\Models\ApplicationTypeBlock;
+use App\Models\MotivationTemplate;
 use App\Models\TemplateAsset;
+use App\Support\ActivityLog;
 use App\Support\Motivations\BookSchema;
 use App\Support\Motivations\ConditionEvaluator;
 use App\Support\Motivations\DocumentKinds;
@@ -15,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ApplicationTypeController extends Controller
 {
@@ -38,6 +40,8 @@ class ApplicationTypeController extends Controller
             'documentKinds' => DocumentKinds::all(),
             'placeholderCatalogue' => Placeholders::catalogue([]),
             'conditionFields' => Placeholders::conditionFields([]),
+            'templateLibrary' => $this->templateLibrary(null),
+            'attachedTemplates' => [],
         ]);
     }
 
@@ -46,13 +50,14 @@ class ApplicationTypeController extends Controller
         $data = $this->validatePayload($request);
         $type = ApplicationType::create($this->typeAttributes($data));
         $this->syncBlocks($type, $data['blocks_json'] ?? '');
+        $this->syncTemplates($type, $data['templates_json'] ?? '', $request);
 
         return redirect()->route('admin.application-types.edit', $type)->with('success', 'Application type created.');
     }
 
     public function edit(ApplicationType $applicationType)
     {
-        $applicationType->load('blocks');
+        $applicationType->load(['blocks', 'templates.publishedVersion']);
 
         return view('admin.motivations.types.form', [
             'type' => $applicationType,
@@ -60,6 +65,16 @@ class ApplicationTypeController extends Controller
             'documentKinds' => DocumentKinds::all(),
             'placeholderCatalogue' => Placeholders::catalogue($applicationType->sections()),
             'conditionFields' => Placeholders::conditionFields($applicationType->sections()),
+            'templateLibrary' => $this->templateLibrary($applicationType->category),
+            'attachedTemplates' => $applicationType->templates->map(fn ($t) => [
+                'template_id' => $t->id,
+                'name' => $t->name,
+                'status' => $t->status,
+                'has_published' => (bool) $t->published_version_id,
+                'is_default' => (bool) $t->pivot->is_default,
+                'sort' => (int) $t->pivot->sort,
+                'condition' => is_string($t->pivot->condition) ? json_decode($t->pivot->condition, true) : $t->pivot->condition,
+            ])->values()->all(),
         ]);
     }
 
@@ -68,6 +83,7 @@ class ApplicationTypeController extends Controller
         $data = $this->validatePayload($request, $applicationType);
         $applicationType->update($this->typeAttributes($data));
         $this->syncBlocks($applicationType, $data['blocks_json'] ?? '');
+        $this->syncTemplates($applicationType, $data['templates_json'] ?? '', $request);
 
         return redirect()->route('admin.application-types.edit', $applicationType)->with('success', 'Changes saved.');
     }
@@ -133,8 +149,8 @@ class ApplicationTypeController extends Controller
     {
         return $request->validate([
             'name' => 'required|string|max:200',
-            'slug' => ['required', 'string', 'max:120', 'alpha_dash', \Illuminate\Validation\Rule::unique('application_types', 'slug')->ignore($existing?->id)],
-            'category' => ['required', \Illuminate\Validation\Rule::in(array_keys(ApplicationType::CATEGORIES))],
+            'slug' => ['required', 'string', 'max:120', 'alpha_dash', Rule::unique('application_types', 'slug')->ignore($existing?->id)],
+            'category' => ['required', Rule::in(array_keys(ApplicationType::CATEGORIES))],
             'description' => 'nullable|string|max:1000',
             'has_motivation' => 'nullable|boolean',
             'is_active' => 'nullable|boolean',
@@ -142,7 +158,75 @@ class ApplicationTypeController extends Controller
             'questions_json' => 'nullable|string',
             'requirements_json' => 'nullable|string',
             'blocks_json' => 'nullable|string',
+            'templates_json' => 'nullable|string',
         ]);
+    }
+
+    /**
+     * Build the "library" dataset the Templates tab uses to let the admin
+     * pick templates to attach. We prefer templates in the same category
+     * but include everything else below them for flexibility.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function templateLibrary(?string $preferCategory): array
+    {
+        return MotivationTemplate::query()
+            ->whereIn('status', [MotivationTemplate::STATUS_DRAFT, MotivationTemplate::STATUS_PUBLISHED])
+            ->orderByRaw('CASE WHEN category = ? THEN 0 ELSE 1 END', [$preferCategory ?? ''])
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($t) => [
+                'id' => $t->id,
+                'name' => $t->name,
+                'category' => $t->category,
+                'category_label' => $t->categoryLabel(),
+                'status' => $t->status,
+                'has_published' => (bool) $t->published_version_id,
+            ])->values()->all();
+    }
+
+    private function syncTemplates(ApplicationType $type, string $json, Request $request): void
+    {
+        $rows = $this->decode($json);
+        $sync = [];
+        $sort = 0;
+        $sawDefault = false;
+
+        foreach ($rows as $row) {
+            $templateId = (int) ($row['template_id'] ?? 0);
+            if ($templateId <= 0 || ! MotivationTemplate::whereKey($templateId)->exists()) {
+                continue;
+            }
+            $isDefault = (bool) ($row['is_default'] ?? false) && ! $sawDefault;
+            if ($isDefault) {
+                $sawDefault = true;
+            }
+            $condition = ConditionEvaluator::normalize($row['condition'] ?? null);
+            $sync[$templateId] = [
+                'is_default' => $isDefault,
+                'sort' => $sort++,
+                // Store as JSON string so the pivot read-back is predictable.
+                'condition' => $condition ? json_encode($condition) : null,
+            ];
+        }
+
+        $before = $type->templates()->pluck('motivation_templates.id')->all();
+        $type->templates()->sync($sync);
+        $after = array_keys($sync);
+
+        if ($before !== $after || $type->wasRecentlyCreated) {
+            ActivityLog::record(
+                ActivityLog::ACTION_TEMPLATE_ASSIGNED,
+                $type,
+                [
+                    'before' => $before,
+                    'after' => $after,
+                    'default' => $sawDefault ? array_key_first(array_filter($sync, fn ($r) => $r['is_default'])) : null,
+                ],
+                $request->user()?->id,
+            );
+        }
     }
 
     private function typeAttributes(array $data): array

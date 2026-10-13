@@ -45,11 +45,11 @@ class LabelController extends Controller
     private function buildQrDataUri(string $payload): string
     {
         $options = new QROptions([
-            'version'         => 5,
+            'version' => 5,
             'outputInterface' => QRGdImagePNG::class,
-            'eccLevel'        => EccLevel::M,
-            'scale'           => 5,
-            'outputBase64'    => true,
+            'eccLevel' => EccLevel::M,
+            'scale' => 5,
+            'outputBase64' => true,
         ]);
 
         return (new QRCode($options))->render($payload);
