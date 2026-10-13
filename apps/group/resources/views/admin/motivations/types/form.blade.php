@@ -254,7 +254,7 @@
                         <div style="margin-top:8px;">
                             <input type="text" class="form-input" placeholder="Title" x-model="block.settings.title" style="margin-bottom:4px;">
                             <input type="text" class="form-input" placeholder="Subtitle" x-model="block.settings.subtitle" style="margin-bottom:4px;">
-                            <textarea class="form-input" rows="3" placeholder="Body text (supports {{placeholders}})" x-model="block.settings.body" style="margin-bottom:4px;"></textarea>
+                            <textarea class="form-input" rows="3" placeholder="Body text (supports @{{placeholders}})" x-model="block.settings.body" style="margin-bottom:4px;"></textarea>
                             <select class="form-input" x-model.number="block.settings.asset_id">
                                 <option :value="0">No image</option>
                                 <template x-for="asset in assets" :key="asset.id">
@@ -503,7 +503,7 @@ function typeBuilder(init) {
         },
         insertPlaceholder(bIdx, path) {
             const el = document.getElementById('blockText-' + bIdx);
-            const token = '{{ "{{" }}' + path + '{{ "}}" }}';
+            const token = '{' + '{' + path + '}' + '}';
             if (!el) return;
             const start = el.selectionStart ?? el.value.length;
             const end = el.selectionEnd ?? el.value.length;

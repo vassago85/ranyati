@@ -64,6 +64,26 @@ class ApplicationTypeBuilderTest extends TestCase
         $this->assertSame('ID', $type->requirements()[0]['label']);
     }
 
+    public function test_builder_create_and_edit_pages_render(): void
+    {
+        $admin = $this->admin();
+        $type = ApplicationType::create([
+            'name' => 'Source',
+            'slug' => 'source',
+            'category' => 'sport',
+            'is_active' => true,
+            'has_motivation' => true,
+            'questions' => [],
+            'document_requirements' => [],
+        ]);
+
+        $this->actingAs($admin)->get('/admin/application-types/create')->assertOk();
+        $this->actingAs($admin)->get('/admin/application-types/'.$type->id.'/edit')
+            ->assertOk()
+            ->assertSee("const token = '{' + '{' + path + '}' + '}';", false)
+            ->assertSee('Body text (supports {{placeholders}})', false);
+    }
+
     public function test_clone_copies_blocks(): void
     {
         $admin = $this->admin();
