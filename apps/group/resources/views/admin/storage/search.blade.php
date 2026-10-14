@@ -5,7 +5,7 @@
     @include('admin.storage._helpers')
 
     <form method="GET" action="{{ route('admin.storage.search') }}" style="margin-bottom: 20px; display:flex; gap:8px;">
-        <input type="text" name="q" value="{{ $q }}" class="form-input" placeholder="Serial number, name, estate, tag AB-R-0042, register D01-P045-13" style="max-width: 640px;" autofocus>
+        <input type="text" name="q" value="{{ $q }}" class="form-input" placeholder="Serial number, name, estate, tag AB-R-0042, register D01-P045-13" aria-label="Search custody records" style="max-width: 640px;" autofocus>
         <button class="btn btn-primary btn-sm">Search</button>
     </form>
 

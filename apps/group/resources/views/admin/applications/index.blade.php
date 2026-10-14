@@ -38,8 +38,8 @@
             <h2>Batches</h2>
             <span style="font-size: 11px; color: rgba(255,255,255,0.3);">Grouped by first 4 digits of reference number</span>
         </div>
-        @if ($batches->isEmpty())
-            <div class="card-body" style="color: rgba(255,255,255,0.4); font-size: 13px;">
+        @if ($batches->isEmpty() && ($unbatchedCount ?? 0) === 0)
+            <div class="empty-state">
                 No applications tracked yet.
             </div>
         @else
@@ -71,6 +71,25 @@
                             </td>
                         </tr>
                     @endforeach
+                    {{-- Bug 3 (audit): the stat card at the top counted every
+                         tracked application, but the batch overview SQL only
+                         emits batches whose digit-stripped reference is at
+                         least 4 characters long. Anything shorter was
+                         silently dropped, producing the "1 application /
+                         No batches tracked yet" contradiction. Surface the
+                         orphan count as its own row so the totals reconcile. --}}
+                    @if (($unbatchedCount ?? 0) > 0)
+                        <tr>
+                            <td style="font-weight: 700; color: rgba(255,255,255,0.75);" title="Reference number was shorter than {{ \App\Models\FirearmApplication::BATCH_KEY_LENGTH }} digits — too short to group into a SAPS batch.">Unbatched</td>
+                            <td style="font-family: monospace; font-size: 12px; color: rgba(255,255,255,0.4);">ref &lt; {{ \App\Models\FirearmApplication::BATCH_KEY_LENGTH }} digits</td>
+                            <td>{{ $unbatchedCount }}</td>
+                            <td>{{ $unbatchedMonitoredCount ?? 0 }}</td>
+                            <td>—</td>
+                            <td style="text-align: right;">
+                                <span class="btn btn-secondary btn-sm" style="opacity:0.4; cursor:not-allowed;" title="Set a {{ \App\Models\FirearmApplication::BATCH_KEY_LENGTH }}+ digit reference number on these applications to enable batch grouping.">—</span>
+                            </td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
         @endif

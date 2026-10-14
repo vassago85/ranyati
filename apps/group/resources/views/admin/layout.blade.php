@@ -290,6 +290,50 @@
         tr.row-link { cursor: pointer; }
         tr.row-link:hover td { background: rgba(245,130,32,0.05); }
 
+        /* Horizontal scroll wrapper for wide tables inside .card.
+           `.card { overflow: hidden }` was clipping action buttons on the
+           right-hand side of wide tables (e.g. enquiries at desktop widths).
+           Wrap any table that outgrows its container in `<div class="table-wrap">`
+           to let it scroll horizontally within the card's rounded corners. */
+        .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-wrap table { width: 100%; min-width: max-content; }
+
+        /* Horizontal scroll strip — for chip/tab rows that would otherwise
+           force the whole page to scroll on narrow viewports (e.g. the
+           motivations list's status filter bar). */
+        .scroll-strip {
+            display: flex; gap: 8px; align-items: center;
+            overflow-x: auto; -webkit-overflow-scrolling: touch;
+            margin: -4px -4px 0; padding: 4px;
+            scrollbar-width: thin;
+        }
+        .scroll-strip > * { flex-shrink: 0; }
+
+        /* Two-column grid that collapses on narrow viewports. Replaces the
+           repeated inline `style="display:grid;grid-template-columns:1fr 1fr;gap:16px"`
+           pattern across admin detail pages. */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* Clamp a cell's text to two lines so long names don't make a row
+           tower vertically. Also keeps word-break sensible for the long
+           Afrikaans/Zulu surnames the admin sees a lot of. */
+        .name-clamp {
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+            overflow: hidden; word-break: break-word;
+            max-width: 320px;
+        }
+
+        /* Empty-state copy inside a card body — used everywhere we need a
+           sentence of guidance instead of a bare "No results". */
+        .empty-state {
+            padding: 32px 20px; text-align: center;
+            color: rgba(255,255,255,0.4); font-size: 13px; line-height: 1.5;
+        }
+        .empty-state strong { color: rgba(255,255,255,0.65); font-weight: 600; }
+
         /* Filter tabs */
         .filter-tabs { display: inline-flex; gap: 4px; padding: 4px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
         .filter-tab {

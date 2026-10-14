@@ -1,17 +1,22 @@
 @extends('admin.layout')
 
-@section('title', 'Members — Motivations')
+@section('title', 'Motivation members')
+
+{{-- Bug 7 (audit): the admin layout already renders an <h1> in the sticky
+     topbar from @section('title'). This page was drawing a second one in
+     its content area, so the page had two h1s — one of them hidden on
+     narrow viewports behind the sidebar. Move the primary action into the
+     topbar's @section('actions') slot (same pattern as Enquiries) and
+     drop the duplicate <h1>. --}}
+@section('actions')
+    <a href="{{ route('admin.motivation-members.create') }}" class="btn btn-primary btn-sm">+ New walk-in member</a>
+@endsection
 
 @section('content')
-<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-    <h1 style="color:#fff;font-size:22px;margin:0;">Motivation members</h1>
-    <a href="{{ route('admin.motivation-members.create') }}" class="btn btn-primary">+ New walk-in member</a>
-</div>
-
 <div class="card" style="margin-bottom:16px;">
     <div class="card-body">
         <form method="GET" style="display:flex;gap:8px;">
-            <input type="search" name="q" value="{{ $search }}" placeholder="Search by name, email, ID number, cell…" class="form-input" style="flex:1;">
+            <input type="search" name="q" value="{{ $search }}" placeholder="Search by name, email, ID number, cell…" aria-label="Search motivation members" class="form-input" style="flex:1;">
             <button class="btn btn-secondary">Search</button>
             @if ($search)<a href="{{ route('admin.motivation-members.index') }}" class="btn btn-sm" style="color:rgba(255,255,255,.5);">Clear</a>@endif
         </form>

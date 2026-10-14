@@ -25,6 +25,23 @@ class AdminFirearmApplicationsController extends Controller
                 ->count(),
         ];
 
+        // Bug 3 (audit): the stat card and the Batches table disagreed because
+        // batchesOverview() only emits batches whose digit-stripped reference
+        // number is at least BATCH_KEY_LENGTH (4) characters long — anything
+        // shorter is dropped by the SQL `LENGTH(digits) >= 4` filter in
+        // BatchAnalytics. Counting (applications - sum(batch counts)) gives us
+        // the honest number of tracked applications that *couldn't* be
+        // batched, so the view can surface the discrepancy instead of
+        // silently losing them.
+        $unbatchedCount = max(
+            0,
+            $totals['applications'] - (int) $batches->sum('applications_count'),
+        );
+        $unbatchedMonitoredCount = max(
+            0,
+            $totals['monitored'] - (int) $batches->sum('monitored_count'),
+        );
+
         $circuitStatus = $circuit->status();
         $recentFailureCount = FirearmApplicationCheck::query()
             ->where('success', false)
@@ -50,6 +67,8 @@ class AdminFirearmApplicationsController extends Controller
         return view('admin.applications.index', compact(
             'batches',
             'totals',
+            'unbatchedCount',
+            'unbatchedMonitoredCount',
             'clients',
             'recentChanges',
             'overallAverages',

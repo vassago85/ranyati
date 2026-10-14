@@ -18,7 +18,7 @@
 
     <form method="GET" action="{{ route('admin.storage.search') }}" style="margin-bottom: 20px; display:flex; gap:8px; align-items:center; position:relative;">
         <svg style="position:absolute; left:14px; top:50%; transform:translateY(-50%); width:16px; height:16px; color:rgba(255,255,255,0.3); pointer-events:none;" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-        <input type="text" name="q" placeholder="Search serial, name, estate, tag AB-R-0042, or register D01-P045-13" class="form-input" style="max-width: 640px; padding-left: 40px;">
+        <input type="text" name="q" placeholder="Search serial, name, estate, tag AB-R-0042, or register D01-P045-13" aria-label="Search custody records" class="form-input" style="max-width: 640px; padding-left: 40px;">
         <button class="btn btn-primary btn-sm">Search</button>
     </form>
 

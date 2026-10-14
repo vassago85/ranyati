@@ -1,0 +1,294 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Ranyati motivations mockups</title>
+<link rel="stylesheet" href="base.css">
+<style>
+.kpi{padding:16px 18px}.kpi .n{font-size:28px;font-weight:750;margin-top:8px}.kpi .s{font-size:11.5px;color:var(--mut);margin-top:4px}
+.pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.ph{padding:16px 18px;border-right:1px solid var(--line)}.ph:last-child{border-right:0}
+.ph .t{display:flex;justify-content:space-between;align-items:baseline}.ph .t b{font-size:22px}
+.ph .row{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);padding:4px 0}.ph .row span:last-child{color:var(--tx);font-weight:600}
+.bar{height:4px;border-radius:2px;background:rgba(255,255,255,.06);margin:10px 0 8px;overflow:hidden}.bar i{display:block;height:100%}
+.tabs{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:10px;background:rgba(255,255,255,.02)}
+.tab{padding:7px 12px;border-radius:7px;color:var(--mut);font-size:12.5px;display:flex;gap:7px;align-items:center;font-weight:500}
+.tab.on{background:var(--orbg);color:var(--or);font-weight:600}.tab em{font-style:normal;font-size:10.5px;background:rgba(255,255,255,.07);padding:1px 7px;border-radius:99px}.tab.on em{background:rgba(245,130,32,.2)}
+.step{display:flex;align-items:flex-start;gap:0;padding:18px 20px 14px}
+.st{flex:1;position:relative;text-align:center;font-size:10.5px;color:var(--mut2)}
+.st:before{content:"";position:absolute;top:9px;left:-50%;width:100%;height:2px;background:rgba(255,255,255,.08)}.st:first-child:before{display:none}
+.st.done:before,.st.cur:before{background:var(--or)}
+.st .c{width:20px;height:20px;border-radius:50%;margin:0 auto 7px;position:relative;z-index:1;background:#141d33;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.st.done .c{background:var(--or);border-color:var(--or);color:#111}.st.cur .c{border-color:var(--or);box-shadow:0 0 0 4px rgba(245,130,32,.2);color:var(--or)}
+.st.done,.st.cur{color:var(--tx)}.st.cur{font-weight:700}
+.phlab{display:flex;padding:0 20px 14px;gap:0}.phlab div{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--mut2);font-weight:700;border-top:1px solid var(--line2);padding-top:6px;margin:0 4px}
+.next{display:flex;align-items:center;gap:16px;padding:16px 20px;border-top:1px solid var(--line);background:rgba(245,130,32,.05)}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:7px 10px;font-size:12.5px}.kv dt{color:var(--mut)}
+.qa{display:grid;grid-template-columns:1fr 1.2fr;gap:8px 18px;font-size:12.5px;padding:4px 0 12px}.qa .q{color:var(--mut)}
+.qsec{font-size:9.5px;letter-spacing:1px;color:var(--mut2);text-transform:uppercase;font-weight:700;margin:10px 0 8px;display:flex;gap:8px;align-items:center}
+.tl{position:relative;padding-left:18px}.tl:before{content:"";position:absolute;left:4px;top:4px;bottom:4px;width:1px;background:var(--line2)}
+.tli{position:relative;padding:0 0 14px;font-size:12px}.tli:before{content:"";position:absolute;left:-18px;top:3px;width:9px;height:9px;border-radius:50%;background:#1b2540;border:2px solid var(--or)}
+.tli .w{color:var(--mut);font-size:11px;margin-top:2px}
+.toggle{width:30px;height:17px;border-radius:99px;background:rgba(255,255,255,.12);position:relative;display:inline-block}.toggle.on{background:var(--or)}.toggle:after{content:"";position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;top:2px;left:2px}.toggle.on:after{left:15px}
+.ptabs{display:flex;gap:22px;border-bottom:1px solid var(--line);padding:0 2px}.ptabs div{padding:10px 0;color:var(--mut);font-weight:500;font-size:13px;display:flex;gap:6px;align-items:center}.ptabs div.on{color:var(--tx);border-bottom:2px solid var(--or);font-weight:650}
+.qitem{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:rgba(255,255,255,.015);margin-bottom:8px}
+.grip{width:8px;height:14px;background:radial-gradient(circle,rgba(255,255,255,.3) 1px,transparent 1.5px) 0 0/4px 4px;opacity:.8}
+.tpl{border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;gap:12px;align-items:flex-start}
+.tpl.act{border-color:rgba(245,130,32,.5);background:rgba(245,130,32,.04)}
+.radio{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);flex-shrink:0;margin-top:2px}.radio.on{border-color:var(--or);box-shadow:inset 0 0 0 3px #0f1729;background:var(--or)}
+.avatar{width:46px;height:46px;border-radius:12px;background:var(--orbg);color:var(--or);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
+.mtop{height:56px;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 16px;gap:12px}
+.burger{width:34px;height:34px;border:1px solid var(--line2);border-radius:8px;display:flex;align-items:center;justify-content:center}.burger i{width:14px;height:10px;border-top:2px solid #cbd5e1;border-bottom:2px solid #cbd5e1;position:relative}.burger i:after{content:"";position:absolute;left:0;right:0;top:2px;border-top:2px solid #cbd5e1}
+.mcard{border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:linear-gradient(180deg,var(--card2),var(--card));margin-bottom:10px}
+.sticky{position:absolute;left:0;right:0;bottom:0;padding:12px 16px 20px;background:linear-gradient(180deg,rgba(10,15,26,0),#0a0f1a 30%);}
+.chip{padding:6px 11px;border-radius:99px;border:1px solid var(--line2);font-size:12px;color:var(--mut);white-space:nowrap;display:flex;gap:6px}.chip.on{background:var(--orbg);border-color:transparent;color:var(--or);font-weight:600}
+.note{font-size:12px;padding:10px 12px;border-radius:9px;background:rgba(255,255,255,.03);border:1px solid var(--line)}
+</style></head><body>
+
+<!-- ===== 1 DASHBOARD ===== -->
+<section class="frame" id="s1">
+<div class="sidebar" data-on="dash"></div>
+<div class="main">
+ <div class="topbar"><h1>Overview</h1><span class="mut" style="font-size:12px">Wednesday, 14 October 2026</span>
+  <div class="act"><div class="input" style="width:300px">⌕ Search clients, refs, ID numbers… <span style="margin-left:auto;font-size:10px;border:1px solid var(--line2);padding:1px 5px;border-radius:4px">/</span></div><span class="btn p">+ New motivation</span></div></div>
+ <div class="content">
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+   <div class="card kpi"><div class="label">Needs your action</div><div class="n" style="color:var(--or)">5</div><div class="s">2 waiting more than 3 days</div></div>
+   <div class="card kpi"><div class="label">Motivations in progress</div><div class="n">14</div><div class="s">across 6 application types</div></div>
+   <div class="card kpi"><div class="label">Awaiting payment</div><div class="n" style="color:var(--yl)">3</div><div class="s">oldest 6 days</div></div>
+   <div class="card kpi"><div class="label">Unread enquiries</div><div class="n" style="color:var(--bl)">6</div><div class="s">5 this month</div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+   <div class="ch"><h3>Motivation pipeline</h3><span class="mut" style="font-size:11.5px">Click any stage to open the filtered list</span><div class="r"><span class="b mu">Last 90 days</span></div></div>
+   <div class="pipe">
+    <div class="ph"><div class="t"><span class="label">Intake</span><b>5</b></div><div class="bar"><i style="width:36%;background:var(--bl)"></i></div>
+     <div class="row"><span>Draft</span><span>2</span></div><div class="row"><span>Submitted</span><span style="color:var(--or)">2 ●</span></div><div class="row"><span>Changes requested</span><span>1</span></div></div>
+    <div class="ph"><div class="t"><span class="label">Preparation</span><b>6</b></div><div class="bar"><i style="width:43%;background:var(--vi)"></i></div>
+     <div class="row"><span>Details confirmed</span><span style="color:var(--or)">1 ●</span></div><div class="row"><span>Awaiting endorsement</span><span style="color:var(--or)">1 ●</span></div><div class="row"><span>Ready to print</span><span>2</span></div><div class="row"><span>Motivation printed</span><span>2</span></div></div>
+    <div class="ph"><div class="t"><span class="label">Payment</span><b>4</b></div><div class="bar"><i style="width:28%;background:var(--yl)"></i></div>
+     <div class="row"><span>Awaiting payment</span><span>3</span></div><div class="row"><span>Payment received</span><span style="color:var(--or)">1 ●</span></div></div>
+    <div class="ph"><div class="t"><span class="label">Fulfilment</span><b>3</b></div><div class="bar"><i style="width:21%;background:var(--gr)"></i></div>
+     <div class="row"><span>Ready for collection</span><span>2</span></div><div class="row"><span>Shipped</span><span>1</span></div><div class="row"><span>Completed (30 days)</span><span class="mut">9</span></div></div>
+   </div>
+  </div>
+  <div class="grid" style="grid-template-columns:1.7fr 1fr">
+   <div class="card">
+    <div class="ch"><h3>Needs your action</h3><span class="b or">5</span><div class="r"><span class="btn sm ghost">View all →</span></div></div>
+    <table><tr><th>Ref</th><th>Client</th><th>Stage</th><th>Waiting</th><th style="text-align:right">Next step</th></tr>
+     <tr><td class="ref">RM-000014</td><td>J. van der Merwe<div class="sub">Sport shooting · S16</div></td><td><span class="b bl">Submitted</span></td><td><span class="age d">5 days</span></td><td style="text-align:right"><span class="btn sm p">Review answers</span></td></tr>
+     <tr><td class="ref">RM-000012</td><td>A. Nkosi<div class="sub">Self defence · S13</div></td><td><span class="b bl">Submitted</span></td><td><span class="age w">4 days</span></td><td style="text-align:right"><span class="btn sm p">Review answers</span></td></tr>
+     <tr><td class="ref">RM-000011</td><td>P. Botha<div class="sub">Hunting · S15</div></td><td><span class="b vi">Details confirmed</span></td><td><span class="age">1 day</span></td><td style="text-align:right"><span class="btn sm p">Generate motivation</span></td></tr>
+     <tr><td class="ref">RM-000009</td><td>L. Pretorius<div class="sub">Sport shooting · S16</div></td><td><span class="b vi">Awaiting endorsement</span></td><td><span class="age">2 days</span></td><td style="text-align:right"><span class="btn sm p">Record endorsement</span></td></tr>
+     <tr><td class="ref">RM-000007</td><td>M. Dlamini<div class="sub">Renewal</div></td><td><span class="b yl">Payment received</span></td><td><span class="age">today</span></td><td style="text-align:right"><span class="btn sm p">Mark ready</span></td></tr>
+    </table>
+   </div>
+   <div class="grid" style="grid-template-rows:auto auto;gap:16px">
+    <div class="card"><div class="ch"><h3>Unread enquiries</h3><span class="b bl">6</span><div class="r"><span class="btn sm ghost">Open inbox →</span></div></div>
+     <div class="cb" style="padding:6px 18px">
+      <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span class="dot" style="background:var(--or);margin-top:5px"></span><div style="flex:1">Sample client one<div class="sub">New application · Hunting & sport</div></div><span class="mut" style="font-size:11px">08 Oct</span></div>
+      <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)"><span class="dot" style="background:var(--or);margin-top:5px"></span><div style="flex:1">Sample client two<div class="sub">Renewal · Self defence</div></div><span class="mut" style="font-size:11px">05 Oct</span></div>
+      <div style="display:flex;gap:10px;padding:9px 0"><span class="dot" style="background:var(--or);margin-top:5px"></span><div style="flex:1">Sample client three<div class="sub">Transfer · Sport shooting</div></div><span class="mut" style="font-size:11px">29 Sep</span></div>
+     </div></div>
+    <div class="card"><div class="ch"><h3>SAPS tracker</h3><div class="r"><span class="btn sm ghost">Open →</span></div></div>
+     <div class="cb" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="label">Lodged with SAPS</div><div style="font-size:20px;font-weight:700;margin-top:4px">7</div></div>
+      <div><div class="label">Status changes 24h</div><div style="font-size:20px;font-weight:700;margin-top:4px;color:var(--gr)">2</div></div>
+     </div></div>
+   </div>
+  </div>
+ </div>
+</div>
+<div class="anno" style="left:1200px;top:76px">1</div><div class="anno" style="left:262px;top:228px">2</div><div class="anno" style="left:262px;top:478px">3</div><div class="anno" style="left:48px;top:58px">4</div>
+</section>
+
+<!-- ===== 2 REQUESTS LIST ===== -->
+<section class="frame" id="s2">
+<div class="sidebar" data-on="mot"></div>
+<div class="main">
+ <div class="topbar"><h1>Motivations</h1><div class="act"><span class="btn">Export CSV</span><span class="btn p">+ New motivation</span></div></div>
+ <div class="content">
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+   <div class="tabs"><div class="tab">All <em>27</em></div><div class="tab on">Needs action <em>5</em></div><div class="tab">Intake <em>5</em></div><div class="tab">Preparation <em>6</em></div><div class="tab">Payment <em>4</em></div><div class="tab">Fulfilment <em>3</em></div><div class="tab">Completed <em>9</em></div></div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:14px">
+   <div class="input" style="flex:1">⌕ Search ref, client name, ID number, cell…</div>
+   <div class="input" style="width:200px">Status: any <span style="margin-left:auto">▾</span></div>
+   <div class="input" style="width:200px">Type: any <span style="margin-left:auto">▾</span></div>
+   <div class="input" style="width:170px">Waiting: any <span style="margin-left:auto">▾</span></div>
+  </div>
+  <div class="card">
+   <table>
+    <tr><th style="width:110px">Ref</th><th>Client</th><th>Type</th><th>Status</th><th>Progress</th><th>In stage</th><th>Updated</th><th style="text-align:right">Next step</th></tr>
+    <tr><td class="ref">RM-000014</td><td>J. van der Merwe<div class="sub">800101******* · 082 *** 1234</div></td><td>Sport shooting<div class="sub">Section 16</div></td><td><span class="b bl">Submitted</span></td><td><div class="bar" style="width:110px;margin:0"><i style="width:18%;background:var(--or)"></i></div><div class="sub">2 of 12</div></td><td><span class="age d">5 days</span></td><td class="mut">5 days ago</td><td style="text-align:right"><span class="btn sm p">Review answers</span></td></tr>
+    <tr><td class="ref">RM-000012</td><td>A. Nkosi<div class="sub">910514******* · 071 *** 5512</div></td><td>Self defence<div class="sub">Section 13</div></td><td><span class="b bl">Submitted</span></td><td><div class="bar" style="width:110px;margin:0"><i style="width:18%;background:var(--or)"></i></div><div class="sub">2 of 12</div></td><td><span class="age w">4 days</span></td><td class="mut">4 days ago</td><td style="text-align:right"><span class="btn sm p">Review answers</span></td></tr>
+    <tr><td class="ref">RM-000011</td><td>P. Botha<div class="sub">750822******* · 083 *** 0921</div></td><td>Hunting<div class="sub">Section 15</div></td><td><span class="b vi">Details confirmed</span></td><td><div class="bar" style="width:110px;margin:0"><i style="width:33%;background:var(--or)"></i></div><div class="sub">4 of 12</div></td><td><span class="age">1 day</span></td><td class="mut">yesterday</td><td style="text-align:right"><span class="btn sm p">Generate motivation</span></td></tr>
+    <tr><td class="ref">RM-000009</td><td>L. Pretorius<div class="sub">880301******* · 060 *** 4410</div></td><td>Sport shooting<div class="sub">Section 16</div></td><td><span class="b vi">Awaiting endorsement</span></td><td><div class="bar" style="width:110px;margin:0"><i style="width:42%;background:var(--or)"></i></div><div class="sub">5 of 12</div></td><td><span class="age">2 days</span></td><td class="mut">2 days ago</td><td style="text-align:right"><span class="btn sm p">Record endorsement</span></td></tr>
+    <tr><td class="ref">RM-000007</td><td>M. Dlamini<div class="sub">690417******* · 082 *** 7781</div></td><td>Renewal<div class="sub">All categories</div></td><td><span class="b yl">Payment received</span></td><td><div class="bar" style="width:110px;margin:0"><i style="width:75%;background:var(--or)"></i></div><div class="sub">9 of 12</div></td><td><span class="age">today</span></td><td class="mut">2 hours ago</td><td style="text-align:right"><span class="btn sm p">Mark ready</span></td></tr>
+   </table>
+   <div style="display:flex;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--line);color:var(--mut);font-size:12px"><span>Showing 5 of 5 needing action</span><span>Whole row opens the request</span></div>
+  </div>
+  <div class="card" style="margin-top:16px;padding:28px;text-align:center;border-style:dashed">
+   <div style="font-weight:650">Empty state example</div><div class="mut" style="margin-top:6px;font-size:12px">No motivations in Payment. When a request is marked printed it moves here automatically.</div>
+  </div>
+ </div>
+</div>
+<div class="anno" style="left:262px;top:78px">1</div><div class="anno" style="left:262px;top:136px">2</div><div class="anno" style="left:770px;top:198px">3</div><div class="anno" style="left:1395px;top:198px">4</div>
+</section>
+
+<!-- ===== 3 REQUEST DETAIL ===== -->
+<section class="frame" id="s3">
+<div class="sidebar" data-on="mot"></div>
+<div class="main">
+ <div class="topbar"><span class="crumb">Motivations /</span><h1>RM-000011</h1><span class="b vi">Details confirmed</span><span class="mut" style="font-size:12px">Hunting · Section 15 · created 3 Oct</span>
+  <div class="act"><span class="btn">Open client</span><span class="btn">⋯</span></div></div>
+ <div class="content" style="padding-top:18px">
+  <div class="card" style="margin-bottom:16px">
+   <div class="step">
+    <div class="st done"><div class="c">✓</div>Draft</div><div class="st done"><div class="c">✓</div>Submitted</div><div class="st done"><div class="c">✓</div>Details<br>confirmed</div><div class="st cur"><div class="c">4</div>Generate</div><div class="st"><div class="c">5</div>Awaiting<br>endorsement</div><div class="st"><div class="c">6</div>Ready to<br>print</div><div class="st"><div class="c">7</div>Printed</div><div class="st"><div class="c">8</div>Awaiting<br>payment</div><div class="st"><div class="c">9</div>Payment<br>received</div><div class="st"><div class="c">10</div>Ready for<br>collection</div><div class="st"><div class="c">11</div>Shipped</div><div class="st"><div class="c">12</div>Completed</div>
+   </div>
+   <div class="next">
+    <div style="flex:1"><div style="font-weight:700;font-size:14px">Next: generate the motivation</div><div class="mut" style="font-size:12px;margin-top:3px">Uses template <b style="color:var(--tx)">Motivation: Hunting v1</b> · one motivation per listed firearm (2 firearms)</div></div>
+    <span class="btn ghost">Send back for changes</span><span class="btn p lg">Generate 2 motivations →</span>
+   </div>
+  </div>
+  <div class="grid" style="grid-template-columns:1fr 1.9fr 1.05fr;align-items:start">
+   <div class="grid" style="gap:16px">
+    <div class="card"><div class="ch"><h3>Client</h3><div class="r"><span class="btn sm ghost">Edit</span></div></div>
+     <div class="cb"><dl class="kv"><dt>Name</dt><dd>P. Botha</dd><dt>ID</dt><dd>750822******* <span class="mut" style="font-size:11px">show</span></dd><dt>Cell</dt><dd>083 *** 0921</dd><dt>Occupation</dt><dd>Farmer</dd><dt>Address</dt><dd>Sample address, Pretoria</dd></dl></div></div>
+    <div class="card"><div class="ch"><h3>Linked</h3></div>
+     <div class="cb" style="font-size:12.5px;display:grid;gap:9px">
+      <div style="display:flex;justify-content:space-between"><span class="mut">Enquiry</span><span>#E-0119 →</span></div>
+      <div style="display:flex;justify-content:space-between"><span class="mut">SAPS application</span><span class="mut">Not lodged yet</span></div>
+      <div style="display:flex;justify-content:space-between"><span class="mut">Other motivations</span><span>1 completed →</span></div>
+     </div></div>
+   </div>
+   <div class="card">
+    <div class="ch"><h3>Answers</h3><span class="b gr">11 of 11 required</span><div class="r"><span class="mut" style="font-size:11.5px">Show unanswered</span><span class="toggle"></span><span class="btn sm">Jump to ▾</span></div></div>
+    <div class="cb" style="padding-top:6px">
+     <div class="qsec">Firearm details <span class="b mu">2 firearms</span></div>
+     <div class="qa"><div class="q">Firearm 1</div><div>.308 Win bolt action · Primary rifle</div><div class="q">Firearm 2</div><div>9mm pistol · Backup handgun</div></div>
+     <div class="qsec">Province & location</div>
+     <div class="qa"><div class="q">Province</div><div>Limpopo</div><div class="q">Closest police station</div><div>Sample SAPS station</div></div>
+     <div class="qsec">Hunting experience</div>
+     <div class="qa"><div class="q">Hunts per year</div><div>4 to 6</div><div class="q">Game hunted</div><div>Plains game, kudu, impala</div><div class="q">Hunting association</div><div>Sample association · member no. on file</div></div>
+     <div class="note mut" style="margin-top:4px">9 questions from branches that don't apply (Section 13 employed, student, pensioner…) are hidden. Toggle "Show unanswered" to see them.</div>
+    </div>
+   </div>
+   <div class="grid" style="gap:16px">
+    <div class="card"><div class="ch"><h3>Documents</h3><span class="b or">1 missing</span></div>
+     <div class="cb" style="display:grid;gap:9px;font-size:12.5px">
+      <div style="display:flex;gap:8px;align-items:center"><span class="b gr">✓</span>ID copy</div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="b gr">✓</span>Competency certificate</div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="b or">!</span>Proof of address <span class="btn sm" style="margin-left:auto">Request</span></div>
+     </div></div>
+    <div class="card"><div class="ch"><h3>Activity</h3></div>
+     <div class="cb"><div class="note" style="margin-bottom:14px;color:var(--mut)">Add an internal note…</div>
+      <div class="tl">
+       <div class="tli">Details confirmed<div class="w">Admin · yesterday 14:20</div></div>
+       <div class="tli">Note: "Client to bring safe certificate on collection"<div class="w">Admin · yesterday 14:18</div></div>
+       <div class="tli">Submitted by client<div class="w">Client portal · 3 Oct 09:41</div></div>
+       <div class="tli" style="padding-bottom:0">Created from enquiry #E-0119<div class="w">Admin · 3 Oct 09:02</div></div>
+      </div></div></div>
+   </div>
+  </div>
+ </div>
+</div>
+<div class="anno" style="left:262px;top:96px">1</div><div class="anno" style="left:1395px;top:180px">2</div><div class="anno" style="left:950px;top:300px">3</div><div class="anno" style="left:1395px;top:300px">4</div><div class="anno" style="left:1395px;top:470px">5</div>
+</section>
+
+<!-- ===== 4 APPLICATION TYPE (MERGED CONFIG) ===== -->
+<section class="frame" id="s4">
+<div class="sidebar" data-on="types"></div>
+<div class="main">
+ <div class="topbar"><span class="crumb">Application types /</span><h1>Motivation: Self Defence (Handgun)</h1><span class="b gr">Active</span>
+  <div class="act"><span class="btn">Preview client form</span><span class="btn">Duplicate</span><span class="btn p">Save</span></div></div>
+ <div class="content" style="padding-top:8px">
+  <div class="ptabs" style="margin-bottom:18px"><div>Overview</div><div>Questions <span class="b mu">47</span></div><div class="on">Motivation template <span class="b mu">2</span></div><div>Documents <span class="b mu">3</span></div><div>Requests <span class="b mu">1</span></div></div>
+  <div class="grid" style="grid-template-columns:1.6fr 1fr;align-items:start">
+   <div class="card"><div class="ch"><h3>Which template generates the motivation</h3><div class="r"><span class="btn sm">+ New template</span></div></div>
+    <div class="cb" style="display:grid;gap:10px">
+     <div class="tpl act"><span class="radio on"></span><div style="flex:1"><div style="display:flex;gap:8px;align-items:center"><b>Self Defence, one page</b><span class="b gr">Active</span><span class="b mu">v1</span></div><div class="sub" style="margin-top:4px">One-page Section 13 motivation. Name, ID, work and firearm come from the request.</div><div class="sub">Published 50 seconds ago</div></div><span class="btn sm">Open builder</span><span class="btn sm ghost">⋯</span></div>
+     <div class="tpl"><span class="radio"></span><div style="flex:1"><div style="display:flex;gap:8px;align-items:center"><b>Motivation: Self Defence (Handgun)</b><span class="b mu">v2</span><span class="b mu">Inactive</span></div><div class="sub" style="margin-top:4px">Section 13(1) self-defence handgun application. Full length.</div><div class="sub">Published 18 hours ago · used by 1 request</div></div><span class="btn sm">Open builder</span><span class="btn sm ghost">⋯</span></div>
+     <div class="note mut">Only one template is active per application type. Existing requests keep the template version they were generated with.</div>
+    </div></div>
+   <div class="grid" style="gap:16px">
+    <div class="card"><div class="ch"><h3>Summary</h3></div><div class="cb"><dl class="kv"><dt>Category</dt><dd>Self defence</dd><dt>Section</dt><dd>13</dd><dt>Motivation</dt><dd>Required</dd><dt>Questions</dt><dd>47 in 9 sections</dd><dt>Documents</dt><dd>ID, address, competency</dd><dt>Public PDF</dt><dd>Questionnaire Handgun Self Defence 2026 →</dd></dl></div></div>
+    <div class="card"><div class="ch"><h3>Merges three screens</h3></div><div class="cb mut" style="font-size:12px;line-height:1.6">Application types, Motivation templates and Digital questionnaires become tabs on one record. The Documents page stays as the public downloads library and links here.</div></div>
+   </div>
+  </div>
+ </div>
+</div>
+<div class="anno" style="left:262px;top:84px">1</div><div class="anno" style="left:262px;top:148px">2</div>
+</section>
+
+<!-- ===== 5 CLIENT RECORD ===== -->
+<section class="frame" id="s5">
+<div class="sidebar" data-on="clients"></div>
+<div class="main">
+ <div class="topbar"><span class="crumb">Clients /</span><h1>P. Botha</h1><div class="act"><span class="btn">Edit</span><span class="btn p">+ New motivation</span></div></div>
+ <div class="content">
+  <div class="card" style="margin-bottom:16px"><div class="cb" style="display:flex;gap:16px;align-items:center">
+   <div class="avatar">PB</div><div style="flex:1"><div style="font-size:16px;font-weight:700">P. Botha</div><div class="sub">750822******* · 083 *** 0921 · sample@example.com</div></div>
+   <div style="display:flex;gap:28px;text-align:right">
+    <div><div class="label">Enquiries</div><div style="font-size:18px;font-weight:700">2</div></div>
+    <div><div class="label">Motivations</div><div style="font-size:18px;font-weight:700">2</div></div>
+    <div><div class="label">SAPS apps</div><div style="font-size:18px;font-weight:700">1</div></div>
+    <div><div class="label">In storage</div><div style="font-size:18px;font-weight:700">0</div></div>
+   </div></div></div>
+  <div class="ptabs" style="margin-bottom:16px"><div class="on">Timeline</div><div>Motivations <span class="b mu">2</span></div><div>Enquiries <span class="b mu">2</span></div><div>SAPS tracker <span class="b mu">1</span></div><div>Storage</div><div>Profile</div></div>
+  <div class="grid" style="grid-template-columns:1.6fr 1fr;align-items:start">
+   <div class="card"><div class="cb"><div class="tl">
+    <div class="tli"><span class="b vi">Motivation</span> RM-000011 Hunting, details confirmed<div class="w">yesterday · next step: generate</div></div>
+    <div class="tli"><span class="b bl">Enquiry</span> #E-0119 New application, hunting<div class="w">3 Oct · converted to RM-000011</div></div>
+    <div class="tli"><span class="b gr">SAPS</span> Ref 1051**** status APPROVED<div class="w">3 months ago · auto check</div></div>
+    <div class="tli"><span class="b vi">Motivation</span> RM-000003 Sport shooting, completed<div class="w">4 months ago</div></div>
+    <div class="tli" style="padding-bottom:0"><span class="b bl">Enquiry</span> #E-0071 New application, sport shooting<div class="w">5 months ago · converted to RM-000003</div></div>
+   </div></div></div>
+   <div class="card"><div class="ch"><h3>Replaces</h3></div><div class="cb mut" style="font-size:12px;line-height:1.6">Members (walk-in), SAPS tracker clients and enquiry contacts collapse into one Clients list. Match on ID number first, then email, then cell. Enquiries without an ID stay unlinked until converted.</div></div>
+  </div>
+ </div>
+</div>
+<div class="anno" style="left:262px;top:86px">1</div><div class="anno" style="left:262px;top:186px">2</div>
+</section>
+
+<!-- ===== 6 MOBILE ===== -->
+<section id="s6" style="display:flex;gap:40px;padding:30px;background:#05070c;width:880px">
+ <div class="frame m">
+  <div class="mtop"><div class="burger"><i></i></div><b style="font-size:16px">Motivations</b><span class="btn sm p" style="margin-left:auto">+ New</span></div>
+  <div style="padding:12px 16px 0">
+   <div class="input" style="margin-bottom:10px">⌕ Search ref, name, ID…</div>
+   <div style="display:flex;gap:6px;overflow:hidden;margin-bottom:12px"><span class="chip on">Needs action 5</span><span class="chip">Intake 5</span><span class="chip">Preparation 6</span><span class="chip">Payment 4</span></div>
+   <div class="mcard"><div style="display:flex;justify-content:space-between"><span class="ref">RM-000014</span><span class="age d">5 days</span></div><div style="margin-top:6px;font-weight:600">J. van der Merwe</div><div class="sub">Sport shooting · S16</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span class="b bl">Submitted</span><span class="btn sm p">Review</span></div></div>
+   <div class="mcard"><div style="display:flex;justify-content:space-between"><span class="ref">RM-000012</span><span class="age w">4 days</span></div><div style="margin-top:6px;font-weight:600">A. Nkosi</div><div class="sub">Self defence · S13</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span class="b bl">Submitted</span><span class="btn sm p">Review</span></div></div>
+   <div class="mcard"><div style="display:flex;justify-content:space-between"><span class="ref">RM-000011</span><span class="age">1 day</span></div><div style="margin-top:6px;font-weight:600">P. Botha</div><div class="sub">Hunting · S15</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span class="b vi">Details confirmed</span><span class="btn sm p">Generate</span></div></div>
+   <div class="mcard"><div style="display:flex;justify-content:space-between"><span class="ref">RM-000009</span><span class="age">2 days</span></div><div style="margin-top:6px;font-weight:600">L. Pretorius</div><div class="sub">Sport shooting · S16</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span class="b vi">Awaiting endorsement</span><span class="btn sm p">Endorse</span></div></div>
+  </div>
+ </div>
+ <div class="frame m">
+  <div class="mtop"><div class="burger"><i></i></div><div><b style="font-size:15px">RM-000011</b><div class="sub" style="margin:0">Hunting · S15</div></div><span class="b vi" style="margin-left:auto">Details confirmed</span></div>
+  <div style="padding:14px 16px">
+   <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px"><span class="mut">Step 4 of 12</span><span>Generate</span></div>
+   <div class="bar" style="margin:0 0 16px"><i style="width:33%;background:var(--or)"></i></div>
+   <div class="mcard"><div class="label" style="margin-bottom:8px">Client</div><dl class="kv" style="grid-template-columns:90px 1fr"><dt>Name</dt><dd>P. Botha</dd><dt>ID</dt><dd>750822*******</dd><dt>Cell</dt><dd>083 *** 0921</dd></dl></div>
+   <div class="mcard"><div class="label" style="margin-bottom:8px">Status</div><span class="b vi">Details confirmed</span><div class="sub" style="margin-top:6px">Confirmed yesterday 14:20</div></div>
+   <div class="mcard" style="display:flex;justify-content:space-between;align-items:center"><span>Answers <span class="b gr">11/11</span></span><span class="mut">›</span></div>
+   <div class="mcard" style="display:flex;justify-content:space-between;align-items:center"><span>Documents <span class="b or">1 missing</span></span><span class="mut">›</span></div>
+   <div class="mcard" style="display:flex;justify-content:space-between;align-items:center"><span>Activity</span><span class="mut">4 ›</span></div>
+  </div>
+  <div class="sticky"><span class="btn p lg" style="width:100%;justify-content:center">Generate 2 motivations</span></div>
+ </div>
+</section>
+
+<script>
+const nav=(on)=>`<div class="brand">RANYATI<small>ADMIN PANEL</small></div>
+<div class="areasw"><span class="on">Motivations</span><span>Arms</span><span>Storage</span></div>
+<a class="sl ${on=='dash'?'on':''}"><i></i>Overview</a>
+<div class="sec">Work</div>
+<a class="sl ${on=='mot'?'on':''}"><i></i>Motivations<span class="ct">5</span></a>
+<a class="sl ${on=='enq'?'on':''}"><i></i>Enquiries<span class="ct">6</span></a>
+<a class="sl ${on=='saps'?'on':''}"><i></i>SAPS tracker</a>
+<a class="sl ${on=='clients'?'on':''}"><i></i>Clients</a>
+<div class="sec">Setup</div>
+<a class="sl ${on=='types'?'on':''}"><i></i>Application types</a>
+<a class="sl ${on=='docs'?'on':''}"><i></i>Public documents</a>
+<a class="sl"><i></i>Activity log</a>
+<div style="position:absolute;bottom:18px;left:12px;width:216px;border-top:1px solid var(--line);padding-top:12px"><a class="sl"><i></i>Settings</a><a class="sl"><i></i>Users</a></div>`;
+document.querySelectorAll('.sidebar').forEach(s=>s.innerHTML=nav(s.dataset.on));
+</script>
+</body></html>

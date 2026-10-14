@@ -28,7 +28,7 @@
             @if($activeFilter)
                 <input type="hidden" name="filter" value="{{ $activeFilter }}">
             @endif
-            <input type="search" name="q" value="{{ $q }}" placeholder="Search name, email, phone, message…" class="form-input" style="max-width: 340px;">
+            <input type="search" name="q" value="{{ $q }}" placeholder="Search name, email, phone, message…" aria-label="Search arms enquiries" class="form-input" style="max-width: 340px;">
             <button type="submit" class="btn btn-secondary btn-sm">Search</button>
             @if($q !== '')
                 <a href="{{ route('admin.arms.enquiries', array_filter(['filter' => $activeFilter])) }}" class="btn btn-secondary btn-sm">Clear</a>

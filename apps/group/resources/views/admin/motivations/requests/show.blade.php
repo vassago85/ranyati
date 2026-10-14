@@ -10,10 +10,19 @@
     $isSubmitted = $motivation->status === MotivationRequest::STATUS_SUBMITTED;
     $isVerified = in_array($motivation->status, [MotivationRequest::STATUS_VERIFIED, MotivationRequest::STATUS_AWAITING_ENDORSEMENT], true);
     $allChecked = $motivation->documents->isNotEmpty() && $motivation->documents->every(fn ($d) => $d->checked_at);
+    // Does this request already have a generated book / set of per-firearm
+    // letters? Drives the Generate vs Regenerate label split on the Actions
+    // card (bug 2 — "Regenerate motivations" showed even when nothing had
+    // been generated yet, which was misleading at the Verified / Awaiting
+    // endorsement stages).
+    $hasGenerated = ($usesTemplates ?? false)
+        ? ($letters ?? collect())->isNotEmpty()
+        : (bool) $motivation->pdf_path;
+    $generateNoun = ($usesTemplates ?? false) ? 'motivations' : 'book';
 @endphp
 
 @section('content')
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+<div class="grid-2" style="margin-bottom:16px;">
     <div class="card">
         <div class="card-header"><h2>Member</h2></div>
         <div class="card-body" style="line-height:1.9;font-size:13px;">
@@ -82,6 +91,19 @@
 <div class="card" style="margin-bottom:16px;">
     <div class="card-header"><h2>Documents</h2></div>
     <div class="card-body">
+        {{-- Bug 6: when no documents have been uploaded the headers-only
+             table was useless — a sentence of guidance is more helpful.
+             The upload UI lives on the member portal and on the admin
+             "edit on behalf" page. --}}
+        @if ($motivation->documents->isEmpty())
+            <div class="empty-state">
+                <strong>No documents uploaded yet.</strong><br>
+                The member can upload required documents from their portal,
+                or you can upload on their behalf from the
+                <a href="{{ route('admin.motivation-requests.edit', $motivation) }}" style="color:#F58220;">Edit answers &amp; documents</a>
+                page.
+            </div>
+        @else
         <table>
             <thead>
                 <tr>
@@ -138,6 +160,8 @@
             </tbody>
         </table>
 
+        @endif {{-- /documents table-vs-empty-state --}}
+
         @if ($motivation->status === MotivationRequest::STATUS_AWAITING_ENDORSEMENT || ! $motivation->documents->contains('kind', DocumentKinds::ENDORSEMENT))
             @if (($requirements[DocumentKinds::ENDORSEMENT] ?? null) !== null)
                 <div style="border-top:1px solid rgba(255,255,255,.06);margin-top:16px;padding-top:16px;">
@@ -161,7 +185,11 @@
     <div class="card-body">
         @if (($letters ?? collect())->isEmpty())
             <p style="color:rgba(255,255,255,.6);font-size:13px;">
-                No motivations generated yet. Confirm the details above to generate a firearm motivation per listed firearm from the attached template.
+                @if ($isSubmitted)
+                    No motivations generated yet. Confirm the details above to generate a firearm motivation per listed firearm from the attached template.
+                @else
+                    No motivations generated yet. Use <strong style="color:#fff;">Generate {{ $generateNoun }}</strong> under <em>Actions</em> below to produce one firearm motivation per listed firearm from the attached template.
+                @endif
             </p>
         @else
             <table style="width:100%;border-collapse:collapse;margin-bottom:12px;">
@@ -235,9 +263,17 @@
             </form>
         @endif
 
-        @if ($motivation->status !== MotivationRequest::STATUS_PRINTED)
+        {{-- Bug 2: don't call the button "Regenerate" before anything has
+             been generated. The underlying POST (/regenerate) is the same
+             action in either case — only the label changes. Hide it entirely
+             while the request is still at Submitted, because the dedicated
+             "Confirm details & generate" button directly above already covers
+             that transition. --}}
+        @if ($motivation->status !== MotivationRequest::STATUS_PRINTED && ! $isSubmitted)
             <form method="POST" action="{{ route('admin.motivation-requests.regenerate', $motivation) }}">
-                @csrf <button class="btn btn-secondary">Regenerate {{ ($usesTemplates ?? false) ? 'motivations' : 'book' }}</button>
+                @csrf <button class="btn {{ $hasGenerated ? 'btn-secondary' : 'btn-primary' }}">
+                    {{ $hasGenerated ? 'Regenerate' : 'Generate' }} {{ $generateNoun }}
+                </button>
             </form>
         @endif
 
@@ -344,7 +380,7 @@
 
         {{-- Deliver --}}
         @if ($motivation->status === MotivationRequest::STATUS_PAID)
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="grid-2">
                 @if ($motivation->delivery_method !== MotivationRequest::DELIVERY_COURIER)
                     <form method="POST" action="{{ route('admin.motivation-requests.ready-for-collection', $motivation) }}" style="display:grid;gap:6px;">
                         @csrf

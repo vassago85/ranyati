@@ -76,7 +76,7 @@
                 <input type="hidden" name="sort" value="{{ $sort }}">
                 <input type="hidden" name="direction" value="{{ $direction }}">
             @endif
-            <input type="search" name="q" value="{{ $q }}" placeholder="Search title, make, model, calibre…" class="form-input" style="max-width: 340px;">
+            <input type="search" name="q" value="{{ $q }}" placeholder="Search title, make, model, calibre…" aria-label="Search arms listings" class="form-input" style="max-width: 340px;">
             <button type="submit" class="btn btn-secondary btn-sm">Search</button>
             @if($q !== '')
                 <a href="{{ $filterLink($activeFilter) }}" class="btn btn-secondary btn-sm">Clear</a>

@@ -61,7 +61,7 @@
                 <input type="hidden" name="sort" value="{{ $sort }}">
                 <input type="hidden" name="direction" value="{{ $direction }}">
             @endif
-            <input type="search" name="q" value="{{ $q }}" placeholder="Search name, email, phone, membership…" class="form-input" style="max-width: 340px;">
+            <input type="search" name="q" value="{{ $q }}" placeholder="Search name, email, phone, membership…" aria-label="Search enquiries" class="form-input" style="max-width: 340px;">
             <button type="submit" class="btn btn-secondary btn-sm">Search</button>
             @if($q !== '')
                 <a href="{{ route('admin.enquiries', array_filter(['filter' => $activeFilter])) }}" class="btn btn-secondary btn-sm">Clear</a>
@@ -88,6 +88,11 @@
                 </p>
             </div>
         @else
+            {{-- Wrapper enables horizontal scroll inside the card. Dropping the
+                 trailing "View" column (the whole row is already clickable via
+                 .row-link + onclick) buys back the width that was clipping on
+                 1534px desktops. --}}
+            <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
@@ -101,7 +106,6 @@
                         <th>Reply</th>
                         <th>Source</th>
                         <th><a href="{{ $sortLink('created_at') }}" style="color:inherit;">Date{!! $sortIndicator('created_at') !!}</a></th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,7 +118,9 @@
                                     <span class="dot dot-green" title="Read"></span>
                                 @endif
                             </td>
-                            <td style="{{ !$enquiry->read_at ? 'color:#fff;font-weight:600;' : '' }}">{{ $enquiry->name }}</td>
+                            <td style="{{ !$enquiry->read_at ? 'color:#fff;font-weight:600;' : '' }}">
+                                <div class="name-clamp">{{ $enquiry->name }}</div>
+                            </td>
                             <td>{{ $enquiry->email }}</td>
                             <td>
                                 {{ $enquiry->endorsement_type ?? '—' }}
@@ -155,13 +161,11 @@
                                 @endif
                             </td>
                             <td style="white-space:nowrap;">{{ $enquiry->created_at->format('d M Y H:i') }}</td>
-                            <td style="text-align:right;">
-                                <a href="{{ route('admin.enquiries.show', $enquiry) }}" class="btn btn-secondary btn-sm" onclick="event.stopPropagation();">View</a>
-                            </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
+            </div>
             @if($enquiries->hasPages())
                 <div style="padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: center; gap: 8px;">
                     @if($enquiries->onFirstPage())

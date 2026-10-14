@@ -3,11 +3,18 @@
 @section('title', 'Motivation requests')
 
 @section('content')
-<div class="filter-tabs" style="margin-bottom:16px;">
+{{-- Bug 4 (audit): the 1 "All" + 12 status tabs together are wider than a
+     390px mobile viewport, which was forcing the whole page to scroll
+     sideways. Wrap in .scroll-strip so the tabs scroll in place while the
+     page body stays within the viewport. Phase 2 collapses this into the
+     four-phase tabbar from the mockup. --}}
+<div class="scroll-strip" style="margin-bottom:16px;">
+<div class="filter-tabs">
     <a href="{{ route('admin.motivation-requests.index') }}" class="filter-tab {{ ! $active ? 'active' : '' }}">All</a>
     @foreach ($statuses as $key => $label)
         <a href="{{ route('admin.motivation-requests.index', ['status' => $key]) }}" class="filter-tab {{ $active === $key ? 'active' : '' }}">{{ $label }}</a>
     @endforeach
+</div>
 </div>
 
 <div class="card">
