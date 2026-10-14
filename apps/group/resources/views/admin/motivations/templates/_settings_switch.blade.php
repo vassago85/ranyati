@@ -1,9 +1,13 @@
-{{-- Switch of per-kind settings panels for the selected block. --}}
+{{-- Per-kind settings panels for the selected block.
+
+     Text-first kinds (heading, text, rich_text, section) are edited inline
+     on the canvas, so this panel only shows their non-text settings (level,
+     condition). Rich kinds like table / yes_no / crime_context still live
+     here because their shape is too complex for inline editing. --}}
+
 <template x-if="selectedBlock().kind === 'title_page'">
     <div>
-        <label><div class="label-row"><span>Title</span><button type="button" class="mini-btn" @click="openPicker('title')">+ placeholder</button></div><input class="form-input" x-model="selectedBlock().settings.title"></label>
-        <label><div class="label-row"><span>Subtitle</span><button type="button" class="mini-btn" @click="openPicker('subtitle')">+ placeholder</button></div><input class="form-input" x-model="selectedBlock().settings.subtitle"></label>
-        <label><div class="label-row"><span>Body</span><button type="button" class="mini-btn" @click="openPicker('body')">+ placeholder</button></div><textarea class="form-input" x-model="selectedBlock().settings.body"></textarea></label>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-bottom:8px;">The title page is edited on the canvas card. Pick its background image here.</div>
         <label><div class="label-row"><span>Image asset</span></div>
             <select class="form-input" x-model.number="selectedBlock().settings.asset_id">
                 <option :value="null">— none —</option>
@@ -15,45 +19,28 @@
 
 <template x-if="selectedBlock().kind === 'heading'">
     <div>
-        <label><div class="label-row"><span>Text</span><button type="button" class="mini-btn" @click="openPicker('text')">+ placeholder</button></div><input class="form-input" x-model="selectedBlock().settings.text"></label>
         <label><div class="label-row"><span>Level</span></div>
-            <select class="form-input" x-model.number="selectedBlock().settings.level" x-init="$el.value = String(selectedBlock().settings.level ?? 2)">
+            <select class="form-input" x-model.number="selectedBlock().settings.level">
                 <option value="1">H1</option><option value="2">H2</option><option value="3">H3</option>
             </select>
         </label>
     </div>
 </template>
 
-<template x-if="selectedBlock().kind === 'text'">
+<template x-if="selectedBlock().kind === 'section'">
     <div>
-        <label><div class="label-row"><span>Paragraph(s)</span><button type="button" class="mini-btn" @click="openPicker('body')">+ placeholder</button></div><textarea class="form-input" x-model="selectedBlock().settings.body" rows="12"></textarea></label>
-        <div style="font-size:11px;color:rgba(255,255,255,.35);">Separate paragraphs with a blank line. Line breaks within a paragraph are preserved.</div>
+        <label><div class="label-row"><span>Heading level</span></div>
+            <select class="form-input" x-model.number="selectedBlock().settings.level">
+                <option value="1">H1</option><option value="2">H2</option><option value="3">H3</option>
+            </select>
+        </label>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);">A section is a heading followed by a rich body. Edit the heading and body text directly on the canvas.</div>
     </div>
 </template>
 
-<template x-if="selectedBlock().kind === 'rich_text'">
-    <div>
-        <div class="label-row"><span>Rich text</span>
-            <div class="rich-toolbar">
-                <button type="button" @click="richCommand('bold')"><strong>B</strong></button>
-                <button type="button" @click="richCommand('italic')"><em>I</em></button>
-                <button type="button" @click="richCommand('underline')"><span style="text-decoration:underline;">U</span></button>
-                <button type="button" @click="richCommand('insertUnorderedList')">• List</button>
-                <button type="button" @click="richCommand('insertOrderedList')">1. List</button>
-                <button type="button" @click="richCommand('justifyLeft')">⯇</button>
-                <button type="button" @click="richCommand('justifyCenter')">◧</button>
-                <button type="button" @click="richCommand('justifyRight')">⯈</button>
-                <button type="button" @click="richLink()">🔗</button>
-                <button type="button" @click="openPicker('html', 'rich')">+ placeholder</button>
-            </div>
-        </div>
-        <div class="rich-editor"
-             contenteditable="true"
-             :data-block-id="selectedBlock().id"
-             @input="selectedBlock().settings.html = $event.target.innerHTML"
-             @blur="selectedBlock().settings.html = $event.target.innerHTML"
-             x-ref="richEditor"
-             x-html="selectedBlock().settings.html || ''"></div>
+<template x-if="selectedBlock().kind === 'text' || selectedBlock().kind === 'rich_text'">
+    <div style="font-size:12px;color:rgba(255,255,255,.5);">
+        Edit the text on the canvas card. The condition below controls when this paragraph appears in generated letters.
     </div>
 </template>
 
@@ -105,49 +92,7 @@
     <div>
         <label><div class="label-row"><span>Left width (%)</span></div><input class="form-input" type="number" min="20" max="80" x-model.number="selectedBlock().settings.left_width"></label>
         <label><div class="label-row"><span>Gap (pt)</span></div><input class="form-input" type="number" min="0" max="40" x-model.number="selectedBlock().settings.gap"></label>
-        <div class="label-row"><span>Columns</span></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-            <div>
-                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px;">Left</div>
-                <template x-for="(child, idx) in selectedBlock().settings.left" :key="child.id">
-                    <div style="padding:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:4px;margin-bottom:4px;font-size:11px;">
-                        <span x-text="kinds[child.kind]"></span>
-                        <button class="mini-btn danger" type="button" style="float:right;" @click="selectedBlock().settings.left.splice(idx,1)">×</button>
-                    </div>
-                </template>
-                <select class="form-input" @change="addNested('left', $event.target.value); $event.target.value=''">
-                    <option value="">+ add block</option>
-                    <template x-for="(label, kind) in simpleChildKinds" :key="kind"><option :value="kind" x-text="label"></option></template>
-                </select>
-            </div>
-            <div>
-                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px;">Right</div>
-                <template x-for="(child, idx) in selectedBlock().settings.right" :key="child.id">
-                    <div style="padding:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:4px;margin-bottom:4px;font-size:11px;">
-                        <span x-text="kinds[child.kind]"></span>
-                        <button class="mini-btn danger" type="button" style="float:right;" @click="selectedBlock().settings.right.splice(idx,1)">×</button>
-                    </div>
-                </template>
-                <select class="form-input" @change="addNested('right', $event.target.value); $event.target.value=''">
-                    <option value="">+ add block</option>
-                    <template x-for="(label, kind) in simpleChildKinds" :key="kind"><option :value="kind" x-text="label"></option></template>
-                </select>
-            </div>
-        </div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px;">Select a nested block from the Blocks list below to edit its text.</div>
-        <template x-for="(child, idx) in [...selectedBlock().settings.left, ...selectedBlock().settings.right]" :key="child.id">
-            <div style="margin-top:8px;padding:8px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:6px;">
-                <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px;" x-text="kinds[child.kind]"></div>
-                <template x-if="child.kind === 'heading'"><input class="form-input" x-model="child.settings.text" placeholder="Heading text"></template>
-                <template x-if="child.kind === 'text'"><textarea class="form-input" x-model="child.settings.body" placeholder="Paragraph text"></textarea></template>
-                <template x-if="child.kind === 'image'">
-                    <select class="form-input" x-model.number="child.settings.asset_id">
-                        <option :value="null">— image asset —</option>
-                        <template x-for="a in assets" :key="a.id"><option :value="a.id" x-text="a.name"></option></template>
-                    </select>
-                </template>
-            </div>
-        </template>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:6px;">Two columns are edited on the canvas card: add nested blocks there, or drag palette items onto the left or right stack.</div>
     </div>
 </template>
 
@@ -203,8 +148,8 @@
         <template x-if="selectedBlock().settings.scope === 'section'">
             <label><div class="label-row"><span>Section key</span></div><input class="form-input" x-model="selectedBlock().settings.section_key" placeholder="e.g. location"></label>
         </template>
-        <label><div class="label-row"><span>Intro</span><button type="button" class="mini-btn" @click="openPicker('intro')">+ placeholder</button></div><textarea class="form-input" x-model="selectedBlock().settings.intro" rows="2"></textarea></label>
-        <label><div class="label-row"><span>Outro</span><button type="button" class="mini-btn" @click="openPicker('outro')">+ placeholder</button></div><textarea class="form-input" x-model="selectedBlock().settings.outro" rows="2"></textarea></label>
+        <label><div class="label-row"><span>Intro</span></div><textarea class="form-input" x-model="selectedBlock().settings.intro" rows="2"></textarea></label>
+        <label><div class="label-row"><span>Outro</span></div><textarea class="form-input" x-model="selectedBlock().settings.outro" rows="2"></textarea></label>
         <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" x-model="selectedBlock().settings.as_list"> Output as a bulleted list</label>
         <label><div class="label-row"><span>If an item has no sentence</span></div>
             <select class="form-input" x-model="selectedBlock().settings.empty_sentence">
@@ -218,20 +163,7 @@
 <template x-if="selectedBlock().kind === 'conditional_group'">
     <div>
         <label><div class="label-row"><span>Group label (internal)</span></div><input class="form-input" x-model="selectedBlock().settings.label"></label>
-        <div class="label-row"><span>Blocks inside</span></div>
-        <template x-for="(child, idx) in selectedBlock().settings.children" :key="child.id">
-            <div style="padding:6px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:6px;margin-bottom:4px;">
-                <div style="font-size:11px;color:#F58220;" x-text="kinds[child.kind]"></div>
-                <template x-if="child.kind === 'heading'"><input class="form-input" style="margin-top:4px;" x-model="child.settings.text"></template>
-                <template x-if="child.kind === 'text'"><textarea class="form-input" style="margin-top:4px;" x-model="child.settings.body"></textarea></template>
-                <button class="mini-btn danger" type="button" style="margin-top:4px;" @click="selectedBlock().settings.children.splice(idx,1)">Remove</button>
-            </div>
-        </template>
-        <select class="form-input" @change="addNested('children', $event.target.value); $event.target.value=''">
-            <option value="">+ add block</option>
-            <template x-for="(label, kind) in simpleChildKinds" :key="kind"><option :value="kind" x-text="label"></option></template>
-        </select>
-        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px;">Set the <strong>Condition</strong> below — children render only when it passes.</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);">Set the condition below. Children render only when it passes. Add nested blocks on the canvas card.</div>
     </div>
 </template>
 

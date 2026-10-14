@@ -14,6 +14,7 @@ use App\Support\Motivations\DocumentKinds;
 use App\Support\Motivations\QuestionSchema;
 use App\Support\Motivations\Templates\BlockKinds;
 use App\Support\Motivations\Templates\PlaceholderCatalogue;
+use App\Support\Motivations\Templates\TemplateSchema;
 use App\Support\Motivations\Templates\TemplateVersionDiff;
 use App\Support\Motivations\Templates\TemplateVersionManager;
 use Illuminate\Http\Request;
@@ -94,6 +95,12 @@ class MotivationTemplateController extends Controller
 
         $draft = $this->versions->ensureDraft($motivationTemplate);
         $assets = TemplateAsset::orderBy('category')->orderBy('name')->get();
+
+        // Normalize on the way out so the canvas always sees the slot
+        // header/footer shape and known block kinds, even if the draft
+        // was saved before the redesign.
+        $draft->blocks = TemplateSchema::normalizeBlocks($draft->blocks);
+        $draft->settings = TemplateSchema::normalizeSettingsJson($draft->settings);
 
         return view('admin.motivations.templates.edit', [
             'template' => $motivationTemplate,

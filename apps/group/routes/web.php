@@ -1274,6 +1274,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         Route::post('/{motivationTemplate}/preview', [TemplatePreviewController::class, 'store'])->name('preview.store');
         Route::get('/{motivationTemplate}/preview/{token}', [TemplatePreviewController::class, 'show'])->name('preview.show');
+        Route::post('/{motivationTemplate}/canvas-preview', [TemplatePreviewController::class, 'canvas'])->name('canvas-preview');
     });
 
     Route::prefix('application-types')->name('application-types.')->group(function () {

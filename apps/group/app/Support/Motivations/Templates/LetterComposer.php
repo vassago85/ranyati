@@ -43,6 +43,63 @@ class LetterComposer
     ) {}
 
     /**
+     * Expose the resolved render context so the canvas-preview endpoint can
+     * walk the placeholder catalogue against this request's data.
+     *
+     * @return array<string, mixed>
+     */
+    public function context(): array
+    {
+        return $this->context;
+    }
+
+    /**
+     * Render a single block in isolation and return just the HTML it would
+     * contribute (plus whether its condition passed and any renderer
+     * warnings). Used by the admin canvas to show live previews of the
+     * "special" cards (yes/no sentences, crime context, table …).
+     *
+     * @param  array<string, mixed>  $block
+     * @return array{html: string, passes: bool, warnings: array<int, string>}
+     */
+    public function previewBlock(array $block): array
+    {
+        $normalised = TemplateSchema::normalizeBlock($block);
+        if ($normalised === null) {
+            return ['html' => '', 'passes' => true, 'warnings' => []];
+        }
+
+        $passes = ConditionEvaluator::passes($normalised['condition'] ?? null, $this->context);
+
+        // Snapshot and reset the per-render buffers so this preview can't
+        // leak into a surrounding compose() run.
+        $savedBuffer = $this->htmlBuffer;
+        $savedSegments = $this->segments;
+        $savedWarnings = $this->warnings;
+        $this->htmlBuffer = [];
+        $this->segments = [];
+        $this->warnings = [];
+
+        // Preview cards always render the block even when its condition
+        // fails; the UI greys the card out separately so the admin can
+        // still see what it would print.
+        $this->renderBlock($normalised);
+        $this->flushHtml();
+
+        $html = implode("\n", array_map(
+            fn ($seg) => ($seg['type'] ?? '') === 'html' ? (string) $seg['html'] : '',
+            $this->segments,
+        ));
+        $warnings = array_values(array_unique($this->warnings));
+
+        $this->htmlBuffer = $savedBuffer;
+        $this->segments = $savedSegments;
+        $this->warnings = $savedWarnings;
+
+        return ['html' => $html, 'passes' => $passes, 'warnings' => $warnings];
+    }
+
+    /**
      * @param  array<int, array<string, mixed>>  $blocks
      * @return array{segments: array<int, array<string, mixed>>, missing: array<int, string>, warnings: array<int, string>}
      */
@@ -92,6 +149,7 @@ class LetterComposer
             BlockKinds::HEADING => $this->appendHtml($this->headingHtml($s)),
             BlockKinds::TEXT => $this->appendHtml($this->paragraphHtml((string) ($s['body'] ?? ''))),
             BlockKinds::RICH_TEXT => $this->appendHtml($this->richTextHtml((string) ($s['html'] ?? ''))),
+            BlockKinds::SECTION => $this->appendHtml($this->sectionHtml($s)),
             BlockKinds::IMAGE => $this->appendHtml($this->imageHtml($s)),
             BlockKinds::DYNAMIC_IMAGE => $this->appendHtml($this->dynamicImageHtml($s)),
             BlockKinds::TWO_COLUMN => $this->appendHtml($this->twoColumnHtml($s)),
@@ -190,6 +248,38 @@ class LetterComposer
         $resolved = $this->resolveHtml($sanitised);
 
         return '<div class="rich-text">'.$resolved.'</div>';
+    }
+
+    /**
+     * Render a `section` block: heading at the top (if set) and the body
+     * underneath. The output is byte-identical to the equivalent heading +
+     * rich_text pair, so the migration that merges Heading + Text into
+     * sections produces the same PDF.
+     *
+     * @param  array<string, mixed>  $s
+     */
+    private function sectionHtml(array $s): string
+    {
+        $heading = $this->headingHtml([
+            'text' => (string) ($s['heading'] ?? ''),
+            'level' => (int) ($s['level'] ?? 2),
+        ]);
+
+        $body = (string) ($s['html'] ?? '');
+        $bodyHtml = '';
+        if (trim($body) !== '') {
+            $sanitised = RichText::sanitize($body);
+            $bodyHtml = '<div class="rich-text">'.$this->resolveHtml($sanitised).'</div>';
+        }
+
+        // A newline between the heading and the body keeps
+        // LetterPdf::previewText() identical to the heading + text pair
+        // this block replaces (those two HTML fragments are joined with
+        // "\n" in the htmlBuffer). The extra whitespace is invisible in
+        // the printed PDF.
+        return $heading === '' || $bodyHtml === ''
+            ? $heading.$bodyHtml
+            : $heading."\n".$bodyHtml;
     }
 
     /**
@@ -637,12 +727,26 @@ class LetterComposer
     /**
      * Resolve placeholders in already-sanitised HTML. Rich text goes
      * through the sanitiser *before* this, so what remains is a safe HTML
-     * subset. Placeholder values are still escaped before substitution so
-     * injected answers can't close tags.
+     * subset. Each substituted value is HTML-escaped individually so an
+     * answer like "Smith & Sons" renders as "Smith &amp; Sons" and a
+     * literal "<" can't close a tag the admin typed around the token.
      */
     private function resolveHtml(string $html): string
     {
-        return Placeholders::replace($html, $this->context, fn ($p) => '', $this->missing);
+        if ($html === '') {
+            return '';
+        }
+
+        return preg_replace_callback(Placeholders::PATTERN, function ($m) {
+            $value = Placeholders::format(data_get($this->context, $m[1]));
+            if ($value === '') {
+                $this->missing[] = $m[1];
+
+                return '';
+            }
+
+            return e($value);
+        }, $html);
     }
 
     private function multilineHtml(string $escaped): string

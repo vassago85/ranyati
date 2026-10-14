@@ -92,15 +92,17 @@ test.describe("Phase 1 bug audit", () => {
         await openFirstMotivation(page);
         await expect(page).toHaveURL(/\/admin\/motivation-requests\/\d+/);
 
-        // With no book / letters, the Actions card's secondary button
-        // reads "Generate book" (not "Regenerate book"). The absence
-        // of "Regenerate" is the whole point of the bug fix.
+        // With no book / letters, the Actions card says Generate — not
+        // Regenerate. Template-mode requests use "motivations"; the
+        // legacy book pipeline still says "book".
         const actionsCard = page
             .locator("div.card")
             .filter({ has: page.locator("h2:text('Actions')") });
         await expect(actionsCard).toBeVisible();
-        await expect(actionsCard.getByRole("button", { name: /^Generate book$/ })).toBeVisible();
-        await expect(actionsCard.getByRole("button", { name: /Regenerate book/ })).toHaveCount(0);
+        await expect(
+            actionsCard.getByRole("button", { name: /^Generate (book|motivations)$/ }),
+        ).toBeVisible();
+        await expect(actionsCard.getByRole("button", { name: /^Regenerate / })).toHaveCount(0);
 
         await testInfo.attach("show-generate-button.png", {
             body: await page.screenshot({ fullPage: true }),

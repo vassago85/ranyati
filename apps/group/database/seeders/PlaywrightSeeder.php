@@ -8,7 +8,11 @@ use App\Models\ClientProfile;
 use App\Models\FirearmApplication;
 use App\Models\MotivationEnquiry;
 use App\Models\MotivationRequest;
+use App\Models\MotivationTemplate;
+use App\Models\MotivationTemplateVersion;
 use App\Models\User;
+use App\Support\Motivations\Templates\BlockKinds;
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 
 /**
@@ -150,6 +154,67 @@ class PlaywrightSeeder extends Seeder
         );
 
         $this->seedPhase2Fixtures($admin, $type);
+        $this->seedCanvasTemplate($admin, $type);
+    }
+
+    /**
+     * A 12-section canvas template used by the builder Playwright spec.
+     * Headings are NATO-phonetic so the drag-from-3-to-10 test can
+     * assert order by readable name rather than UUID.
+     */
+    private function seedCanvasTemplate(User $admin, ApplicationType $type): void
+    {
+        $names = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliet', 'Kilo', 'Lima'];
+        $blocks = [];
+        foreach ($names as $name) {
+            $body = $name === 'Alpha'
+                ? '<p>Applicant {{profile.full_name}} lives at {{profile.physical_address}}.</p>'
+                : '<p>Body of '.$name.'.</p>';
+            $blocks[] = [
+                'id' => (string) Str::uuid(),
+                'kind' => BlockKinds::SECTION,
+                'settings' => [
+                    'heading' => $name,
+                    'level' => 2,
+                    'html' => $body,
+                ],
+                'condition' => null,
+            ];
+        }
+
+        $template = MotivationTemplate::updateOrCreate(
+            ['slug' => 'playwright-canvas'],
+            [
+                'name' => 'Playwright canvas',
+                'category' => 'sport',
+                'description' => 'Seeded fixture for the canvas builder Playwright spec.',
+                'status' => MotivationTemplate::STATUS_DRAFT,
+                'created_by' => $admin->id,
+                'updated_by' => $admin->id,
+            ],
+        );
+
+        $draft = $template->draftVersion();
+        if ($draft) {
+            $draft->update([
+                'blocks' => $blocks,
+                'settings' => MotivationTemplateVersion::defaultSettings(),
+                'updated_by' => $admin->id,
+            ]);
+        } else {
+            MotivationTemplateVersion::create([
+                'template_id' => $template->id,
+                'version' => 1,
+                'blocks' => $blocks,
+                'settings' => MotivationTemplateVersion::defaultSettings(),
+                'created_by' => $admin->id,
+                'updated_by' => $admin->id,
+            ]);
+        }
+
+        $type->templates()->syncWithoutDetaching([
+            $template->id => ['is_default' => true, 'sort' => 0, 'condition' => null],
+        ]);
     }
 
     /**

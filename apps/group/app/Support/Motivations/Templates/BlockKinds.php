@@ -17,6 +17,8 @@ class BlockKinds
 
     public const RICH_TEXT = 'rich_text';
 
+    public const SECTION = 'section';
+
     public const IMAGE = 'image';
 
     public const DYNAMIC_IMAGE = 'dynamic_image';
@@ -54,6 +56,7 @@ class BlockKinds
                 self::PAGE_BREAK => 'Page break',
             ],
             'Text' => [
+                self::SECTION => 'Section (heading + body)',
                 self::HEADING => 'Heading',
                 self::TEXT => 'Plain text',
                 self::RICH_TEXT => 'Rich text',

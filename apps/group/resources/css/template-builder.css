@@ -1,0 +1,461 @@
+/*
+ * Motivation template builder — canvas rebuild.
+ *
+ * The canvas is designed to look like the printed page, so most of its
+ * visual DNA lives on `.tb-page`. Chrome (left palette, top bar, right
+ * settings) stays dark to match the surrounding admin theme.
+ */
+
+:root {
+    --tb-accent: #F58220;
+    --tb-page-bg: #ffffff;
+    --tb-page-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    --tb-chrome-bg: rgba(255, 255, 255, 0.03);
+    --tb-chrome-border: rgba(255, 255, 255, 0.08);
+    --tb-chrome-muted: rgba(255, 255, 255, 0.5);
+    --tb-chrome-text: #e5e7eb;
+}
+
+/* ── Layout ────────────────────────────────────────────────────── */
+
+.tb-shell {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr) 320px;
+    gap: 14px;
+    align-items: start;
+    position: relative;
+}
+
+.tb-shell.is-right-collapsed {
+    grid-template-columns: 240px minmax(0, 1fr) 48px;
+}
+
+.tb-pane {
+    background: var(--tb-chrome-bg);
+    border: 1px solid var(--tb-chrome-border);
+    border-radius: 10px;
+    padding: 12px;
+    min-height: 400px;
+}
+
+.tb-pane h3 {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--tb-chrome-muted);
+    text-transform: uppercase;
+    margin: 0 0 10px;
+}
+
+/* ── Top bar ───────────────────────────────────────────────────── */
+
+.tb-topbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.tb-topbar .tb-name-input {
+    font-size: 16px;
+    font-weight: 700;
+    min-width: 220px;
+}
+
+.tb-topbar .tb-meta {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--tb-chrome-muted);
+}
+
+.tb-status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+.tb-status-badge.is-draft { background: rgba(245, 130, 32, 0.14); color: var(--tb-accent); }
+.tb-status-badge.is-published { background: rgba(34, 197, 94, 0.14); color: #86efac; }
+.tb-status-badge.is-archived { background: rgba(255, 255, 255, 0.08); color: rgba(255, 255, 255, 0.5); }
+
+.tb-sample-picker {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--tb-chrome-border);
+    border-radius: 6px;
+}
+
+.tb-sample-picker select,
+.tb-sample-picker input {
+    background: transparent;
+    border: none;
+    color: var(--tb-chrome-text);
+    font-size: 12px;
+    outline: none;
+}
+
+/* ── Left panel: tabs ──────────────────────────────────────────── */
+
+.tb-left-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--tb-chrome-border);
+}
+.tb-left-tabs button {
+    flex: 1;
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    color: var(--tb-chrome-muted);
+    font-size: 12px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+.tb-left-tabs button.is-active {
+    color: var(--tb-accent);
+    border-bottom-color: var(--tb-accent);
+}
+
+.tb-palette-group { margin-bottom: 12px; }
+.tb-palette-group-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    margin: 8px 0 4px;
+}
+
+.tb-palette-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    text-align: left;
+    padding: 6px 8px;
+    margin-bottom: 3px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--tb-chrome-text);
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: grab;
+}
+.tb-palette-item:hover {
+    background: rgba(245, 130, 32, 0.1);
+    border-color: rgba(245, 130, 32, 0.4);
+    color: var(--tb-accent);
+}
+.tb-palette-item.sortable-chosen,
+.tb-palette-item.sortable-ghost {
+    opacity: 0.5;
+}
+
+.tb-outline-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    margin-bottom: 3px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+    color: var(--tb-chrome-text);
+    font-size: 12px;
+    cursor: pointer;
+}
+.tb-outline-item:hover { background: rgba(255, 255, 255, 0.05); }
+.tb-outline-item.is-selected { background: rgba(245, 130, 32, 0.12); color: var(--tb-accent); }
+.tb-outline-item .tb-outline-level-2 { padding-left: 12px; opacity: 0.85; }
+.tb-outline-item .tb-outline-level-3 { padding-left: 24px; opacity: 0.7; }
+.tb-outline-item .tb-outline-cond {
+    font-size: 10px;
+    background: rgba(245, 130, 32, 0.14);
+    color: var(--tb-accent);
+    padding: 1px 6px;
+    border-radius: 999px;
+    margin-left: auto;
+}
+
+/* ── Canvas ────────────────────────────────────────────────────── */
+
+.tb-canvas-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 24px 12px 60px;
+    overflow: auto;
+    min-height: 600px;
+}
+
+.tb-page {
+    position: relative;
+    background: var(--tb-page-bg);
+    color: #111;
+    box-shadow: var(--tb-page-shadow);
+    border-radius: 2px;
+    overflow: visible;
+    /* width/padding set from JS using the page settings */
+}
+
+/* Scoped letter typography — the preprocessor includes
+   motivations/book/_letter_css.blade.php with $scope='.tb-page .tb-page-body'. */
+
+.tb-page-band {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 8px;
+    font-size: 9pt;
+    color: #555;
+    position: relative;
+    cursor: pointer;
+}
+.tb-page-band.is-empty {
+    background: rgba(0, 0, 0, 0.03);
+    color: #999;
+    font-style: italic;
+    text-align: center;
+    justify-content: center;
+}
+.tb-page-band.is-empty .tb-slot { grid-column: 1 / -1; }
+.tb-page-band.is-selected { outline: 2px solid var(--tb-accent); outline-offset: -2px; }
+.tb-page-band.has-border-top { border-top: 1px solid #ccc; }
+.tb-page-band.has-border-bottom { border-bottom: 1px solid #ccc; }
+
+.tb-slot {
+    min-height: 18px;
+    padding: 2px 4px;
+    border-radius: 3px;
+    cursor: text;
+}
+.tb-slot.is-left { text-align: left; }
+.tb-slot.is-centre { text-align: center; }
+.tb-slot.is-right { text-align: right; }
+.tb-slot.is-empty { color: #bbb; font-style: italic; }
+.tb-slot.is-selected { background: rgba(245, 130, 32, 0.12); outline: 1px solid var(--tb-accent); }
+.tb-slot img { max-height: 32px; max-width: 100%; }
+
+.tb-page-body { padding: 0; }
+
+/* ── Blocks on the canvas ─────────────────────────────────────── */
+
+.tb-block {
+    position: relative;
+    padding: 2px 0;
+    margin: 2px 0;
+    border-radius: 3px;
+    transition: box-shadow 0.1s ease;
+}
+.tb-block:hover { box-shadow: 0 0 0 1px rgba(245, 130, 32, 0.3); }
+.tb-block.is-selected { box-shadow: 0 0 0 2px var(--tb-accent); }
+.tb-block.is-dragging { opacity: 0.4; }
+.tb-block.is-hidden { opacity: 0.35; }
+
+.tb-block-gutter {
+    position: absolute;
+    top: 2px;
+    opacity: 0;
+    display: flex;
+    gap: 2px;
+    transition: opacity 0.1s;
+    z-index: 2;
+}
+.tb-block:hover .tb-block-gutter,
+.tb-block.is-selected .tb-block-gutter { opacity: 1; }
+
+.tb-block-gutter.is-left { left: -42px; }
+.tb-block-gutter.is-right { right: -84px; }
+
+.tb-gutter-btn {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #555;
+    cursor: pointer;
+    padding: 0;
+}
+.tb-gutter-btn:hover { background: var(--tb-accent); color: #fff; border-color: var(--tb-accent); }
+.tb-gutter-btn.tb-handle { cursor: grab; }
+.tb-gutter-btn.is-danger:hover { background: #ef4444; border-color: #ef4444; }
+
+.tb-cond-pill {
+    display: inline-block;
+    font-size: 9pt;
+    background: rgba(245, 130, 32, 0.14);
+    color: #b05a16;
+    border: 1px solid rgba(245, 130, 32, 0.4);
+    padding: 1px 8px;
+    border-radius: 999px;
+    margin-bottom: 4px;
+}
+
+/* Insertion line while a block is being dragged. */
+.tb-blocks-list .sortable-ghost {
+    opacity: 0.4;
+    background: rgba(245, 130, 32, 0.1);
+    border: 1px dashed var(--tb-accent);
+}
+.tb-blocks-list .sortable-drag { opacity: 0.9; }
+
+/* Page break visual. */
+.tb-page-break {
+    text-align: center;
+    margin: 10px 0;
+    position: relative;
+    color: #999;
+    font-size: 10pt;
+}
+.tb-page-break::before,
+.tb-page-break::after {
+    content: '';
+    display: inline-block;
+    width: 40%;
+    vertical-align: middle;
+    border-top: 1px dashed #bbb;
+    margin: 0 8px;
+}
+
+/* ── Preview cards for the "special" block kinds ──────────────── */
+
+.tb-preview-card {
+    border: 1px solid #e4e4e4;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fafafa;
+    margin: 6px 0;
+    position: relative;
+}
+.tb-preview-card .tb-card-label {
+    display: inline-block;
+    font-size: 9pt;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #999;
+    margin-bottom: 6px;
+}
+.tb-preview-card .tb-card-body { font-size: 10pt; }
+.tb-preview-card .tb-card-empty { color: #999; font-style: italic; }
+
+/* ── TipTap editors ───────────────────────────────────────────── */
+
+.tb-editor .ProseMirror {
+    outline: none;
+    min-height: 1em;
+}
+.tb-editor .ProseMirror p { margin: 0 0 8pt; text-align: justify; }
+
+.tb-token {
+    display: inline-block;
+    background: rgba(245, 130, 32, 0.14);
+    color: #b05a16;
+    border: 1px solid rgba(245, 130, 32, 0.4);
+    border-radius: 4px;
+    padding: 0 4px;
+    margin: 0 1px;
+    font-size: 0.9em;
+    cursor: pointer;
+    user-select: all;
+}
+.tb-token.is-sample { background: #e6f4ea; color: #166534; border-color: #86efac; }
+
+.tb-floating-toolbar {
+    position: absolute;
+    background: #111;
+    color: #fff;
+    border-radius: 6px;
+    padding: 4px;
+    display: flex;
+    gap: 2px;
+    z-index: 20;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.tb-floating-toolbar button {
+    background: transparent;
+    color: #ddd;
+    border: none;
+    padding: 4px 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+.tb-floating-toolbar button:hover,
+.tb-floating-toolbar button.is-active {
+    background: rgba(245, 130, 32, 0.3);
+    color: #fff;
+}
+
+/* Suggestion popup for {{ tokens */
+.tb-suggestion {
+    position: absolute;
+    background: #0d1424;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    max-height: 320px;
+    overflow: auto;
+    width: 280px;
+    z-index: 100;
+    color: #fff;
+    font-size: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.tb-suggestion-group {
+    padding: 4px 10px;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.03);
+}
+.tb-suggestion-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+}
+.tb-suggestion-item:hover,
+.tb-suggestion-item.is-selected { background: rgba(245, 130, 32, 0.12); color: var(--tb-accent); }
+.tb-suggestion-item .tb-path {
+    font-family: ui-monospace, Menlo, monospace;
+    font-size: 11px;
+    color: inherit;
+}
+.tb-suggestion-item .tb-label { color: rgba(255, 255, 255, 0.6); }
+
+/* ── Right panel ──────────────────────────────────────────────── */
+
+.tb-right-collapse-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tb-right-pane.is-collapsed .tb-settings-body { display: none; }
+
+/* ── Mobile ───────────────────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+    .tb-shell { display: block; }
+    .tb-pane { margin-bottom: 10px; }
+    .tb-canvas-wrap { padding: 10px 0; }
+}

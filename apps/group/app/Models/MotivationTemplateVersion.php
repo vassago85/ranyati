@@ -87,21 +87,50 @@ class MotivationTemplateVersion extends Model
                 'font_family' => 'DejaVu Sans',
                 'font_size' => 11,
             ],
-            'header' => [
-                'enabled' => false,
-                'asset_id' => null,
-                'text' => '',
-                'different_first_page' => true,
-            ],
-            'footer' => [
-                'enabled' => true,
-                'text' => '',
-                'show_page_numbers' => true,
-                'different_first_page' => true,
-            ],
+            'header' => self::defaultBand(enabled: false, pageNumberSlot: null),
+            'footer' => self::defaultBand(enabled: true, pageNumberSlot: 'right'),
             // "per_firearm": one letter per firearms_table row (the default).
             // "combined": one letter covers every firearm.
             'letter_mode' => 'per_firearm',
         ];
+    }
+
+    /**
+     * Slot-based header or footer band. A band has three slots (left,
+     * centre, right); each slot is one of: none, text (with {{tokens}}),
+     * image (from the asset library), page_number, date ({{today}}),
+     * reference ({{request.reference}}).
+     *
+     * The historical shape (text, asset_id, show_page_numbers,
+     * different_first_page) is converted to this on read.
+     *
+     * @return array<string, mixed>
+     */
+    public static function defaultBand(bool $enabled = false, ?string $pageNumberSlot = null): array
+    {
+        $slots = [
+            'left' => self::emptySlot(),
+            'centre' => self::emptySlot(),
+            'right' => self::emptySlot(),
+        ];
+        if ($pageNumberSlot !== null && isset($slots[$pageNumberSlot])) {
+            $slots[$pageNumberSlot] = ['type' => 'page_number', 'format' => 'Page {X} of {Y}'];
+        }
+
+        return [
+            'enabled' => $enabled,
+            'hide_first_page' => true,
+            'height_mm' => 0,
+            'border' => false,
+            'slots' => $slots,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public static function emptySlot(): array
+    {
+        return ['type' => 'none'];
     }
 }

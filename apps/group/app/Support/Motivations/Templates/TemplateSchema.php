@@ -102,6 +102,14 @@ class TemplateSchema
                 // can save intermediate drafts without losing nested tags.
                 'html' => mb_substr(trim((string) ($s['html'] ?? '')), 0, 50000),
             ],
+            BlockKinds::SECTION => [
+                // Heading + rich body in one block. The migration from the
+                // 39-block "heading, text, heading, text…" layout folds
+                // adjacent pairs with matching conditions into this.
+                'heading' => $str('heading', 500),
+                'level' => in_array((int) ($s['level'] ?? 2), [1, 2, 3], true) ? (int) $s['level'] : 2,
+                'html' => mb_substr(trim((string) ($s['html'] ?? '')), 0, 50000),
+            ],
             BlockKinds::IMAGE => [
                 'asset_id' => $assetId('asset_id'),
                 'width' => $int('width', 60, 10, 100),
@@ -274,20 +282,135 @@ class TemplateSchema
                 'font_family' => mb_substr(trim((string) ($page['font_family'] ?? $defaults['page']['font_family'])), 0, 60) ?: $defaults['page']['font_family'],
                 'font_size' => self::clamp((int) ($page['font_size'] ?? $defaults['page']['font_size']), 8, 18),
             ],
-            'header' => [
-                'enabled' => filter_var($header['enabled'] ?? $defaults['header']['enabled'], FILTER_VALIDATE_BOOLEAN),
-                'asset_id' => ($aid = (int) ($header['asset_id'] ?? 0)) > 0 ? $aid : null,
-                'text' => mb_substr(trim((string) ($header['text'] ?? '')), 0, 2000),
-                'different_first_page' => filter_var($header['different_first_page'] ?? true, FILTER_VALIDATE_BOOLEAN),
-            ],
-            'footer' => [
-                'enabled' => filter_var($footer['enabled'] ?? $defaults['footer']['enabled'], FILTER_VALIDATE_BOOLEAN),
-                'text' => mb_substr(trim((string) ($footer['text'] ?? '')), 0, 2000),
-                'show_page_numbers' => filter_var($footer['show_page_numbers'] ?? true, FILTER_VALIDATE_BOOLEAN),
-                'different_first_page' => filter_var($footer['different_first_page'] ?? true, FILTER_VALIDATE_BOOLEAN),
-            ],
+            'header' => self::normalizeBand($header, 'header'),
+            'footer' => self::normalizeBand($footer, 'footer'),
             'letter_mode' => in_array($input['letter_mode'] ?? null, ['per_firearm', 'combined'], true) ? $input['letter_mode'] : $defaults['letter_mode'],
         ];
+    }
+
+    /**
+     * Normalise a header or footer band. Accepts the new slot shape and
+     * also upgrades the legacy shape (text, asset_id, show_page_numbers,
+     * different_first_page) so old versions keep rendering unchanged after
+     * the schema moves.
+     *
+     * Legacy upgrade rules:
+     *   - asset_id -> left image slot
+     *   - text -> centre slot when there's a logo, otherwise left slot
+     *   - show_page_numbers -> right slot "Page {X} of {Y}"
+     *   - different_first_page -> hide_first_page
+     *   - height_mm = 0, so the body margins don't change
+     *
+     * @param  array<string, mixed>  $band
+     * @param  string  $which  'header' or 'footer'
+     * @return array<string, mixed>
+     */
+    private static function normalizeBand(array $band, string $which): array
+    {
+        $isNewShape = isset($band['slots']) && is_array($band['slots']);
+
+        if (! $isNewShape && (isset($band['text']) || isset($band['asset_id']) || isset($band['show_page_numbers']))) {
+            return self::upgradeLegacyBand($band, $which);
+        }
+
+        $defaults = MotivationTemplateVersion::defaultBand(
+            enabled: $which === 'footer',
+            pageNumberSlot: $which === 'footer' ? 'right' : null,
+        );
+
+        $slotsIn = is_array($band['slots'] ?? null) ? $band['slots'] : [];
+        $slots = [];
+        foreach (['left', 'centre', 'right'] as $pos) {
+            $slots[$pos] = self::normalizeSlot($slotsIn[$pos] ?? null);
+        }
+
+        return [
+            'enabled' => filter_var($band['enabled'] ?? $defaults['enabled'], FILTER_VALIDATE_BOOLEAN),
+            'hide_first_page' => filter_var($band['hide_first_page'] ?? $defaults['hide_first_page'], FILTER_VALIDATE_BOOLEAN),
+            'height_mm' => self::clamp((int) ($band['height_mm'] ?? $defaults['height_mm']), 0, 40),
+            'border' => filter_var($band['border'] ?? $defaults['border'], FILTER_VALIDATE_BOOLEAN),
+            'slots' => $slots,
+        ];
+    }
+
+    /**
+     * Convert a pre-redesign band to the slot shape.
+     *
+     * @param  array<string, mixed>  $band
+     * @return array<string, mixed>
+     */
+    private static function upgradeLegacyBand(array $band, string $which): array
+    {
+        $text = mb_substr(trim((string) ($band['text'] ?? '')), 0, 2000);
+        $assetId = ($aid = (int) ($band['asset_id'] ?? 0)) > 0 ? $aid : null;
+        $showPageNumbers = filter_var($band['show_page_numbers'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        $hideFirst = filter_var($band['different_first_page'] ?? true, FILTER_VALIDATE_BOOLEAN);
+        $enabled = filter_var($band['enabled'] ?? ($which === 'footer'), FILTER_VALIDATE_BOOLEAN);
+
+        $slots = [
+            'left' => ['type' => 'none'],
+            'centre' => ['type' => 'none'],
+            'right' => ['type' => 'none'],
+        ];
+
+        if ($assetId !== null) {
+            $slots['left'] = ['type' => 'image', 'asset_id' => $assetId];
+            if ($text !== '') {
+                $slots['centre'] = ['type' => 'text', 'value' => $text];
+            }
+        } elseif ($text !== '') {
+            $slots['left'] = ['type' => 'text', 'value' => $text];
+        }
+
+        if ($showPageNumbers) {
+            $slots['right'] = ['type' => 'page_number', 'format' => 'Page {X} of {Y}'];
+        }
+
+        return [
+            'enabled' => $enabled,
+            'hide_first_page' => $hideFirst,
+            // height_mm stays 0 so body margins don't shift on the first
+            // render after the upgrade. Admins bump it when they want a
+            // taller band.
+            'height_mm' => 0,
+            'border' => false,
+            'slots' => $slots,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function normalizeSlot(mixed $slot): array
+    {
+        if (! is_array($slot)) {
+            return ['type' => 'none'];
+        }
+
+        $type = (string) ($slot['type'] ?? 'none');
+        if (! in_array($type, ['none', 'text', 'image', 'page_number', 'date', 'reference'], true)) {
+            return ['type' => 'none'];
+        }
+
+        return match ($type) {
+            'none' => ['type' => 'none'],
+            'text' => [
+                'type' => 'text',
+                'value' => mb_substr(trim((string) ($slot['value'] ?? '')), 0, 500),
+            ],
+            'image' => [
+                'type' => 'image',
+                'asset_id' => ($aid = (int) ($slot['asset_id'] ?? 0)) > 0 ? $aid : null,
+            ],
+            'page_number' => [
+                'type' => 'page_number',
+                'format' => in_array($slot['format'] ?? null, ['Page {X} of {Y}', '{X}', 'Page {X}'], true)
+                    ? (string) $slot['format']
+                    : 'Page {X} of {Y}',
+            ],
+            'date' => ['type' => 'date', 'value' => '{{today}}'],
+            'reference' => ['type' => 'reference', 'value' => '{{request.reference}}'],
+        };
     }
 
     private static function clamp(int $value, int $min, int $max): int

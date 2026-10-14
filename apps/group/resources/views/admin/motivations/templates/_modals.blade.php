@@ -1,35 +1,17 @@
-{{-- Modal: placeholder picker --}}
-<template x-if="pickerOpen">
-    <div class="modal-backdrop" @click.self="pickerOpen = false">
-        <div class="modal wide" style="width:560px;">
-            <h2 style="margin:0 0 10px;">Insert placeholder</h2>
-            <input class="form-input search-input" placeholder="Search…" x-model="pickerSearch">
-            <template x-for="(group, groupName) in filteredCatalogue()" :key="groupName">
-                <div style="margin-bottom:10px;">
-                    <div style="font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:4px;" x-text="groupName"></div>
-                    <template x-for="(label, path) in group" :key="path">
-                        <span class="placeholder-chip" @click="insertPlaceholder(path)" x-text="'{' + '{' + path + '}' + '}' + ' — ' + label"></span>
-                    </template>
-                </div>
-            </template>
-            <div style="text-align:right;margin-top:8px;">
-                <button type="button" class="btn btn-secondary btn-sm" @click="pickerOpen = false">Close</button>
-            </div>
-        </div>
-    </div>
-</template>
-
-{{-- Modal: page settings --}}
+{{-- Modal: page settings (size, orientation, font, margins, letter mode) --}}
 <template x-if="openSettings">
     <div class="modal-backdrop" @click.self="openSettings = false">
         <div class="modal wide">
             <h2 style="margin:0 0 10px;">Page setup</h2>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
                 <label><div class="label-row"><span>Page size</span></div>
-                    <select class="form-input" x-model="settings.page.size"><option>A4</option><option>Letter</option></select>
+                    <select class="form-input" x-model="settings.page.size" @change="recomputePageSize()"><option>A4</option><option>Letter</option></select>
                 </label>
                 <label><div class="label-row"><span>Orientation</span></div>
-                    <select class="form-input" x-model="settings.page.orientation"><option value="portrait">Portrait</option><option value="landscape">Landscape</option></select>
+                    <select class="form-input" x-model="settings.page.orientation" @change="recomputePageSize()">
+                        <option value="portrait">Portrait</option>
+                        <option value="landscape">Landscape</option>
+                    </select>
                 </label>
                 <label><div class="label-row"><span>Font family</span></div><input class="form-input" x-model="settings.page.font_family"></label>
                 <label><div class="label-row"><span>Font size (pt)</span></div><input class="form-input" type="number" min="8" max="18" x-model.number="settings.page.font_size"></label>
@@ -37,7 +19,7 @@
                 <label><div class="label-row"><span>Margin right (mm)</span></div><input class="form-input" type="number" min="0" max="50" x-model.number="settings.page.margin_right"></label>
                 <label><div class="label-row"><span>Margin bottom (mm)</span></div><input class="form-input" type="number" min="0" max="50" x-model.number="settings.page.margin_bottom"></label>
                 <label><div class="label-row"><span>Margin left (mm)</span></div><input class="form-input" type="number" min="0" max="50" x-model.number="settings.page.margin_left"></label>
-                <label><div class="label-row"><span>Motivation mode</span></div>
+                <label style="grid-column:1 / -1;"><div class="label-row"><span>Motivation mode</span></div>
                     <select class="form-input" x-model="settings.letter_mode">
                         <option value="per_firearm">One motivation per firearm (default)</option>
                         <option value="combined">One combined motivation for all firearms</option>
@@ -45,39 +27,12 @@
                 </label>
             </div>
 
-            <h3 style="margin:16px 0 6px;color:rgba(255,255,255,.6);font-size:12px;letter-spacing:.1em;text-transform:uppercase;">Header</h3>
-            <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" x-model="settings.header.enabled"> Show a header on every page</label>
-            <template x-if="settings.header.enabled">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                    <label><div class="label-row"><span>Logo</span></div>
-                        <select class="form-input" x-model.number="settings.header.asset_id">
-                            <option :value="null">— none —</option>
-                            <template x-for="a in assets.filter(a => a.category === 'logo' || a.category === 'letterhead')" :key="a.id"><option :value="a.id" x-text="a.name"></option></template>
-                        </select>
-                    </label>
-                    <label style="grid-column:1 / -1;"><div class="label-row"><span>Header text</span></div>
-                        <textarea class="form-input" rows="2" x-model="settings.header.text" placeholder="e.g. @{{profile.full_name}} ID: @{{profile.id_number}} Initial _______"></textarea>
-                        <small style="color:rgba(255,255,255,.5);">Tokens like <code>@{{profile.full_name}}</code>, <code>@{{profile.id_number}}</code> and <code>@{{firearm.serial}}</code> resolve per request.</small>
-                    </label>
-                    <label style="display:flex;gap:6px;align-items:center;grid-column:1 / -1;"><input type="checkbox" x-model="settings.header.different_first_page"> Hide on the first page</label>
-                </div>
-            </template>
-
-            <h3 style="margin:16px 0 6px;color:rgba(255,255,255,.6);font-size:12px;letter-spacing:.1em;text-transform:uppercase;">Footer</h3>
-            <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" x-model="settings.footer.enabled"> Show a footer on every page</label>
-            <template x-if="settings.footer.enabled">
-                <div>
-                    <label><div class="label-row"><span>Footer text</span></div>
-                        <textarea class="form-input" rows="2" x-model="settings.footer.text" placeholder="e.g. @{{profile.full_name}} — @{{today}}"></textarea>
-                        <small style="color:rgba(255,255,255,.5);">Supports the same <code>@{{…}}</code> tokens as the body.</small>
-                    </label>
-                    <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" x-model="settings.footer.show_page_numbers"> Show page numbers (Page X of Y)</label>
-                    <label style="display:flex;gap:6px;align-items:center;"><input type="checkbox" x-model="settings.footer.different_first_page"> Hide on the first page</label>
-                </div>
-            </template>
+            <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:rgba(255,255,255,.5);">
+                Header and footer bands are now edited directly on the canvas page. Click the band at the top or bottom of the page to turn it on.
+            </div>
 
             <div style="margin-top:14px;text-align:right;">
-                <button type="button" class="btn btn-primary btn-sm" @click="openSettings = false">Done</button>
+                <button type="button" class="btn btn-primary btn-sm" @click="openSettings = false; save(true)">Done</button>
             </div>
         </div>
     </div>
@@ -125,7 +80,7 @@
                         <span style="color:rgba(255,255,255,.4);font-size:11px;" x-text="v.published_at ? v.publisher+' · '+v.published_at : ''"></span>
                         <div style="flex:1;"></div>
                         <template x-if="!v.is_draft">
-                            <form :action="urls.update.replace(/\/?$/, '/versions/'+v.id+'/restore')" method="POST" @submit="loading = true">
+                            <form :action="urls.update.replace(/\/?$/, '/versions/'+v.id+'/restore')" method="POST">
                                 <input type="hidden" name="_token" :value="urls.csrfToken">
                                 <button class="btn btn-sm btn-secondary">Restore as draft</button>
                             </form>
@@ -145,5 +100,31 @@
     </div>
 </template>
 
-{{-- Hidden form for restoring versions --}}
-<form id="restore-form" method="POST" style="display:none;"></form>
+{{-- Right drawer: PDF render preview --}}
+<template x-if="openRenderDrawer">
+    <div class="modal-backdrop" @click.self="openRenderDrawer = false" style="justify-content:flex-end;padding:0;">
+        <div class="modal" style="width:min(760px, 90vw);height:100vh;max-height:none;border-radius:0;margin:0;">
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+                <h2 style="margin:0;flex:1;">Render PDF</h2>
+                <button type="button" class="btn btn-secondary btn-sm" @click="openRenderDrawer = false">Close</button>
+            </div>
+            <template x-if="previewMissing.length > 0">
+                <div style="padding:8px;margin-bottom:8px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:6px;font-size:12px;color:#fca5a5;">
+                    <strong>Empty placeholders:</strong> <span x-text="previewMissing.join(', ')"></span>
+                </div>
+            </template>
+            <template x-if="previewWarnings.length > 0">
+                <div style="padding:8px;margin-bottom:8px;background:rgba(245,130,32,0.08);border:1px solid rgba(245,130,32,0.3);border-radius:6px;font-size:12px;color:#F58220;">
+                    <strong>Warnings:</strong> <span x-text="previewWarnings.join('; ')"></span>
+                </div>
+            </template>
+            <template x-if="previewUrl">
+                <iframe :src="previewUrl" title="Preview" style="width:100%;height:calc(100vh - 140px);border:1px solid rgba(255,255,255,.1);border-radius:6px;background:#fff;"></iframe>
+            </template>
+            <template x-if="!previewUrl">
+                <div style="padding:60px;text-align:center;color:rgba(255,255,255,.3);font-size:12px;">Rendering…</div>
+            </template>
+        </div>
+    </div>
+</template>
+

@@ -1,4 +1,6 @@
-{{-- Shared PDF shell for a template-rendered letter segment. --}}
+{{-- Shared PDF shell for a template-rendered letter segment. The header
+     and footer bands are drawn by dompdf's canvas page_script callback
+     (see LetterPdf::attachBands), so this view only owns the body. --}}
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,66 +35,9 @@
     .img-caption { font-size: 9pt; color: #555; margin-top: 4pt; }
     .page-break { page-break-after: always; }
     .missing { background: #fee; color: #a00; padding: 0 2pt; border-radius: 2pt; }
-    header.pdf-header, footer.pdf-footer {
-        position: fixed;
-        left: 0; right: 0;
-        color: #555;
-        font-size: 9pt;
-    }
-    header.pdf-header { top: -{{ max(5, (int) $margins['top'] - 10) }}mm; }
-    footer.pdf-footer { bottom: -{{ max(5, (int) $margins['bottom'] - 10) }}mm; }
-    header.pdf-header .inner, footer.pdf-footer .inner { padding: 4pt 0; }
-    header.pdf-header img { max-height: {{ (int) $margins['top'] - 6 }}mm; }
-    .page-number { text-align: right; }
-    .header-first-only { display: block; }
-    .header-rest-only { display: none; }
-    .page_1_of_many .header-first-only { display: block; }
 </style>
 </head>
 <body>
-@if ($header['enabled'])
-    <header class="pdf-header">
-        <div class="inner">
-            @if (! empty($header['data_uri']))
-                <img src="{{ $header['data_uri'] }}" alt="">
-            @endif
-            @if ($header['text'] !== '')
-                <div>{!! $header['text'] !!}</div>
-            @endif
-        </div>
-    </header>
-@endif
-
-@if ($footer['enabled'])
-    <footer class="pdf-footer">
-        <div class="inner">
-            @if ($footer['text'] !== '')
-                <div>{!! $footer['text'] !!}</div>
-            @endif
-            @if ($footer['show_page_numbers'])
-                <div class="page-number">
-                    Page <span class="pagenum"></span>
-                </div>
-            @endif
-        </div>
-        @if ($footer['show_page_numbers'])
-            {{-- DomPDF replaces this script with page numbers after layout. --}}
-            <script type="text/php">
-                if (isset($pdf)) {
-                    $font = $fontMetrics->get_font("{!! addslashes($fontFamily) !!}", "normal");
-                    $size = 9;
-                    $pdf->page_text(
-                        $pdf->get_width() - {{ (int) $margins['right'] }} * 2.83 - 60,
-                        $pdf->get_height() - {{ (int) $margins['bottom'] }} * 2.83 + 6,
-                        "Page {PAGE_NUM} of {PAGE_COUNT}",
-                        $font, $size, [0.3, 0.3, 0.3]
-                    );
-                }
-            </script>
-        @endif
-    </footer>
-@endif
-
 {!! $body !!}
 </body>
 </html>

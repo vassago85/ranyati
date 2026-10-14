@@ -12,6 +12,7 @@ use App\Support\Motivations\Templates\LetterComposer;
 use App\Support\Motivations\Templates\LetterPdf;
 use App\Support\Motivations\Templates\OnePageSelfDefenceTemplate;
 use App\Support\Motivations\Templates\RenderContext;
+use App\Support\Motivations\Templates\TemplateSchema;
 use App\Support\Motivations\Templates\TemplateSelector;
 use Database\Seeders\MotivationTypesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -87,7 +88,10 @@ class OnePageSelfDefenceTemplateTest extends TestCase
         )))->compose((array) $version->blocks);
 
         $text = LetterPdf::previewText($result['segments']);
-        $settings = LetterPdf::resolveHeaderFooter((array) $version->settings, RenderContext::for($request));
+        $settings = LetterPdf::resolveHeaderFooter(
+            TemplateSchema::normalizeSettingsJson((array) $version->settings),
+            RenderContext::for($request),
+        );
 
         $this->assertSame(1, count(array_filter($result['segments'], fn ($s) => ($s['type'] ?? '') === 'html')));
         $this->assertStringContainsString('PETRUS JOHANNES BOTHA', $text);
@@ -99,7 +103,10 @@ class OnePageSelfDefenceTemplateTest extends TestCase
         $this->assertStringContainsString('R254902', $text);
         $this->assertStringContainsString('Canik', $text);
         $this->assertStringContainsString('MC9L', $text);
-        $this->assertStringContainsString('PETRUS JOHANNES BOTHA ID: 770912 5034 08 1 Initial_________', $settings['header']['text']);
+        $this->assertStringContainsString(
+            'PETRUS JOHANNES BOTHA ID: 770912 5034 08 1 Initial_________',
+            (string) data_get($settings, 'header.slots.left.value', data_get($settings, 'header.text')),
+        );
         $this->assertStringNotContainsString('Supporting documents', $text);
         $this->assertStringNotContainsString('Lieutenant-General', $text);
     }

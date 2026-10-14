@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\MotivationRequest;
 use App\Models\MotivationTemplate;
+use App\Support\Motivations\Placeholders;
 use App\Support\Motivations\QuestionSchema;
 use App\Support\Motivations\Templates\LetterComposer;
 use App\Support\Motivations\Templates\LetterPdf;
+use App\Support\Motivations\Templates\PlaceholderCatalogue;
 use App\Support\Motivations\Templates\PreviewSampleData;
 use App\Support\Motivations\Templates\RenderContext;
 use App\Support\Motivations\Templates\TemplateSchema;
@@ -81,6 +83,81 @@ class TemplatePreviewController extends Controller
             'warnings' => $result['warnings'],
             'preview_text' => LetterPdf::previewText($result['segments']),
             'url' => route('admin.motivation-templates.preview.show', ['motivationTemplate' => $motivationTemplate, 'token' => $token]),
+        ]);
+    }
+
+    /**
+     * Live canvas preview data: placeholder values resolved against the
+     * chosen sample record, per-block HTML for the special "card" kinds
+     * and whether each block's condition passes.
+     *
+     * The admin builder calls this on every settings change for a card
+     * (debounced) and whenever the sample record is swapped. It is a
+     * JSON endpoint — no PDF rendering, no disk writes.
+     */
+    public function canvas(Request $request, MotivationTemplate $motivationTemplate)
+    {
+        Gate::authorize('view', $motivationTemplate);
+
+        $data = $request->validate([
+            'blocks' => 'nullable|array',
+            'request_id' => 'nullable|integer|exists:motivation_requests,id',
+            'firearm_index' => 'nullable|integer|min:1',
+        ]);
+
+        $blocks = TemplateSchema::normalizeBlocks($data['blocks'] ?? []);
+
+        $motivationRequest = isset($data['request_id'])
+            ? MotivationRequest::with(['user.clientProfile', 'applicationType.blocks', 'documents'])
+                ->findOrFail($data['request_id'])
+            : PreviewSampleData::requestFor($motivationTemplate);
+
+        $firearmRow = null;
+        if (! empty($data['firearm_index']) && $motivationRequest->applicationType) {
+            $firearms = QuestionSchema::firearms(
+                $motivationRequest->applicationType->sections(),
+                $motivationRequest->answers ?? [],
+            );
+            $firearmRow = $firearms[$data['firearm_index']] ?? null;
+        }
+
+        $context = RenderContext::for(
+            $motivationRequest,
+            $firearmRow ? RenderContext::firearm((int) $data['firearm_index'], $firearmRow) : null,
+        );
+
+        $composer = new LetterComposer($motivationRequest, $context);
+
+        // Resolve every placeholder catalogue path once, so the Alpine
+        // front-end can swap chips -> sample values without a round-trip
+        // per chip.
+        $values = [];
+        foreach (PlaceholderCatalogue::forTemplate($motivationTemplate) as $group) {
+            foreach ($group as $path => $_label) {
+                $values[$path] = Placeholders::format(data_get($context, $path));
+            }
+        }
+
+        // Per-block HTML only for the "card" kinds — the plain text,
+        // heading, section and rich_text blocks render inline in the
+        // canvas via TipTap, so we don't need server HTML for them.
+        $cardKinds = [
+            'yes_no_sentences', 'crime_context', 'table',
+            'document_insert', 'dynamic_image', 'signature', 'title_page',
+        ];
+        $cards = [];
+        $passes = [];
+        foreach ($blocks as $block) {
+            $passes[$block['id']] = \App\Support\Motivations\ConditionEvaluator::passes($block['condition'] ?? null, $context);
+            if (in_array($block['kind'], $cardKinds, true)) {
+                $cards[$block['id']] = $composer->previewBlock($block);
+            }
+        }
+
+        return response()->json([
+            'values' => $values,
+            'cards' => $cards,
+            'passes' => $passes,
         ]);
     }
 

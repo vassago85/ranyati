@@ -50,6 +50,9 @@ class TemplateBuilderTest extends TestCase
         $this->actingAs($this->admin())
             ->get('/admin/motivation-templates/'.$template->id.'/edit')
             ->assertOk()
+            // The canvas rebuild still boots an Alpine component called
+            // `templateBuilder` via the Vite bundle; the Page setup button
+            // moved into the topbar but the label is the same.
             ->assertSee('templateBuilder(', false)
             ->assertSee('Page setup', false);
     }

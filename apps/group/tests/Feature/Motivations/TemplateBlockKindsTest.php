@@ -345,8 +345,8 @@ class TemplateBlockKindsTest extends TestCase
             'page' => ['size' => 'A4', 'orientation' => 'portrait', 'margin_top' => 20, 'margin_right' => 18, 'margin_bottom' => 20, 'margin_left' => 18, 'font_family' => 'DejaVu Sans', 'font_size' => 11],
         ], $context);
 
-        $this->assertSame('Jane Doe ID: 9001011234080 Initial_________', $resolved['header']['text']);
-        $this->assertSame('Page footer for Jane Doe', $resolved['footer']['text']);
+        $this->assertSame('Jane Doe ID: 9001011234080 Initial_________', $resolved['header']['slots']['left']['value']);
+        $this->assertSame('Page footer for Jane Doe', $resolved['footer']['slots']['left']['value']);
     }
 
     public function test_running_header_escapes_resolved_values_but_keeps_admin_typed_html(): void
@@ -385,9 +385,13 @@ class TemplateBlockKindsTest extends TestCase
             'page' => ['size' => 'A4', 'orientation' => 'portrait', 'margin_top' => 20, 'margin_right' => 18, 'margin_bottom' => 20, 'margin_left' => 18, 'font_family' => 'DejaVu Sans', 'font_size' => 11],
         ], RenderContext::for($r));
 
-        $this->assertStringContainsString('<strong>', $resolved['header']['text']);
-        $this->assertStringContainsString('A&lt;B&gt; D&quot;E', $resolved['header']['text']);
-        $this->assertStringNotContainsString('<B>', $resolved['header']['text']);
+        // Slot values are drawn on the PDF canvas as plain text, so
+        // placeholder substitution does not HTML-escape. The raw name
+        // (including < and ") is what page_script paints.
+        $value = (string) $resolved['header']['slots']['left']['value'];
+        $this->assertStringContainsString('<strong>', $value);
+        $this->assertStringContainsString('A<B> D"E', $value);
+        $this->assertStringContainsString('9001011234080', $value);
     }
 
     public function test_pdf_render_honours_header_and_footer_text_and_page_numbers(): void
