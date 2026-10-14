@@ -11,18 +11,25 @@ use App\Support\Motivations\Templates\LetterPdf;
 use App\Support\Motivations\Templates\PreviewSampleData;
 use App\Support\Motivations\Templates\RenderContext;
 use App\Support\Motivations\Templates\TemplateSchema;
+use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
  * The builder previews a template without saving by posting the live blocks
  * + settings, picking either a sample dataset or a real motivation request.
  *
- * The POST renders the PDF, caches the bytes keyed by a one-off token and
- * returns the token + preview metadata. The GET then streams the cached
- * PDF into an iframe (works inside `frame-src 'self'`).
+ * The POST renders the PDF, writes the bytes to the local disk keyed by a
+ * one-off token and returns the token + preview metadata. The GET then
+ * streams that file into an iframe (works inside `frame-src 'self'`).
+ *
+ * The bytes stay off the cache table on purpose. Production uses the
+ * database cache on MySQL, and Laravel only base64-encodes serialized
+ * values that contain null bytes for SQLite and Postgres. A PDF is
+ * binary, so the MySQL insert fails with "Incorrect string value" and
+ * the builder surfaces Laravel's generic "Server Error" JSON message.
  */
 class TemplatePreviewController extends Controller
 {
@@ -66,7 +73,7 @@ class TemplatePreviewController extends Controller
 
         $bytes = LetterPdf::render($result['segments'], $settings, $context);
         $token = (string) Str::uuid();
-        Cache::put('template-preview:'.$token, $bytes, now()->addMinutes(10));
+        $this->storePreview($token, $bytes);
 
         return response()->json([
             'token' => $token,
@@ -81,15 +88,46 @@ class TemplatePreviewController extends Controller
     {
         Gate::authorize('view', $motivationTemplate);
 
-        // Use get() rather than pull() so the iframe can safely re-fetch
-        // the same preview without hitting a 404 on reload.
-        $bytes = Cache::get('template-preview:'.$token);
-        abort_if($bytes === null, 404, 'Preview expired — generate a new one.');
+        abort_unless(Str::isUuid($token), 404);
+
+        $path = self::previewPath($token);
+        $disk = Storage::disk('local');
+        // Previews are short-lived. Drop the file once it is older than
+        // the window the builder is allowed to re-fetch it in.
+        if (! $disk->exists($path) || $disk->lastModified($path) < now()->subMinutes(10)->getTimestamp()) {
+            $disk->delete($path);
+            abort(404, 'Preview expired — generate a new one.');
+        }
+
+        $bytes = $disk->get($path);
+        abort_if(! is_string($bytes) || $bytes === '', 404, 'Preview expired — generate a new one.');
 
         return response($bytes, 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="preview-'.$motivationTemplate->slug.'.pdf"',
             'Cache-Control' => 'no-store',
         ]);
+    }
+
+    private function storePreview(string $token, string $bytes): void
+    {
+        $disk = Storage::disk('local');
+        $disk->put(self::previewPath($token), $bytes);
+        $this->purgeExpiredPreviews($disk);
+    }
+
+    private static function previewPath(string $token): string
+    {
+        return 'template-previews/'.$token.'.pdf';
+    }
+
+    private function purgeExpiredPreviews(Filesystem $disk): void
+    {
+        $cutoff = now()->subMinutes(15)->getTimestamp();
+        foreach ($disk->files('template-previews') as $file) {
+            if ($disk->lastModified($file) < $cutoff) {
+                $disk->delete($file);
+            }
+        }
     }
 }

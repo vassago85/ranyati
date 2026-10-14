@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Support\Motivations\Templates\TemplateVersionManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -173,7 +174,14 @@ class TemplateBuilderTest extends TestCase
             ->assertJsonStructure(['token', 'url', 'missing', 'warnings']);
 
         $url = $response->json('url');
+        $token = $response->json('token');
         $this->assertStringContainsString('/preview/', $url);
+
+        // The PDF must live on the local disk, not in the cache. The
+        // production cache is MySQL, and a serialized PDF is not valid
+        // UTF-8, so Cache::put of the raw bytes 500s on Render.
+        $this->assertTrue(Storage::disk('local')->exists('template-previews/'.$token.'.pdf'));
+        $this->assertNull(Cache::get('template-preview:'.$token));
 
         $pdf = $this->actingAs($this->admin())->get($url);
         $pdf->assertOk();
