@@ -38,4 +38,16 @@ return [
         'banking' => env('MOTIVATIONS_BANKING'),
     ],
 
+    /*
+    | How long a motivation may sit in its current admin-action status
+    | before it goes amber (warning) or red (overdue) in the dashboard's
+    | "Needs your action" table. The admin can tune these without a code
+    | change by setting MOTIVATIONS_WAITING_AMBER_DAYS /
+    | MOTIVATIONS_WAITING_RED_DAYS in `.env`.
+    */
+    'waiting_thresholds' => [
+        'amber_days' => (int) env('MOTIVATIONS_WAITING_AMBER_DAYS', 3),
+        'red_days' => (int) env('MOTIVATIONS_WAITING_RED_DAYS', 5),
+    ],
+
 ];

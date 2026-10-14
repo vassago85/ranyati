@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\MotivationPhase;
+use App\Enums\MotivationStatus;
 use App\Http\Controllers\Controller;
 use App\Mail\MotivationUpdate;
+use App\Models\ApplicationType;
 use App\Models\MotivationDocument;
 use App\Models\MotivationRequest;
+use App\Support\Mask;
 use App\Support\Motivations\BookRenderer;
 use App\Support\Motivations\DocumentKinds;
 use App\Support\Motivations\MotivationStorage;
@@ -15,25 +19,219 @@ use App\Support\Motivations\Templates\LetterGenerator;
 use App\Support\Motivations\Templates\TemplateSelector;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class MotivationRequestController extends Controller
 {
+    /**
+     * Phase 2 (mockup 02): the motivations list.
+     *
+     * Query-string shape (every filter round-trips):
+     *   q         free-text search (name, email, reference, masked ID/cell digits)
+     *   filter    'needs-action' | 'in-progress' — the dashboard KPI
+     *             tiles deep-link into these pseudo-filters
+     *   phase     one of MotivationPhase keys (intake/preparation/payment/fulfilment)
+     *   status    one of MotivationStatus values (overrides phase)
+     *   type      application type id
+     *   waiting   '3' or '7' (minimum days in current stage)
+     *   sort      'oldest' | 'newest' (default newest)
+     *   per_page  10|25|50 (default 25)
+     */
     public function index(Request $request)
     {
-        $filter = $request->query('status');
+        [$query, $filters] = $this->buildListQuery($request);
 
-        $query = MotivationRequest::with(['user', 'applicationType'])->latest();
-        if ($filter && array_key_exists($filter, MotivationRequest::STATUSES)) {
-            $query->where('status', $filter);
-        }
+        $counts = $this->tabCounts($request);
 
         return view('admin.motivations.requests.index', [
-            'requests' => $query->paginate(25)->withQueryString(),
-            'statuses' => MotivationRequest::STATUSES,
-            'active' => $filter,
+            'requests' => $query->paginate((int) $filters['per_page'])->withQueryString(),
+            'filters' => $filters,
+            'counts' => $counts,
+            'types' => ApplicationType::query()->orderBy('name')->get(['id', 'name', 'category']),
+            'phases' => MotivationPhase::ordered(),
+            'statuses' => MotivationStatus::ordered(),
         ]);
+    }
+
+    /**
+     * CSV export of the current filter. Deliberately *un*masked — this is
+     * an admin-only download for back-office processing and auditing.
+     * The client-facing list view keeps the masked columns.
+     */
+    public function export(Request $request): StreamedResponse
+    {
+        [$query] = $this->buildListQuery($request);
+        $query->getQuery()->offset = null;
+        $query->getQuery()->limit = null;
+
+        $filename = 'ranyati-motivations-'.now()->format('Y-m-d-His').'.csv';
+
+        return new StreamedResponse(function () use ($query) {
+            $out = fopen('php://output', 'wb');
+            fputcsv($out, [
+                'Reference', 'Client name', 'Client email',
+                'ID number', 'Cell',
+                'Application type', 'Category',
+                'Status key', 'Status label', 'Phase',
+                'Days in current stage',
+                'Created', 'Updated',
+            ]);
+            $query->chunk(500, function ($rows) use ($out) {
+                foreach ($rows as $m) {
+                    $status = MotivationStatus::from($m->status);
+                    $profile = $m->user->clientProfile;
+                    fputcsv($out, [
+                        $m->reference(),
+                        $m->user->name,
+                        $m->user->email,
+                        $profile?->id_number,
+                        $profile?->cell,
+                        $m->applicationType->name,
+                        $m->applicationType->categoryLabel(),
+                        $status->value,
+                        $status->label(),
+                        $status->phase()->label(),
+                        // Explicit cast to int. Newer Carbon returns a
+                        // float microsecond value when the two
+                        // timestamps are on the same instant, which
+                        // leaks "4.33e-6" into the CSV for same-day
+                        // rows if we don't round down.
+                        (int) ($m->updated_at ? abs($m->updated_at->diffInDays(now())) : 0),
+                        optional($m->created_at)->format('Y-m-d H:i:s'),
+                        optional($m->updated_at)->format('Y-m-d H:i:s'),
+                    ]);
+                }
+            });
+            fclose($out);
+        }, Response::HTTP_OK, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    /**
+     * Build the shared query used by both the HTML list and the CSV
+     * export so a URL that filters down to one row in the browser is
+     * guaranteed to export the exact same one row.
+     *
+     * @return array{0: \Illuminate\Database\Eloquent\Builder, 1: array<string, mixed>}
+     */
+    private function buildListQuery(Request $request): array
+    {
+        $filters = [
+            'q' => trim((string) $request->query('q', '')),
+            'filter' => in_array($request->query('filter'), ['needs-action', 'in-progress'], true) ? $request->query('filter') : null,
+            'phase' => in_array($request->query('phase'), array_map(fn ($p) => $p->value, MotivationPhase::ordered()), true) ? $request->query('phase') : null,
+            'status' => array_key_exists($request->query('status', ''), MotivationStatus::labels()) ? $request->query('status') : null,
+            'type' => $request->query('type') ? (int) $request->query('type') : null,
+            'waiting' => in_array($request->query('waiting'), ['3', '7'], true) ? (int) $request->query('waiting') : null,
+            'sort' => $request->query('sort') === 'oldest' ? 'oldest' : 'newest',
+            'per_page' => in_array((int) $request->query('per_page'), [10, 25, 50], true) ? (int) $request->query('per_page') : 25,
+        ];
+
+        $query = MotivationRequest::query()->with(['user.clientProfile', 'applicationType']);
+
+        if ($filters['filter'] === 'needs-action') {
+            $query->whereIn('status', MotivationStatus::needsActionValues());
+        } elseif ($filters['filter'] === 'in-progress') {
+            $query->whereNotIn('status', [
+                MotivationStatus::DRAFT->value,
+                MotivationStatus::COMPLETED->value,
+            ]);
+        }
+
+        if ($filters['status']) {
+            $query->where('status', $filters['status']);
+        } elseif ($filters['phase']) {
+            $phase = MotivationPhase::from($filters['phase']);
+            $query->whereIn('status', array_map(fn ($s) => $s->value, $phase->statuses()));
+        }
+
+        if ($filters['type']) {
+            $query->where('application_type_id', $filters['type']);
+        }
+
+        if ($filters['waiting']) {
+            $query->where('updated_at', '<=', now()->subDays($filters['waiting']));
+        }
+
+        if ($filters['q'] !== '') {
+            $digits = preg_replace('/\D+/', '', $filters['q']) ?? '';
+            $like = '%'.$filters['q'].'%';
+            $digitLike = $digits !== '' ? '%'.$digits.'%' : null;
+
+            $query->where(function ($sub) use ($like, $digits, $digitLike) {
+                $sub->whereHas('user', fn ($u) => $u->where('name', 'like', $like)
+                    ->orWhere('email', 'like', $like));
+
+                // Reference search: "RM-000012", "RM12", "12" all map to id=12.
+                $refDigits = ltrim($digits, '0');
+                if ($refDigits !== '') {
+                    $sub->orWhere('motivation_requests.id', (int) $refDigits);
+                }
+
+                if ($digitLike) {
+                    $sub->orWhereHas('user.clientProfile', fn ($p) => $p->where('id_number', 'like', $digitLike)
+                        ->orWhere('cell', 'like', $digitLike));
+                }
+            });
+        }
+
+        $query->orderBy('updated_at', $filters['sort'] === 'oldest' ? 'asc' : 'desc')->orderByDesc('id');
+
+        return [$query, $filters];
+    }
+
+    /**
+     * Counts for the 7 phase tabs. Each count honours the search query
+     * and the type/waiting filters so the user sees a live breakdown of
+     * the current filtered set, not an all-time snapshot.
+     *
+     * @return array<string, int>
+     */
+    private function tabCounts(Request $request): array
+    {
+        // Clone a tab-count baseline query that applies the same q/type/waiting
+        // filters as the main list, but ignores status/phase/filter so the
+        // tabs show what's reachable from the current context.
+        $baseline = fn () => tap(MotivationRequest::query()->with([]),
+            function ($q) use ($request) {
+                if ($type = (int) $request->query('type')) {
+                    $q->where('application_type_id', $type);
+                }
+                if (in_array($request->query('waiting'), ['3', '7'], true)) {
+                    $q->where('updated_at', '<=', now()->subDays((int) $request->query('waiting')));
+                }
+                if (($qText = trim((string) $request->query('q', ''))) !== '') {
+                    $digits = preg_replace('/\D+/', '', $qText) ?? '';
+                    $like = '%'.$qText.'%';
+                    $digitLike = $digits !== '' ? '%'.$digits.'%' : null;
+                    $q->where(function ($sub) use ($like, $digits, $digitLike) {
+                        $sub->whereHas('user', fn ($u) => $u->where('name', 'like', $like)->orWhere('email', 'like', $like));
+                        $refDigits = ltrim($digits, '0');
+                        if ($refDigits !== '') {
+                            $sub->orWhere('motivation_requests.id', (int) $refDigits);
+                        }
+                        if ($digitLike) {
+                            $sub->orWhereHas('user.clientProfile', fn ($p) => $p->where('id_number', 'like', $digitLike)->orWhere('cell', 'like', $digitLike));
+                        }
+                    });
+                }
+            });
+
+        return [
+            'all' => $baseline()->count(),
+            'needs-action' => $baseline()->whereIn('status', MotivationStatus::needsActionValues())->count(),
+            'intake' => $baseline()->whereIn('status', array_map(fn ($s) => $s->value, MotivationPhase::INTAKE->statuses()))->count(),
+            'preparation' => $baseline()->whereIn('status', array_map(fn ($s) => $s->value, MotivationPhase::PREPARATION->statuses()))->count(),
+            'payment' => $baseline()->whereIn('status', array_map(fn ($s) => $s->value, MotivationPhase::PAYMENT->statuses()))->count(),
+            'fulfilment' => $baseline()->whereIn('status', array_map(fn ($s) => $s->value, MotivationPhase::FULFILMENT->statuses()))->count(),
+            'completed' => $baseline()->where('status', MotivationStatus::COMPLETED->value)->count(),
+        ];
     }
 
     public function show(MotivationRequest $motivation)

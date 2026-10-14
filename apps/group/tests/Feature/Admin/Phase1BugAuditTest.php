@@ -236,11 +236,20 @@ class Phase1BugAuditTest extends TestCase
             ->getContent();
 
         $this->assertStringContainsString('class="scroll-strip"', $html);
-        // Still has all 12 statuses + "All" rendered inside it so the
-        // existing filter functionality is intact for Phase 2 to replace.
-        $this->assertStringContainsString('>All<', $html);
-        foreach (MotivationRequest::STATUSES as $label) {
-            $this->assertStringContainsString('>'.$label.'<', $html);
+
+        // Phase 2 replaced the 13-chip bar with a 7-phase-tab bar inside
+        // the same `.scroll-strip` wrapper. The underlying fix is still
+        // valid; the labels now cover phases, not every granular status.
+        // All 7 phase-tab labels must render.
+        foreach (['All', 'Needs action', 'Intake', 'Preparation', 'Payment', 'Fulfilment', 'Completed'] as $label) {
+            $this->assertStringContainsString($label, $html, "Phase 2 phase-tab '$label' is missing.");
+        }
+
+        // Every granular status label still reachable via the exact-status
+        // `<select>` in the toolbar — power-user path, matching the brief's
+        // "search, plus filters for exact status" requirement.
+        foreach (MotivationRequest::STATUSES as $statusLabel) {
+            $this->assertStringContainsString($statusLabel, $html, "Status label '$statusLabel' no longer reachable from the list.");
         }
     }
 

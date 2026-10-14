@@ -102,4 +102,24 @@ class AdminAreas
 
         return $area ? route($area['route']) : route('admin.dashboard');
     }
+
+    /**
+     * Which area the current request is inside, resolved from the route
+     * name. Used by the sidebar to show only the active area's links.
+     *
+     * Falls back to the first available area (usually "motivations") when
+     * the route is one of the shared ones (`admin.choose`, `admin.settings`,
+     * `admin.users*`) that is not bound to a single area.
+     */
+    public static function currentFromRoute(): string
+    {
+        $name = Route::currentRouteName() ?? '';
+
+        return match (true) {
+            $name === 'admin.arms' => 'arms',
+            str_starts_with($name, 'admin.arms.') => 'arms',
+            str_starts_with($name, 'admin.storage.') => 'storage',
+            default => 'motivations',
+        };
+    }
 }

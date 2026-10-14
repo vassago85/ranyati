@@ -90,18 +90,31 @@ class ExistingPagesSmokeTest extends TestCase
         }
     }
 
-    public function test_new_storage_admin_nav_does_not_break_admin_shell(): void
+    public function test_admin_shell_renders_the_area_switcher_and_motivations_nav(): void
     {
+        // Phase 2 refactor: the sidebar is now area-aware. `/admin` lives
+        // in the Motivations area, so Motivations links render inline
+        // while the Arms and Storage areas are reachable via the
+        // segmented area switcher at the top of the sidebar.
         $admin = $this->admin();
 
-        $this->actingAs($admin)
-            ->get('/admin')
-            ->assertOk()
-            ->assertSee('Storage', false)
-            ->assertSee('Deceased estates', false)
-            ->assertSee('Self storage', false)
-            ->assertSee('Mail Settings', false)
-            ->assertSee('Listings', false);
+        $response = $this->actingAs($admin)->get('/admin')->assertOk();
+
+        // Motivations area nav must be inline.
+        $response
+            ->assertSee('Dashboard', false)
+            ->assertSee('Enquiries', false)
+            ->assertSee('Mail settings', false);
+
+        // The area switcher offers every available area, including the
+        // ones whose link trees are hidden on this page. Assert on the
+        // uniquely-identifying hidden input value for each area so
+        // whitespace in the button label can't produce false negatives.
+        $response
+            ->assertSee('class="area-switcher"', false)
+            ->assertSee('name="area" value="motivations"', false)
+            ->assertSee('name="area" value="arms"', false)
+            ->assertSee('name="area" value="storage"', false);
     }
 
     public function test_admin_storage_dashboard_loads_without_r2_configured(): void

@@ -544,21 +544,14 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         return redirect()->to(AdminAreas::urlFor($validated['area']));
     })->name('choose.submit');
 
-    Route::get('/', function () {
-        $total = MotivationEnquiry::count();
-        $unread = MotivationEnquiry::whereNull('read_at')->count();
+    // Phase 2: `/admin` is the motivations-area overview (mockup 01) —
+    // 4 KPI tiles, phase pipeline card, "Needs your action" table. The
+    // previous enquiries-only dashboard is now covered by the Enquiries
+    // link in the sidebar and the "Unread enquiries" KPI tile.
+    Route::get('/', \App\Http\Controllers\Admin\DashboardController::class)->name('dashboard');
 
-        return view('admin.dashboard', [
-            'stats' => [
-                'total' => $total,
-                'unread' => $unread,
-                'read' => $total - $unread,
-                'this_month' => MotivationEnquiry::whereMonth('created_at', now()->month)
-                    ->whereYear('created_at', now()->year)->count(),
-            ],
-            'recent' => MotivationEnquiry::latest()->take(10)->get(),
-        ]);
-    })->name('dashboard');
+    // Global search used by the topbar search field (focus with `/`).
+    Route::get('/search', \App\Http\Controllers\Admin\SearchController::class)->name('search');
 
     Route::get('/enquiries', function (Request $request) {
         $allowedFilters = ['unread', 'read', 'month', 'needs_reply', ...MotivationEnquiry::statusKeys()];
@@ -1308,6 +1301,10 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
     Route::prefix('motivation-requests')->name('motivation-requests.')->group(function () {
         Route::get('/', [MotivationRequestController::class, 'index'])->name('index');
+        // Phase 2: CSV export of the current filter. Registered BEFORE
+        // the `{motivation}` show route so Laravel's model-binding on
+        // `/{motivation}` doesn't swallow `/export`.
+        Route::get('/export.csv', [MotivationRequestController::class, 'export'])->name('export');
         Route::get('/{motivation}', [MotivationRequestController::class, 'show'])->name('show');
         Route::get('/{motivation}/edit', [MotivationRequestController::class, 'editOnBehalf'])->name('edit');
         Route::post('/{motivation}/answers', [MotivationRequestController::class, 'updateAnswers'])->name('answers');

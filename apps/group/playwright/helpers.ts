@@ -41,3 +41,23 @@ export async function loginAsAdmin(page: Page): Promise<void> {
 export async function pageScrollWidth(page: Page): Promise<number> {
     return await page.evaluate(() => document.documentElement.scrollWidth);
 }
+
+/**
+ * Clicks the first motivation request in the list in a way that works
+ * at any viewport. Phase 2 renders the list as a `<table>` on desktop
+ * and as `<a class="requests-card">` cards on mobile, so neither
+ * selector in isolation can be used across both projects.
+ */
+export async function openFirstMotivation(page: Page): Promise<void> {
+    // Both the desktop table and the mobile card list live in the DOM
+    // simultaneously — CSS hides one or the other based on viewport.
+    // `.first()` on a comma selector would pick the first match in DOM
+    // order, which is the hidden desktop row at mobile widths. Scope by
+    // visibility to always land on the one the user actually sees.
+    const anyEntry = page
+        .locator("tr.row-link, a.requests-card")
+        .filter({ visible: true })
+        .first();
+    await anyEntry.waitFor({ state: "visible" });
+    await anyEntry.click();
+}

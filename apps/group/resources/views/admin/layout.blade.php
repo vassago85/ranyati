@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>@yield('title', 'Admin') — Ranyati</title>
+    <title>@yield('title', 'Admin') â€” Ranyati</title>
     <link rel="icon" href="{{ asset('ranyati-icon.png') }}" type="image/png">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800" rel="stylesheet" />
@@ -154,7 +154,7 @@
             color: #fff;
         }
         /* Disabled prev/next (current page = first/last) and the page-count
-           text container — neither should look like a clickable pill. */
+           text container â€” neither should look like a clickable pill. */
         nav[role="navigation"][aria-label="Pagination Navigation"] span[aria-disabled="true"] {
             opacity: 0.4;
             border-color: rgba(255,255,255,0.04);
@@ -298,7 +298,7 @@
         .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .table-wrap table { width: 100%; min-width: max-content; }
 
-        /* Horizontal scroll strip — for chip/tab rows that would otherwise
+        /* Horizontal scroll strip â€” for chip/tab rows that would otherwise
            force the whole page to scroll on narrow viewports (e.g. the
            motivations list's status filter bar). */
         .scroll-strip {
@@ -326,7 +326,7 @@
             max-width: 320px;
         }
 
-        /* Empty-state copy inside a card body — used everywhere we need a
+        /* Empty-state copy inside a card body â€” used everywhere we need a
            sentence of guidance instead of a bare "No results". */
         .empty-state {
             padding: 32px 20px; text-align: center;
@@ -345,145 +345,126 @@
         .filter-tab .count { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
         .filter-tab.active .count { background: rgba(245,130,32,0.2); color: #F58220; }
 
+        /* ---------- Sidebar Phase 2 (area switcher, groups, badges) ---------- */
+        .area-switcher {
+            display: flex; gap: 4px; margin: 0 16px 8px;
+            padding: 4px; border-radius: 10px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .area-switcher__form { flex: 1; margin: 0; }
+        .area-switcher__btn {
+            display: block; width: 100%; padding: 7px 8px;
+            background: transparent; border: 0; cursor: pointer;
+            border-radius: 7px;
+            font-family: inherit; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            color: rgba(255,255,255,0.45);
+            transition: background .15s, color .15s;
+        }
+        .area-switcher__btn:hover { color: rgba(255,255,255,0.85); background: rgba(255,255,255,0.04); }
+        .area-switcher__btn.is-active {
+            background: color-mix(in srgb, var(--accent, #F58220) 14%, transparent);
+            color: var(--accent, #F58220);
+        }
+
+        .sidebar-group-title {
+            padding: 12px 12px 6px;
+            font-size: 9px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.2em;
+            color: rgba(255,255,255,0.25);
+        }
+        .sidebar-divider {
+            margin: 12px 12px 0;
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .sidebar-link__label { flex: 1; }
+        .sidebar-badge {
+            min-width: 20px; height: 20px; padding: 0 6px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 999px;
+            background: rgba(245,130,32,0.2);
+            color: #F58220;
+            font-size: 10px; font-weight: 700;
+        }
+        .sidebar-user {
+            padding: 10px 12px; margin: 4px 4px 6px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        .sidebar-user__name { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.75); }
+        .sidebar-user__area {
+            margin-top: 2px;
+            font-size: 10px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.12em;
+            color: rgba(255,255,255,0.35);
+        }
+        .sidebar-link--logout { color: rgba(239,68,68,0.6); }
+
+        /* ---------- Topbar global search ---------- */
+        .topbar-search {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 12px; border-radius: 9px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            min-width: 220px; max-width: 420px; flex: 1;
+            transition: border-color .15s, background .15s;
+        }
+        .topbar-search:focus-within {
+            border-color: rgba(245,130,32,0.4);
+            background: rgba(255,255,255,0.06);
+        }
+        .topbar-search svg { width: 14px; height: 14px; color: rgba(255,255,255,0.35); flex-shrink: 0; }
+        .topbar-search input {
+            flex: 1; min-width: 0;
+            background: transparent; border: 0; outline: none;
+            color: #fff; font-size: 13px; font-family: inherit;
+        }
+        .topbar-search input::placeholder { color: rgba(255,255,255,0.3); }
+        .topbar-search kbd {
+            flex-shrink: 0;
+            padding: 1px 6px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px;
+            font-size: 10px; font-family: inherit; font-weight: 600;
+            color: rgba(255,255,255,0.5);
+        }
+        @media (max-width: 768px) {
+            .topbar-search { display: none; }
+        }
+
     </style>
     @stack('head')
 </head>
-<body x-data="{ sidebarOpen: false }" x-effect="document.body.classList.toggle('sidebar-locked', sidebarOpen && window.innerWidth < 1024)" @keydown.escape.window="sidebarOpen = false" @resize.window="if (window.innerWidth >= 1024) sidebarOpen = false">
-    <aside class="sidebar" :class="{ 'is-open': sidebarOpen }">
-        <div class="sidebar-brand">
-            <img src="{{ asset('logo-ranyatigroup-white_text.png') }}" alt="Ranyati Group" style="height: 24px; width: auto; opacity: 0.8;" />
-            <div style="margin-top: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.2);">Admin Panel</div>
-        </div>
-        <nav class="sidebar-nav" @click="if ($event.target.closest('a') && window.innerWidth < 1024) sidebarOpen = false">
-            <div style="padding: 4px 12px 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(245,130,32,0.45);">Motivations</div>
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25a2.25 2.25 0 0 1-2.25-2.25v-2.25Z"/></svg>
-                Dashboard
-            </a>
-            <a href="{{ route('admin.enquiries') }}" class="sidebar-link {{ request()->routeIs('admin.enquiries*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
-                Enquiries
-            </a>
-            <a href="{{ route('admin.documents') }}" class="sidebar-link {{ request()->routeIs('admin.documents*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-                Documents
-            </a>
-            <a href="{{ route('admin.questionnaires') }}" class="sidebar-link {{ request()->routeIs('admin.questionnaires*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z"/></svg>
-                Questionnaires
-            </a>
-            @if (Route::has('admin.motivation-requests.index'))
-            <a href="{{ route('admin.motivation-requests.index') }}" class="sidebar-link {{ request()->routeIs('admin.motivation-requests*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-                Motivations
-            </a>
-            @endif
-            @if (Route::has('admin.motivation-members.index'))
-            <a href="{{ route('admin.motivation-members.index') }}" class="sidebar-link {{ request()->routeIs('admin.motivation-members*') ? 'active' : '' }}" style="padding-left: 36px; font-size: 12px;">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg>
-                Members (walk-in)
-            </a>
-            @endif
-            @if (Route::has('admin.motivation-templates.index'))
-            <a href="{{ route('admin.motivation-templates.index') }}" class="sidebar-link {{ request()->routeIs('admin.motivation-templates*') ? 'active' : '' }}" style="padding-left: 36px; font-size: 12px;">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5A3.375 3.375 0 0 0 10.125 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V17.25m-7.5-10.5h.008v.008H10.5V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm1.125 7.5h4.5m-4.5 3h4.5"/></svg>
-                Motivation templates
-            </a>
-            @endif
-            @if (Route::has('admin.application-types.index'))
-            <a href="{{ route('admin.application-types.index') }}" class="sidebar-link {{ request()->routeIs('admin.application-types*') ? 'active' : '' }}" style="padding-left: 36px; font-size: 12px;">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/></svg>
-                Application types
-            </a>
-            @endif
-            @if(Route::has('admin.applications'))
-            <a href="{{ route('admin.applications') }}" class="sidebar-link {{ request()->routeIs('admin.applications') || request()->routeIs('admin.applications.batch') || request()->routeIs('admin.applications.user') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg>
-                SAPS Tracker
-            </a>
-            @endif
-            @if(Route::has('admin.applications.log'))
-            <a href="{{ route('admin.applications.log') }}" class="sidebar-link {{ request()->routeIs('admin.applications.log') ? 'active' : '' }}" style="padding-left: 36px; font-size: 12px;">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg>
-                Activity log
-            </a>
-            @endif
-
-            <div style="margin: 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.04);"></div>
-            <div style="padding: 12px 12px 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(196,90,60,0.5);">Arms</div>
-            <a href="{{ route('admin.arms') }}" class="sidebar-link {{ request()->routeIs('admin.arms') || request()->routeIs('admin.arms.create') || request()->routeIs('admin.arms.edit') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z"/></svg>
-                Listings
-            </a>
-            <a href="{{ route('admin.arms.enquiries') }}" class="sidebar-link {{ request()->routeIs('admin.arms.enquiries*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/></svg>
-                Enquiries
-            </a>
-
-            @if(Route::has('admin.storage.dashboard'))
-            <div style="margin: 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.04);"></div>
-            <div style="padding: 12px 12px 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(52,211,153,0.5);">Storage</div>
-            <a href="{{ route('admin.storage.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.storage.dashboard') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                Dashboard
-            </a>
-            <a href="{{ route('admin.storage.estates') }}" class="sidebar-link {{ request()->routeIs('admin.storage.estates*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"/></svg>
-                Deceased estates
-            </a>
-            <a href="{{ route('admin.storage.self') }}" class="sidebar-link {{ request()->routeIs('admin.storage.self*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z"/></svg>
-                Self storage
-            </a>
-            <a href="{{ route('admin.storage.log') }}" class="sidebar-link {{ request()->routeIs('admin.storage.log') ? 'active' : '' }}" style="padding-left: 36px; font-size: 12px;">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"/></svg>
-                Custody log
-            </a>
-            <a href="{{ route('admin.storage.search') }}" class="sidebar-link {{ request()->routeIs('admin.storage.search') ? 'active' : '' }}" style="padding-left: 36px; font-size: 12px;">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
-                Search
-            </a>
-            <a href="{{ route('admin.storage.settings') }}" class="sidebar-link {{ request()->routeIs('admin.storage.settings') ? 'active' : '' }}" style="padding-left: 36px; font-size: 12px;">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992.006.085.006.17 0 .255-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124-.072.044-.146.086-.22.128-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87-.075-.04-.148-.083-.22-.127-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                R2 settings
-            </a>
-            @endif
-
-            <div style="margin: 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.04);"></div>
-            <div style="padding: 12px 12px 8px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">System</div>
-            @if(Route::has('admin.choose'))
-            <a href="{{ route('admin.choose') }}" class="sidebar-link {{ request()->routeIs('admin.choose') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/></svg>
-                Switch area
-            </a>
-            @endif
-            <a href="{{ route('admin.settings') }}" class="sidebar-link {{ request()->routeIs('admin.settings') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/></svg>
-                Mail Settings
-            </a>
-            @if(auth()->user()->canManageUsers())
-            <a href="{{ route('admin.users') }}" class="sidebar-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
-                Users
-            </a>
-            @endif
-            <div style="flex: 1;"></div>
-            @auth
-            <div style="padding: 8px 12px; margin-bottom: 4px;">
-                <div style="font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.6);">{{ auth()->user()->name }}</div>
-                <div style="font-size: 10px; color: rgba(255,255,255,0.25); margin-top: 2px;">{{ auth()->user()->role_label }}</div>
-            </div>
-            @endauth
-            <a href="{{ route('admin.logout') }}" class="sidebar-link" style="color: rgba(239,68,68,0.6);" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9"/></svg>
-                Logout
-            </a>
-            <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" style="display:none;">@csrf</form>
-        </nav>
-        <div class="sidebar-footer">
-            &copy; {{ date('Y') }} Ranyati Group
-        </div>
-    </aside>
+@php
+    use App\Support\AdminAreas;
+    $currentArea = AdminAreas::currentFromRoute();
+@endphp
+<body
+    x-data="{
+        sidebarOpen: false,
+        // Phase 2: pressing '/' anywhere outside an input field focuses
+        // the global admin search. Alpine @keydown handlers only accept
+        // a single expression — an `if (...) { ... }` block silently
+        // fails to parse — so the logic lives as a method on x-data.
+        focusGlobalSearch($event) {
+            if ($event.key !== '/') return;
+            const tag = $event.target && $event.target.tagName;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag)) return;
+            if ($event.target && $event.target.isContentEditable) return;
+            const input = document.getElementById('admin-global-search-input');
+            if (!input) return;
+            $event.preventDefault();
+            input.focus();
+        },
+    }"
+    x-effect="document.body.classList.toggle('sidebar-locked', sidebarOpen && window.innerWidth < 1024)"
+    @keydown.escape.window="sidebarOpen = false"
+    @resize.window="if (window.innerWidth >= 1024) sidebarOpen = false"
+    @keydown.window="focusGlobalSearch($event)"
+>
+    @include('admin.partials.sidebar', ['currentArea' => $currentArea])
 
     <div class="sidebar-backdrop" :class="{ 'is-open': sidebarOpen }" @click="sidebarOpen = false" aria-hidden="true"></div>
 
@@ -495,6 +476,21 @@
                 </button>
                 <h1>@yield('title', 'Dashboard')</h1>
             </div>
+            @if (Route::has('admin.search') && $currentArea === 'motivations')
+                <form method="GET" action="{{ route('admin.search') }}" class="topbar-search" role="search" aria-label="Global admin search">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg>
+                    <input
+                        type="search"
+                        name="q"
+                        id="admin-global-search-input"
+                        placeholder="Search clients, IDs, referencesâ€¦"
+                        aria-label="Search clients, IDs, cell numbers, email or motivation reference"
+                        value="{{ request('q') }}"
+                        autocomplete="off"
+                    />
+                    <kbd aria-hidden="true">/</kbd>
+                </form>
+            @endif
             <div class="topbar-actions">
                 @yield('actions')
             </div>

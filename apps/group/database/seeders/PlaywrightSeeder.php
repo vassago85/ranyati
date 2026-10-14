@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\MotivationStatus;
 use App\Models\ApplicationType;
 use App\Models\ClientProfile;
 use App\Models\FirearmApplication;
@@ -145,6 +146,119 @@ class PlaywrightSeeder extends Seeder
             [
                 'label' => 'Short-ref sample (Playwright)',
                 'monitoring_enabled' => true,
+            ],
+        );
+
+        $this->seedPhase2Fixtures($admin, $type);
+    }
+
+    /**
+     * Phase 2 adds the dashboard, the 7-phase list and the global search.
+     * Each of those surfaces needs enough variety to tell apart: at least
+     * one motivation per phase, a handful of "needs admin action" rows,
+     * a completed-in-last-30-days row (for the pipeline card's special
+     * case), and a couple more enquiries so the unread/read KPIs read
+     * sensibly.
+     */
+    private function seedPhase2Fixtures(User $admin, ApplicationType $type): void
+    {
+        // Second application type so the list's type filter has
+        // something non-trivial to pick between.
+        $secondaryType = ApplicationType::updateOrCreate(
+            ['slug' => 'playwright-type-hunting'],
+            [
+                'name' => 'Playwright hunting type',
+                'category' => 'hunting',
+                'is_active' => true,
+                'has_motivation' => true,
+                'questions' => [[
+                    'key' => 'main',
+                    'title' => 'Main',
+                    'fields' => [
+                        ['name' => 'why', 'label' => 'Why', 'type' => 'text', 'required' => true],
+                    ],
+                ]],
+                'document_requirements' => [],
+            ],
+        );
+
+        // Spread a motivation across every status except VERIFIED (which
+        // the Phase 1 fixture already covers). The specific statuses
+        // chosen give the dashboard pipeline card at least one row per
+        // phase and the Needs-action table 3-4 rows.
+        $statusesToSeed = [
+            MotivationStatus::DRAFT->value => ['days' => 1, 'type' => $type->id],
+            MotivationStatus::SUBMITTED->value => ['days' => 2, 'type' => $type->id],
+            MotivationStatus::CHANGES_REQUESTED->value => ['days' => 4, 'type' => $type->id],
+            MotivationStatus::AWAITING_ENDORSEMENT->value => ['days' => 6, 'type' => $type->id],
+            MotivationStatus::READY_TO_PRINT->value => ['days' => 1, 'type' => $secondaryType->id],
+            MotivationStatus::PRINTED->value => ['days' => 2, 'type' => $secondaryType->id],
+            MotivationStatus::INVOICED->value => ['days' => 3, 'type' => $secondaryType->id],
+            MotivationStatus::PAID->value => ['days' => 7, 'type' => $secondaryType->id],
+            MotivationStatus::READY_FOR_COLLECTION->value => ['days' => 1, 'type' => $type->id],
+            MotivationStatus::SHIPPED->value => ['days' => 2, 'type' => $type->id],
+            MotivationStatus::COMPLETED->value => ['days' => 10, 'type' => $type->id],
+        ];
+
+        $index = 1;
+        foreach ($statusesToSeed as $status => $meta) {
+            $email = 'playwright-'.strtolower(str_replace('_', '-', $status)).'@ranyati.test';
+            $user = User::updateOrCreate(
+                ['email' => $email],
+                [
+                    'name' => 'Member '.ucwords(str_replace('_', ' ', $status)),
+                    'password' => 'playwright-pass',
+                    'role' => User::ROLE_CLIENT,
+                ],
+            );
+            $user->forceFill(['email_verified_at' => now()])->save();
+
+            ClientProfile::updateOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'full_names' => 'Member',
+                    'surname' => ucwords(str_replace('_', ' ', $status)),
+                    'id_number' => '85010100000'.str_pad((string) $index, 2, '0', STR_PAD_LEFT),
+                    'physical_address' => "{$index} Fixture Street, Pretoria",
+                    'occupation' => 'Fixture occupation',
+                    'cell' => '082100'.str_pad((string) $index, 4, '0', STR_PAD_LEFT),
+                    'email' => $email,
+                ],
+            );
+
+            MotivationRequest::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'application_type_id' => $meta['type'],
+                ],
+                [
+                    'status' => $status,
+                    'answers' => ['why' => 'Seeded Phase 2 fixture for status '.$status.'.'],
+                    'delivery_method' => MotivationRequest::DELIVERY_COLLECT,
+                    'submitted_at' => now()->subDays($meta['days'] + 1),
+                    // updated_at drives the "in stage" age — set it so
+                    // we end up with a mix of grey / amber / red
+                    // waiting pills in the dashboard table.
+                    'updated_at' => now()->subDays($meta['days']),
+                ],
+            );
+            $index++;
+        }
+
+        // Second enquiry — read, so the unread/read split on the
+        // dashboard KPI tile has at least one of each.
+        MotivationEnquiry::updateOrCreate(
+            ['email' => 'returning-visitor@example.com'],
+            [
+                'name' => 'Returning Visitor',
+                'phone' => '0823334444',
+                'endorsement_type' => 'Renewal',
+                'saps_station' => 'Centurion',
+                'purpose' => 'Hunting',
+                'services' => [],
+                'source' => 'website',
+                'status' => MotivationEnquiry::STATUS_IN_PROGRESS,
+                'read_at' => now()->subDay(),
             ],
         );
     }

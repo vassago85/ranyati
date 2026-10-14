@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAsAdmin, pageScrollWidth } from "./helpers";
+import { loginAsAdmin, openFirstMotivation, pageScrollWidth } from "./helpers";
 
 /**
  * Browser-level regression suite for the Phase 1 "bugs from the audit"
@@ -85,11 +85,11 @@ test.describe("Phase 1 bug audit", () => {
     }, testInfo) => {
         // The seeder puts exactly one Verified-status motivation in
         // the DB with no letters and no PDF, so the first row of the
-        // index is the one we want.
+        // index is the one we want. Phase 2 renders the list as a
+        // table on desktop and as a stack of cards on mobile, so we
+        // use the helper that targets both.
         await page.goto("/admin/motivation-requests");
-        const firstRow = page.locator("table tr.row-link").first();
-        await expect(firstRow).toBeVisible();
-        await firstRow.click();
+        await openFirstMotivation(page);
         await expect(page).toHaveURL(/\/admin\/motivation-requests\/\d+/);
 
         // With no book / letters, the Actions card's secondary button
@@ -138,27 +138,33 @@ test.describe("Phase 1 bug audit", () => {
         });
     });
 
-    test("bug 4: motivation requests list wraps the 13-tab bar in a scroll strip", async ({
+    test("bug 4: motivation requests list exposes a 7-phase tab bar + exact-status select", async ({
         page,
     }, testInfo) => {
+        // Phase 2 collapses the old 13-status filter bar into 7 phase
+        // tabs ("All", "Needs action", 4 phases, "Completed") plus a
+        // searchable exact-status select in the toolbar. The bug 4
+        // guarantee — no horizontal page scroll at 390px — is still
+        // tested below in the mobile-specific describe block.
         await page.goto("/admin/motivation-requests");
 
-        const strip = page.locator(".scroll-strip").first();
-        await expect(strip).toBeVisible();
+        const tabs = page.locator(".filter-tabs .filter-tab");
+        await expect(tabs).toHaveCount(7);
 
-        const tabs = strip.locator(".filter-tab");
-        // 1 "All" + 12 status entries from MotivationRequest::STATUSES.
-        await expect(tabs).toHaveCount(13);
+        // Each tab still shows a count pill, so admins can see the
+        // workload at a glance without clicking through.
+        await expect(tabs.locator(".count")).toHaveCount(7);
 
-        // Programmatic scroll must work — the strip has to be the
-        // overflow-x container, not the page.
-        const scrolled = await strip.evaluate((el) => {
-            el.scrollLeft = 400;
-            return el.scrollLeft;
-        });
-        expect(scrolled).toBeGreaterThan(0);
+        // The exact-status select still covers every one of the 12
+        // statuses, so Phase 2's phase-first UI did not drop any
+        // filtering capability from Phase 1.
+        const statusSelect = page.locator("select[name=status]");
+        await expect(statusSelect).toBeVisible();
+        const optionCount = await statusSelect.locator("option").count();
+        // 12 statuses + 1 "Any status" placeholder.
+        expect(optionCount).toBe(13);
 
-        await testInfo.attach("requests-scroll-strip.png", {
+        await testInfo.attach("requests-phase-tabs.png", {
             body: await page.screenshot({ fullPage: false }),
             contentType: "image/png",
         });
@@ -168,7 +174,7 @@ test.describe("Phase 1 bug audit", () => {
         page,
     }, testInfo) => {
         await page.goto("/admin/motivation-requests");
-        await page.locator("table tr.row-link").first().click();
+        await openFirstMotivation(page);
         await expect(page).toHaveURL(/\/admin\/motivation-requests\/\d+/);
 
         // The responsive helper class is applied.
@@ -194,7 +200,7 @@ test.describe("Phase 1 bug audit", () => {
         page,
     }, testInfo) => {
         await page.goto("/admin/motivation-requests");
-        await page.locator("table tr.row-link").first().click();
+        await openFirstMotivation(page);
 
         const documentsCard = page
             .locator("div.card")
@@ -287,7 +293,7 @@ test.describe("Phase 1 — mobile-specific layout at 390 px", () => {
         // side-by-side at ~150 px each. The grid-2 helper collapses
         // them on viewports under 768 px.
         await page.goto("/admin/motivation-requests");
-        await page.locator("table tr.row-link").first().click();
+        await openFirstMotivation(page);
         const detailScroll = await pageScrollWidth(page);
         expect(detailScroll).toBeLessThanOrEqual(410);
 
