@@ -1,0 +1,43 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/group
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, xml, ctype, tokenizer, bcmath, gd, zip, intl, pdo_sqlite
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/group/package-lock.json
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run tests
+        run: php artisan test

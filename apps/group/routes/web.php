@@ -495,16 +495,31 @@ Route::post('/admin/login', function (Request $request) {
         'password' => 'required',
     ]);
 
+    // Password guessing on this public form. Same limit as the OTP sends:
+    // 3 attempts for an email, then a 120 second wait.
+    $email = strtolower(trim($request->email));
+    $rateLimitKey = 'admin-login:'.$email;
+
+    if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
+        return back()->withInput($request->only('email'))->withErrors([
+            'email' => 'Too many attempts. Please wait '.RateLimiter::availableIn($rateLimitKey).' seconds.',
+        ]);
+    }
+
     if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        RateLimiter::hit($rateLimitKey, 120);
+
         return back()->withInput($request->only('email'))->withErrors(['email' => 'Invalid credentials.']);
     }
 
     if (! $request->user()->isAdmin()) {
         Auth::logout();
+        RateLimiter::hit($rateLimitKey, 120);
 
-        return back()->withErrors(['email' => 'You do not have admin access.']);
+        return back()->withInput($request->only('email'))->withErrors(['email' => 'You do not have admin access.']);
     }
 
+    RateLimiter::clear($rateLimitKey);
     $request->session()->regenerate();
 
     return redirect()->to($request->user()->adminLandingUrl());

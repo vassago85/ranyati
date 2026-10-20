@@ -143,6 +143,30 @@ class AreaChooserTest extends TestCase
         $this->get('/admin/choose')->assertRedirect('/admin/login');
     }
 
+    public function test_three_failed_admin_logins_lock_the_email(): void
+    {
+        $this->admin(['email' => 'locked-out@example.com']);
+
+        for ($i = 0; $i < 3; $i++) {
+            $this->post('/admin/login', [
+                'email' => 'locked-out@example.com',
+                'password' => 'wrong-password',
+            ])->assertSessionHasErrors('email');
+        }
+
+        $response = $this->post('/admin/login', [
+            'email' => 'locked-out@example.com',
+            'password' => 'password123',
+        ]);
+
+        $response->assertSessionHasErrors('email');
+        $this->assertStringContainsString(
+            'Too many attempts',
+            $response->getSession()->get('errors')->first('email'),
+        );
+        $this->assertGuest();
+    }
+
     public function test_switch_area_link_appears_in_the_admin_sidebar(): void
     {
         $this->actingAs($this->admin())

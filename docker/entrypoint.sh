@@ -10,6 +10,8 @@ mkdir -p /var/www/html/storage/framework/views
 mkdir -p /var/www/html/storage/framework/cache
 mkdir -p /var/www/html/storage/framework/sessions
 mkdir -p /var/www/html/storage/logs
+mkdir -p /var/www/html/storage/app/private
+mkdir -p /var/www/html/storage/app/public
 mkdir -p /var/www/html/bootstrap/cache
 
 chown -R www-data:www-data /var/www/html/storage
@@ -33,7 +35,7 @@ sleep 3
 echo "Database is ready"
 
 echo "Running migrations..."
-php artisan migrate --seed --force || echo "Migration had issues, continuing..."
+php artisan migrate --seed --force
 
 echo "Clearing caches..."
 php artisan config:clear
