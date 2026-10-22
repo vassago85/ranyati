@@ -9,8 +9,12 @@
 @endsection
 
 @php
-    $descMax = 5000;
-    $longMax = 20000;
+    $descMax = 20000;
+    $calibreOptions = $calibres ?? [];
+    $rawCalibre = (string) old('calibre', $listing?->calibre ?? '');
+    $normalCalibre = \App\Support\ArmsListingNormaliser::calibre($rawCalibre) ?? '';
+    $calibreIsKnown = $normalCalibre !== '' && in_array($normalCalibre, $calibreOptions, true);
+    $descriptionText = (string) old('description', $listing?->fullDescription() ?? '');
 @endphp
 
 @section('content')
@@ -29,6 +33,10 @@
         }
         .listing-form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .listing-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        [x-cloak] { display: none !important; }
+        .row-menu-item { display:block; width:100%; text-align:left; background:transparent; border:0; color:rgba(255,255,255,0.82); font:inherit; font-size:13px; font-weight:500; padding:10px; border-radius:6px; cursor:pointer; min-height:44px; text-decoration:none; }
+        .row-menu-item:hover { background: rgba(255,255,255,0.06); color:#fff; }
+        .row-menu-item:disabled { opacity:0.4; cursor:not-allowed; }
 
         @media (max-width: 1023px) {
             .listing-form-layout { grid-template-columns: 1fr; }
@@ -43,70 +51,73 @@
     @if($listing)
         {{-- Quick-action toolbar: same status verbs as the listings index but
              within reach of the edit form so operators don't round-trip. --}}
-        <div class="card" style="margin-bottom: 20px;">
+        <div class="card" style="margin-bottom: 20px;" x-data="{ open: false, confirm: null }" @keydown.escape.window="open = false; confirm = null">
             <div class="card-body" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                 <div style="flex:1; min-width:180px;">
-                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.4); font-weight: 600;">Status</div>
+                    <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.4); font-weight: 600;">{{ $listing->stock_number }}</div>
                     <div style="margin-top: 6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                        @if(in_array($listing->status, ['active', 'reduced'], true))
-                            <span class="badge badge-green">Active</span>
-                        @elseif($listing->status === 'sold')
-                            <span class="badge" style="background: rgba(239,68,68,0.18); color: #ef4444;">Sold</span>
-                        @else
-                            <span class="badge badge-zinc">Archived</span>
+                        @include('partials.arms-status', ['listing' => $listing])
+                        @if($listing->occupiesFeaturedSpot())
+                            @include('partials.arms-status', ['label' => 'Featured', 'tone' => 'featured'])
                         @endif
-                        @if($listing->is_featured && in_array($listing->status, ['active', 'reduced'], true))
-                            <span class="badge badge-orange">Featured</span>
-                        @endif
-                        @if($listing->original_price && $listing->original_price > $listing->price)
-                            <span class="badge" style="background: rgba(239,68,68,0.15); color: #ef4444;">Price Reduced</span>
+                        @if($listing->isPriceReduced())
+                            @include('partials.arms-status', ['label' => 'Reduced', 'tone' => 'reduced'])
                         @endif
                     </div>
                 </div>
 
-                <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
-                    @if(in_array($listing->status, ['active', 'reduced'], true))
-                        @if($listing->is_featured)
-                            <form method="POST" action="{{ route('admin.arms.unfeature', $listing) }}" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-secondary btn-sm">Unfeature</button>
-                            </form>
-                        @else
-                            <form method="POST" action="{{ route('admin.arms.feature', $listing) }}" style="display:inline;">
-                                @csrf
-                                <button type="submit" class="btn btn-primary btn-sm">Feature</button>
-                            </form>
-                        @endif
-                        <form method="POST" action="{{ route('admin.arms.sold', $listing) }}" style="display:inline;" onsubmit="return confirm('Mark this listing as sold? Its page stays live with a Sold state, but it leaves the grid and sitemap.')">
+                <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; position:relative;">
+                    @if($listing->isLive())
+                        <form method="POST" action="{{ route('admin.arms.sold', $listing) }}" style="display:inline;">
                             @csrf
-                            <button type="submit" class="btn btn-secondary btn-sm">Mark Sold</button>
-                        </form>
-                        <form method="POST" action="{{ route('admin.arms.archive', $listing) }}" style="display:inline;" onsubmit="return confirm('Archive this listing? Its public detail page will return 404 until you restore it.')">
-                            @csrf
-                            <button type="submit" class="btn btn-secondary btn-sm">Archive</button>
+                            <button type="submit" class="btn btn-secondary btn-sm">Mark sold</button>
                         </form>
                     @else
                         <form method="POST" action="{{ route('admin.arms.restore', $listing) }}" style="display:inline;">
                             @csrf
-                            <button type="submit" class="btn btn-secondary btn-sm">Restore</button>
+                            <button type="submit" class="btn btn-secondary btn-sm">Put back on sale</button>
                         </form>
                     @endif
 
-                    @if(Route::has('admin.arms.duplicate'))
-                        <form method="POST" action="{{ route('admin.arms.duplicate', $listing) }}" style="display:inline;">
-                            @csrf
-                            <button type="submit" class="btn btn-secondary btn-sm" title="Create a copy of this listing to edit">Duplicate</button>
-                        </form>
-                    @endif
-
-                    <a href="{{ route('admin.arms.card', $listing) }}" class="btn btn-secondary btn-sm">Card</a>
-
-                    <form method="POST" action="{{ route('admin.arms.delete', $listing) }}" style="display:inline;" onsubmit="return confirm('Delete this listing permanently? This cannot be undone.')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
+                    <button type="button" class="btn btn-secondary btn-sm" @click="open = !open">More</button>
+                    <div x-show="open" x-cloak @click.outside="open = false" style="position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:200px; padding:6px; border-radius:10px; background:#0d1424; border:1px solid rgba(255,255,255,0.1);">
+                        @if($listing->isLive())
+                            @if($listing->is_featured)
+                                <form method="POST" action="{{ route('admin.arms.unfeature', $listing) }}">@csrf<button type="submit" class="row-menu-item">Remove from top</button></form>
+                            @elseif($featuredFull ?? false)
+                                <button type="button" class="row-menu-item" disabled title="Remove another listing from the top first.">Feature</button>
+                            @else
+                                <form method="POST" action="{{ route('admin.arms.feature', $listing) }}">@csrf<button type="submit" class="row-menu-item">Feature</button></form>
+                            @endif
+                            @if($listing->isPriceReduced())
+                                <form method="POST" action="{{ route('admin.arms.remove-reduction', $listing) }}">@csrf<button type="submit" class="row-menu-item">Remove reduction</button></form>
+                            @else
+                                <button type="button" class="row-menu-item" @click="open = false; confirm = { message: @js('Reduce the price of '.$listing->displayName().'. The current price becomes the crossed-out price.'), action: @js(route('admin.arms.reduce', $listing)), needsPrice: true }">Reduce price</button>
+                            @endif
+                        @endif
+                        <form method="POST" action="{{ route('admin.arms.duplicate', $listing) }}">@csrf<button type="submit" class="row-menu-item">Duplicate</button></form>
+                        @if($listing->isLive() || $listing->status === 'sold')
+                            <a href="{{ route('admin.arms.card', $listing) }}" class="row-menu-item">WhatsApp card</a>
+                        @endif
+                        @if($listing->isLive())
+                            <button type="button" class="row-menu-item" @click="open = false; confirm = { message: @js('Archive '.$listing->displayName().'? It leaves the public list until you put it back on sale.'), action: @js(route('admin.arms.archive', $listing)), needsPrice: false }">Archive</button>
+                        @endif
+                        <div style="height:1px; margin:4px 0; background:rgba(255,255,255,0.08);"></div>
+                        <button type="button" class="row-menu-item" style="color:#ef4444;" @click="open = false; confirm = { message: @js('Delete '.$listing->displayName().'? This cannot be undone.'), action: @js(route('admin.arms.delete', $listing)), method: 'DELETE', needsPrice: false }">Delete</button>
+                    </div>
                 </div>
+            </div>
+            <div x-show="confirm" x-cloak style="padding: 0 20px 20px;">
+                <p style="color:#fff; margin-bottom:12px;" x-text="confirm ? confirm.message : ''"></p>
+                <form method="POST" :action="confirm ? confirm.action : ''">
+                    @csrf
+                    <input type="hidden" name="_method" :value="confirm && confirm.method ? confirm.method : 'POST'">
+                    <input x-show="confirm && confirm.needsPrice" type="number" name="price" min="0" step="1" class="form-input" placeholder="New price" style="margin-bottom:12px;" :required="confirm && confirm.needsPrice">
+                    <div style="display:flex; gap:8px; justify-content:flex-end;">
+                        <button type="button" class="btn btn-secondary" @click="confirm = null">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </div>
+                </form>
             </div>
         </div>
     @endif
@@ -116,12 +127,15 @@
             title: @js((string) old('title', $listing?->title ?? '')),
             make: @js((string) old('make', $listing?->make ?? '')),
             model: @js((string) old('model', $listing?->model ?? '')),
-            calibre: @js((string) old('calibre', $listing?->calibre ?? '')),
+            calibre: @js($calibreIsKnown ? $normalCalibre : ''),
+            calibreCustom: @js($calibreIsKnown ? '' : $normalCalibre),
+            calibreOther: @js(! $calibreIsKnown && $normalCalibre !== ''),
+            calibreOptions: @js($calibreOptions),
+            calibreQuery: @js($calibreIsKnown ? $normalCalibre : ($normalCalibre !== '' ? '' : '')),
+            calibreOpen: false,
             price: @js((string) old('price', $listing?->price ?? '')),
-            originalPrice: @js((string) old('original_price', $listing?->original_price ?? '')),
             accessories: @js((string) old('accessories', $listing?->accessories ?? '')),
-            description: @js((string) old('description', $listing?->description ?? '')),
-            descriptionLong: @js((string) old('description_long', $listing?->description_long ?? '')),
+            description: @js($descriptionText),
         })"
         x-init="init()"
         class="listing-form-layout"
@@ -138,7 +152,7 @@
                     method="POST"
                     action="{{ $listing ? route('admin.arms.update', $listing) : route('admin.arms.store') }}"
                     enctype="multipart/form-data"
-                    @submit="dirty = false"
+                    @submit="syncCalibre(); dirty = false"
                 >
                     @csrf
                     @if($listing) @method('PUT') @endif
@@ -152,29 +166,20 @@
 
                     <div class="form-group">
                         <label class="form-label">Title <span style="color:#ef4444;">*</span></label>
-                        <input type="text" name="title" class="form-input" x-model="title" placeholder="e.g. Glock 19 Gen 5 — Excellent Condition" required>
+                        <input type="text" name="title" class="form-input" x-model="title" placeholder="e.g. Glock 19 Gen 5 — Excellent Condition" required spellcheck="true" lang="en-ZA">
                         <div class="form-hint">A short descriptive title for the listing</div>
                         @error('title') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                     </div>
 
-                    <div class="listing-form-row-2">
+                    <div class="listing-form-row-2" style="grid-template-columns: 1fr;">
                         <div class="form-group">
                             <label class="form-label">Selling Price <span style="color:#ef4444;">*</span></label>
                             <div style="position:relative;">
                                 <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.5); font-weight:700; pointer-events:none;">R</span>
-                                <input type="number" name="price" class="form-input" style="padding-left:28px;" x-model="price" placeholder="15000" step="0.01" min="0" required>
+                                <input type="number" name="price" class="form-input" style="padding-left:28px;" x-model="price" placeholder="7500" step="1" min="0" required>
                             </div>
-                            <div class="form-hint">Current asking price shown on the listing. Preview: <span style="color:#F58220;font-weight:600;" x-text="formatPrice(price)"></span></div>
+                            <div class="form-hint">Shown as <span style="color:#F58220;font-weight:600;" x-text="formatPrice(price)"></span>. To show a crossed-out price, use Reduce price in More.</div>
                             @error('price') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Original Price <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional)</span></label>
-                            <div style="position:relative;">
-                                <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.5); font-weight:700; pointer-events:none;">R</span>
-                                <input type="number" name="original_price" class="form-input" style="padding-left:28px;" x-model="originalPrice" placeholder="Leave blank if not reduced" step="0.01" min="0">
-                            </div>
-                            <div class="form-hint">Set this when reducing — the original price will show struck through.</div>
-                            @error('original_price') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
@@ -190,25 +195,65 @@
                             @error('make') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Model <span style="color:#ef4444;">*</span></label>
-                            <input type="text" name="model" class="form-input" x-model="model" placeholder="e.g. 19 Gen 5" required>
+                            <label class="form-label">Model <span style="color:rgba(255,255,255,0.3);font-weight:400;">(optional)</span></label>
+                            <input type="text" name="model" class="form-input" x-model="model" placeholder="e.g. 19 Gen 5" spellcheck="true" lang="en-ZA">
+                            <div class="form-hint">Leave blank if this firearm has no model. N/A is saved as blank.</div>
                             @error('model') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="position: relative;" @click.outside="calibreOpen = false">
                             <label class="form-label">Calibre <span style="color:#ef4444;">*</span></label>
-                            <input type="text" name="calibre" list="arms-calibres" class="form-input" x-model="calibre" placeholder="e.g. 9mm Luger" required>
-                            <datalist id="arms-calibres">
-                                @foreach(\App\Support\Cartridges::all() as $cal)
-                                    <option value="{{ $cal }}">
-                                @endforeach
-                            </datalist>
+                            <input type="hidden" name="calibre" x-ref="calibreField" :value="submittedCalibre()">
+                            <input
+                                type="text"
+                                class="form-input"
+                                x-model="calibreQuery"
+                                @focus="calibreOpen = true"
+                                @input="calibreOpen = true"
+                                @keydown.escape="calibreOpen = false"
+                                placeholder="Search calibres"
+                                aria-label="Search calibres"
+                                autocomplete="off"
+                                role="combobox"
+                                :aria-expanded="calibreOpen"
+                            >
+                            <div x-show="calibreOpen" x-cloak style="position: absolute; z-index: 20; left: 0; right: 0; margin-top: 4px; max-height: 220px; overflow: auto; background: #0d1424; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 4px;">
+                                <template x-for="option in filteredCalibres()" :key="option">
+                                    <button type="button" @click="pickCalibre(option)" style="display:block;width:100%;text-align:left;background:transparent;border:0;color:#fff;font:inherit;font-size:13px;padding:8px 10px;cursor:pointer;border-radius:6px;" x-text="option"></button>
+                                </template>
+                                <p x-show="filteredCalibres().length === 0" style="margin: 8px 10px; font-size: 12px; color: rgba(255,255,255,0.4);">No matches.</p>
+                                <button type="button" @click="pickOther()" style="display:block; width:100%; text-align:left; background:transparent; border:0; color:#F58220; font:inherit; font-size:13px; font-weight:600; padding:8px 10px; cursor:pointer;">Other</button>
+                            </div>
+                            <input x-show="calibreOther" x-cloak type="text" class="form-input" style="margin-top: 8px;" x-model="calibreCustom" placeholder="Type the calibre" aria-label="Other calibre" spellcheck="true" lang="en-ZA">
                             @error('calibre') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
+                        </div>
+                    </div>
+
+                    <div class="listing-form-row-2">
+                        <div class="form-group">
+                            <label class="form-label">Type <span style="color:#ef4444;">*</span></label>
+                            <select name="type" class="form-input" required>
+                                <option value="">Choose a type</option>
+                                @foreach(\App\Models\ArmsListing::TYPES as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('type', $listing?->type) === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('type') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Condition <span style="color:#ef4444;">*</span></label>
+                            <select name="condition" class="form-input" required>
+                                <option value="">Choose a condition</option>
+                                @foreach(\App\Models\ArmsListing::CONDITIONS as $value => $label)
+                                    <option value="{{ $value }}" @selected(old('condition', $listing?->condition) === $value)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('condition') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Accessories</label>
-                        <input type="text" name="accessories" class="form-input" x-model="accessories" placeholder="e.g. 3 magazines, holster, cleaning kit">
+                        <input type="text" name="accessories" class="form-input" x-model="accessories" placeholder="e.g. 3 magazines, holster, cleaning kit" spellcheck="true" lang="en-ZA">
                         <div class="form-hint">Optional — list any included accessories</div>
                         @error('accessories') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                     </div>
@@ -218,19 +263,9 @@
                             <span>Description</span>
                             <span style="font-weight:500; text-transform:none; letter-spacing:0;" :style="description.length > {{ $descMax }} ? 'color:#ef4444;' : 'color:rgba(255,255,255,0.35);'" x-text="`${description.length} / {{ number_format($descMax) }}`"></span>
                         </label>
-                        <textarea name="description" class="form-input" rows="4" x-model="description" placeholder="Additional details about condition, history, etc." style="resize: vertical;"></textarea>
-                        <div class="form-hint">Short summary shown on the homepage card and as the fallback on the detail page.</div>
+                        <textarea name="description" class="form-input" rows="8" x-model="description" placeholder="Condition, history, and anything a buyer should know." style="resize: vertical;" spellcheck="true" lang="en-ZA"></textarea>
+                        <div class="form-hint">Cards and the WhatsApp image use the first 160 characters. The full text is on the listing page.</div>
                         @error('description') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="display:flex; align-items:center; justify-content:space-between;">
-                            <span>Long Description <span style="color: rgba(255,255,255,0.3); font-weight: 400; text-transform:none; letter-spacing:0;">(optional)</span></span>
-                            <span style="font-weight:500; text-transform:none; letter-spacing:0;" :style="descriptionLong.length > {{ $longMax }} ? 'color:#ef4444;' : 'color:rgba(255,255,255,0.35);'" x-text="`${descriptionLong.length} / {{ number_format($longMax) }}`"></span>
-                        </label>
-                        <textarea name="description_long" class="form-input" rows="8" x-model="descriptionLong" placeholder="Optional in-depth write-up — condition, provenance, range history, why it's a good buy. Rendered on the detail page when present; falls back to the short description above when left blank." style="resize: vertical;"></textarea>
-                        <div class="form-hint">Only shown on the listing detail page. Leave blank to keep using the short description.</div>
-                        @error('description_long') <div style="margin-top:6px; font-size:12px; color:#ef4444;">{{ $message }}</div> @enderror
                     </div>
 
                     @if($listing)
@@ -267,12 +302,10 @@
                              x-text="calibre || 'Calibre'"></div>
 
                         <div style="margin-top: 12px; display:flex; align-items:baseline; gap:8px;">
-                            <template x-if="originalPrice && parseFloat(originalPrice) > parseFloat(price || 0)">
-                                <span style="font-size: 12px; color: rgba(255,255,255,0.35); text-decoration: line-through;"
-                                      x-text="'R' + Number(originalPrice || 0).toLocaleString('en-ZA')"></span>
-                            </template>
-                            <span style="font-size: 18px; font-weight: 800; color: #F58220;"
-                                  x-text="'R' + Number(price || 0).toLocaleString('en-ZA')"></span>
+                            @if($listing?->isPriceReduced())
+                                <span style="font-size: 12px; color: rgba(255,255,255,0.35); text-decoration: line-through;">{{ \App\Support\ArmsFormat::money($listing->original_price) }}</span>
+                            @endif
+                            <span style="font-size: 18px; font-weight: 800; color: #F58220;" x-text="formatPrice(price)"></span>
                         </div>
 
                         <div style="margin-top: 10px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.55); white-space: pre-wrap;"
@@ -297,7 +330,7 @@
                     // Any user-driven input flips dirty. We watch each tracked
                     // field explicitly so programmatic seeding on init doesn't
                     // trigger the warning.
-                    const tracked = ['title', 'make', 'model', 'calibre', 'price', 'originalPrice', 'accessories', 'description', 'descriptionLong'];
+                    const tracked = ['title', 'make', 'model', 'calibre', 'calibreCustom', 'price', 'accessories', 'description'];
                     tracked.forEach((prop) => {
                         this.$watch(prop, () => { this.dirty = true; });
                     });
@@ -310,10 +343,48 @@
                     });
                 },
 
+                filteredCalibres() {
+                    const query = (this.calibreQuery || '').trim().toLowerCase();
+                    if (query === '' || query === (this.calibre || '').toLowerCase()) {
+                        return this.calibreOptions;
+                    }
+                    return this.calibreOptions.filter((option) => option.toLowerCase().includes(query));
+                },
+
+                pickCalibre(value) {
+                    this.calibreOther = false;
+                    this.calibreCustom = '';
+                    this.calibre = value;
+                    this.calibreQuery = value;
+                    this.calibreOpen = false;
+                },
+
+                pickOther() {
+                    this.calibreOther = true;
+                    this.calibre = '';
+                    this.calibreQuery = '';
+                    this.calibreOpen = false;
+                },
+
+                submittedCalibre() {
+                    return this.calibreOther ? (this.calibreCustom || '') : (this.calibre || '');
+                },
+
+                syncCalibre() {
+                    if (this.calibreOther) {
+                        this.$refs.calibreField.value = this.calibreCustom || '';
+                        return;
+                    }
+
+                    const query = (this.calibreQuery || '').trim();
+                    const exact = this.calibreOptions.find((option) => option.toLowerCase() === query.toLowerCase());
+                    this.$refs.calibreField.value = exact || query;
+                },
+
                 formatPrice(v) {
-                    const n = Number(String(v ?? '').replace(/[^0-9.]/g, ''));
-                    if (!isFinite(n) || n <= 0) return 'R0';
-                    return 'R' + n.toLocaleString('en-ZA');
+                    const n = Math.round(Number(String(v ?? '').replace(/[^0-9.]/g, '')));
+                    if (!isFinite(n) || n <= 0) return 'R 0';
+                    return 'R ' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 },
             };
         }

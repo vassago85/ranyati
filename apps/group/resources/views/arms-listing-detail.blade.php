@@ -3,13 +3,14 @@
     $imgUrls       = collect($listing->images ?? [])->map(fn ($p) => asset('storage/'.$p))->values();
     $primaryImage  = $imgUrls->first() ?? asset('ranyati-group-logo.png');
 
-    $makeModel     = trim($listing->make.' '.$listing->model);
+    $makeModel     = $listing->displayName();
     $headline      = $makeModel.' — '.$listing->calibre;
     $isSold        = $listing->status === 'sold';
-    $isReduced     = ! $isSold && $listing->original_price && $listing->original_price > $listing->price;
-    $priceFormatted = 'R'.number_format((float) $listing->price, 0, '.', ' ');
+    $unavailable   = $unavailable ?? ! $listing->isLive();
+    $isReduced     = ! $unavailable && $listing->isPriceReduced();
+    $priceFormatted = \App\Support\ArmsFormat::money($listing->price);
     $originalPriceFormatted = $listing->original_price
-        ? 'R'.number_format((float) $listing->original_price, 0, '.', ' ')
+        ? \App\Support\ArmsFormat::money($listing->original_price)
         : null;
 
     $title         = 'Used '.$headline.' for Sale | Ranyati Arms — Pretoria, Gauteng';
@@ -31,10 +32,10 @@
         '@context'    => 'https://schema.org/',
         '@type'       => 'Product',
         'name'        => $headline,
-        'description' => $listing->description ?: $metaDescription,
+        'description' => $listing->fullDescription() ?: $metaDescription,
         'image'       => $imgUrls->count() > 0 ? $imgUrls->all() : [asset('ranyati-group-logo.png')],
         'brand'       => ['@type' => 'Brand', 'name' => $listing->make],
-        'sku'         => 'RA-'.$listing->id,
+        'sku'         => $listing->stock_number ?: ('RA-'.$listing->id),
         'category'    => 'Used Firearm',
         'itemCondition' => 'https://schema.org/UsedCondition',
         'offers'      => [
@@ -85,7 +86,7 @@
     <meta name="description" content="{{ $metaDescription }}">
     <meta name="keywords" content="used {{ $listing->make }}, {{ $headline }} for sale, second-hand {{ $listing->make }} {{ $listing->model }}, used firearms Pretoria, used firearms Gauteng, used firearms South Africa, {{ $listing->calibre }} for sale">
     <link rel="canonical" href="{{ $url }}">
-    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="robots" content="{{ $unavailable ? 'noindex, follow' : 'index, follow, max-image-preview:large' }}">
     <meta name="geo.region" content="ZA-GP">
     <meta name="geo.placename" content="Pretoria">
 
@@ -281,6 +282,11 @@
 
             {{-- Details --}}
             <div>
+                @if($unavailable)
+                    <div class="sold-banner" style="margin-bottom: 12px; padding: 12px 14px; border-radius: 10px; background: rgba(251,191,36,0.12); color: #fbbf24; font-weight: 700;">
+                        {{ $isSold ? 'Sold' : 'No longer available' }}
+                    </div>
+                @endif
                 @if($isSold)
                     <span class="sold-badge">Sold</span>
                 @elseif($isReduced)
@@ -302,7 +308,7 @@
                     @endif
                 </div>
 
-                @php $detailDescription = $listing->description_long ?: $listing->description; @endphp
+                @php $detailDescription = $listing->fullDescription(); @endphp
                 @if($detailDescription)
                     <p class="mt-5 text-[14px] leading-[1.7] text-white/75 whitespace-pre-line">{{ $detailDescription }}</p>
                 @endif
@@ -310,29 +316,35 @@
                 {{-- Specs --}}
                 <div class="mt-7 rounded-xl border border-white/5 bg-white/[0.02] p-5">
                     <div class="spec-row"><span class="spec-label">Make</span><span class="spec-val">{{ $listing->make }}</span></div>
-                    <div class="spec-row"><span class="spec-label">Model</span><span class="spec-val">{{ $listing->model }}</span></div>
+                    @if($listing->model)
+                        <div class="spec-row"><span class="spec-label">Model</span><span class="spec-val">{{ $listing->model }}</span></div>
+                    @endif
                     <div class="spec-row"><span class="spec-label">Calibre</span><span class="spec-val">{{ $listing->calibre }}</span></div>
-                    <div class="spec-row"><span class="spec-label">Condition</span><span class="spec-val">Used — Personally Inspected</span></div>
+                    @if($listing->conditionLabel())
+                        <div class="spec-row"><span class="spec-label">Condition</span><span class="spec-val">{{ $listing->conditionLabel() }}</span></div>
+                    @endif
                     @if($listing->accessories)
                         <div class="spec-row"><span class="spec-label">Includes</span><span class="spec-val" style="text-align:right; max-width: 60%;">{{ $listing->accessories }}</span></div>
                     @endif
                     <div class="spec-row"><span class="spec-label">Location</span><span class="spec-val">Pretoria, Gauteng</span></div>
-                    <div class="spec-row"><span class="spec-label">Reference</span><span class="spec-val">RA-{{ $listing->id }}</span></div>
+                    @if($listing->stock_number)
+                        <div class="spec-row"><span class="spec-label">Stock number</span><span class="spec-val">{{ $listing->stock_number }}</span></div>
+                    @endif
                 </div>
 
                 {{-- CTAs --}}
                 <div class="mt-7 flex flex-wrap gap-3">
-                    @if($isSold)
-                        <span class="btn-sold" aria-disabled="true">This firearm has been sold</span>
+                    @if($unavailable)
+                        <span class="btn-sold" aria-disabled="true">{{ $isSold ? 'This firearm has been sold' : 'This firearm is no longer available' }}</span>
                     @else
-                        <a href="/#listing-{{ $listing->id }}" class="btn-primary">
+                        <a href="/#listing-{{ $listing->id }}" class="btn-primary" style="min-height:44px;">
                             Enquire about this firearm
                         </a>
-                    @endif
-                    <a href="{{ $whatsappShare }}" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Share this listing on WhatsApp">
+                        <a href="{{ $whatsappShare }}" target="_blank" rel="noopener noreferrer" class="btn-wa" aria-label="Share this listing on WhatsApp" style="min-height:44px;">
                         <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                         Share on WhatsApp
-                    </a>
+                        </a>
+                    @endif
                 </div>
 
                 {{-- Compliance --}}
@@ -345,7 +357,7 @@
         {{-- Related listings --}}
         @if($related->count() > 0)
             <section class="mt-16 lg:mt-20">
-                <h2 class="text-[1.5rem] font-black tracking-[-0.02em] text-white">Other firearms for sale</h2>
+                <h2 class="text-[1.5rem] font-black tracking-[-0.02em] text-white">{{ $unavailable ? 'Similar firearms' : 'Other firearms for sale' }}</h2>
                 <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach($related as $other)
                         @php
@@ -369,7 +381,7 @@
         {{-- Footer --}}
         <footer class="mt-16 border-t border-white/5 pt-8 pb-4 text-[11px] text-white/40">
             <div class="flex flex-wrap items-center justify-between gap-3">
-                <p>&copy; {{ date('Y') }} Ranyati Arms — a division of Ranyati Group. Pretoria, Gauteng, South Africa.</p>
+                <p>&copy; {{ date('Y') }} Ranyati Arms — a division of Ranyati Group. Pretoria, Gauteng, South Africa. Enquire on any listing and we'll get back to you.</p>
                 <a href="/" class="text-white/55 hover:text-white">Back to all listings</a>
             </div>
         </footer>

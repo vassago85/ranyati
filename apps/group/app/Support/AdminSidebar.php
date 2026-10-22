@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Enums\MotivationStatus;
+use App\Models\ArmsEnquiry;
 use App\Models\MotivationEnquiry;
 use App\Models\MotivationRequest;
 use App\Models\User;
@@ -215,8 +216,16 @@ class AdminSidebar
             'links' => array_values(array_filter([
                 self::link('Listings', 'admin.arms', 'rifle', active: request()->routeIs('admin.arms')
                     || request()->routeIs('admin.arms.create')
-                    || request()->routeIs('admin.arms.edit')),
-                self::link('Enquiries', 'admin.arms.enquiries', 'envelope', active: request()->routeIs('admin.arms.enquiries*')),
+                    || request()->routeIs('admin.arms.edit')
+                    || request()->routeIs('admin.arms.card')),
+                self::link(
+                    'Enquiries',
+                    'admin.arms.enquiries',
+                    'envelope',
+                    active: request()->routeIs('admin.arms.enquiries*'),
+                    badge: ArmsEnquiry::where('status', 'new')->count() ?: null,
+                ),
+                self::link('Saved replies', 'admin.arms.replies', 'message', active: request()->routeIs('admin.arms.replies*')),
             ])),
         ]];
     }

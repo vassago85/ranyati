@@ -2,22 +2,42 @@
 
 namespace App\Models;
 
+use App\Support\ArmsDescriptions;
+use App\Support\ArmsFormat;
+use App\Support\ArmsStock;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ArmsListing extends Model
 {
+    public const TYPES = [
+        'handgun' => 'Handgun',
+        'rifle' => 'Rifle',
+        'shotgun' => 'Shotgun',
+    ];
+
+    public const CONDITIONS = [
+        'excellent' => 'Excellent',
+        'very_good' => 'Very good',
+        'good' => 'Good',
+        'fair' => 'Fair',
+    ];
+
     protected $fillable = [
         'title',
         'slug',
+        'stock_number',
         'make',
         'model',
         'calibre',
+        'type',
+        'condition',
         'accessories',
         'price',
         'original_price',
@@ -77,6 +97,49 @@ class ArmsListing extends Model
         return $query->where('status', 'sold');
     }
 
+    public function scopePriceReduced(Builder $query): Builder
+    {
+        return $query->where(function (Builder $inner): void {
+            $inner->where('status', 'reduced')
+                ->orWhere(function (Builder $price): void {
+                    $price->whereNotNull('original_price')
+                        ->whereColumn('original_price', '>', 'price');
+                });
+        });
+    }
+
+    /**
+     * Admin list default: featured pins first, then the newest listing.
+     */
+    public function scopeAdminOrdered(Builder $query): Builder
+    {
+        return $query->orderByDesc('is_featured')
+            ->orderByDesc('created_at')
+            ->orderByDesc('id');
+    }
+
+    public static function featuredSpotCount(): int
+    {
+        return static::query()
+            ->where('is_featured', true)
+            ->whereIn('status', ['active', 'reduced'])
+            ->count();
+    }
+
+    public static function featuredLimit(): int
+    {
+        return max(0, (int) config('arms.max_featured', 6));
+    }
+
+    public function featuredSpotsAreFull(): bool
+    {
+        if ($this->occupiesFeaturedSpot()) {
+            return false;
+        }
+
+        return static::featuredSpotCount() >= static::featuredLimit();
+    }
+
     public function scopePrioritised(Builder $query): Builder
     {
         return $query->visible()
@@ -94,18 +157,184 @@ class ArmsListing extends Model
             : asset('ranyati-icon.png');
     }
 
+    public function displayName(): string
+    {
+        return trim($this->make.' '.($this->model ?? ''));
+    }
+
+    public function typeLabel(): ?string
+    {
+        return self::TYPES[$this->type] ?? null;
+    }
+
+    public function conditionLabel(): ?string
+    {
+        return self::CONDITIONS[$this->condition] ?? null;
+    }
+
+    public function fullDescription(): ?string
+    {
+        return ArmsDescriptions::preferred($this->description, $this->description_long);
+    }
+
+    public function cardDescription(): ?string
+    {
+        return ArmsFormat::excerpt($this->fullDescription());
+    }
+
+    public function isNewArrival(): bool
+    {
+        if (! $this->isLive() || $this->created_at === null) {
+            return false;
+        }
+
+        $days = max(1, (int) config('arms.new_badge_days', 14));
+
+        return $this->created_at->gte(now()->subDays($days));
+    }
+
+    public function needsType(): bool
+    {
+        return $this->isLive() && ($this->type === null || $this->type === '');
+    }
+
+    public function needsCondition(): bool
+    {
+        return $this->isLive() && ($this->condition === null || $this->condition === '');
+    }
+
+    public function isPriceReduced(): bool
+    {
+        return $this->original_price !== null && (float) $this->original_price > (float) $this->price;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function similarActive(int $limit = 3): Collection
+    {
+        $base = static::query()->visible()->where('id', '!=', $this->id);
+        $primary = clone $base;
+
+        if ($this->type) {
+            $primary->where('type', $this->type);
+        }
+
+        if ($this->calibre) {
+            $primary->where('calibre', $this->calibre);
+        }
+
+        $found = $primary->orderByDesc('created_at')->orderByDesc('id')->limit($limit)->get();
+
+        if ($found->count() < $limit && $this->type) {
+            $more = (clone $base)
+                ->where('type', $this->type)
+                ->whereNotIn('id', $found->pluck('id'))
+                ->orderByDesc('created_at')
+                ->orderByDesc('id')
+                ->limit($limit - $found->count())
+                ->get();
+            $found = $found->concat($more);
+        }
+
+        return $found->values();
+    }
+
+    /**
+     * @param  Collection<int, self>  $listings
+     * @return Collection<int, self>
+     */
+    public static function arrangeForPublic(Collection $listings, ?string $type, string $sort): Collection
+    {
+        $filtered = $type === null
+            ? $listings->values()
+            : $listings->where('type', $type)->values();
+
+        if ($sort === 'price_asc') {
+            return $filtered->sortBy(fn (self $listing) => (float) $listing->price)->values();
+        }
+
+        if ($sort === 'price_desc') {
+            return $filtered->sortByDesc(fn (self $listing) => (float) $listing->price)->values();
+        }
+
+        $limit = static::featuredLimit();
+        $featured = $filtered
+            ->filter(fn (self $listing) => $listing->occupiesFeaturedSpot())
+            ->sortByDesc(fn (self $listing) => $listing->featured_at ?? $listing->created_at)
+            ->take($limit)
+            ->values();
+        $featuredIds = $featured->pluck('id');
+        $rest = $filtered
+            ->reject(fn (self $listing) => $featuredIds->contains($listing->id))
+            ->sortByDesc(fn (self $listing) => $listing->created_at)
+            ->values();
+
+        return $featured->concat($rest)->values();
+    }
+
+    public function isLive(): bool
+    {
+        return in_array($this->status, ['active', 'reduced'], true);
+    }
+
+    /**
+     * A stored upload path counts. The grey placeholder drawn when this is
+     * empty is not a photo.
+     */
+    public function hasRealPhoto(): bool
+    {
+        foreach ($this->images ?? [] as $path) {
+            if (is_string($path) && trim($path) !== '') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function missingPhoto(): bool
+    {
+        return $this->isLive() && ! $this->hasRealPhoto();
+    }
+
+    public function isStale(): bool
+    {
+        if (! $this->isLive() || $this->created_at === null) {
+            return false;
+        }
+
+        $days = max(1, (int) config('arms.stale_after_days', 60));
+
+        return $this->created_at->lte(now()->subDays($days));
+    }
+
+    public function occupiesFeaturedSpot(): bool
+    {
+        return $this->is_featured && $this->isLive();
+    }
+
     /**
      * Pin a listing to the top of the public stock grid. Also restores
      * archived/sold listings back to a live active state.
+     *
+     * Returns false when the featured limit is already full and this listing
+     * does not already hold a spot. Nothing is changed in that case.
      */
-    public function feature(): void
+    public function feature(): bool
     {
+        if ($this->featuredSpotsAreFull()) {
+            return false;
+        }
+
         $this->update([
             'status' => 'active',
             'is_featured' => true,
             'featured_at' => now(),
             'archived_at' => null,
         ]);
+
+        return true;
     }
 
     public function unfeature(): void
@@ -188,6 +417,10 @@ class ArmsListing extends Model
     protected static function booted(): void
     {
         static::saving(function (self $listing): void {
+            if (empty($listing->stock_number)) {
+                $listing->stock_number = ArmsStock::next();
+            }
+
             if (empty($listing->slug)) {
                 $listing->slug = self::generateSlug($listing->make, $listing->model, $listing->calibre, $listing->id);
             }

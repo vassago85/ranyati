@@ -85,6 +85,7 @@ class ExistingPagesSmokeTest extends TestCase
 
         foreach ($paths as $path) {
             $this->actingAs($admin)
+                ->followingRedirects()
                 ->get($path)
                 ->assertOk();
         }

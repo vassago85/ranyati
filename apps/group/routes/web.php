@@ -26,12 +26,15 @@ use App\Mail\NewArmsEnquiry;
 use App\Mail\NewMotivationEnquiry;
 use App\Models\ArmsEnquiry;
 use App\Models\ArmsListing;
+use App\Models\ArmsSavedReply;
 use App\Models\Document;
 use App\Models\MotivationEnquiry;
 use App\Models\QuestionnaireResponse;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\AdminAreas;
+use App\Support\ArmsListingNormaliser;
+use App\Support\ArmsPhone;
 use App\Support\ImageOptimizer;
 use App\Support\MotivationServices;
 use App\Support\QuestionnaireRegistry;
@@ -49,8 +52,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
-Route::get('/', function () {
-    $host = request()->getHost();
+Route::get('/', function (Request $request) {
+    $host = $request->getHost();
 
     if (str_starts_with($host, 'motivations.')) {
         return view('motivations');
@@ -61,8 +64,24 @@ Route::get('/', function () {
     }
 
     if (str_starts_with($host, 'arms.')) {
+        $type = in_array($request->query('type'), array_keys(ArmsListing::TYPES), true)
+            ? $request->query('type')
+            : null;
+        $sort = in_array($request->query('sort'), ['newest', 'price_asc', 'price_desc'], true)
+            ? $request->query('sort')
+            : 'newest';
+        $stock = ArmsListing::visible()->get();
+
         return view('arms-landing', [
-            'listings' => ArmsListing::prioritised()->get(),
+            'listings' => ArmsListing::arrangeForPublic($stock, $type, $sort),
+            'typeCounts' => [
+                'all' => $stock->count(),
+                'handgun' => $stock->where('type', 'handgun')->count(),
+                'rifle' => $stock->where('type', 'rifle')->count(),
+                'shotgun' => $stock->where('type', 'shotgun')->count(),
+            ],
+            'activeType' => $type,
+            'activeSort' => $sort,
         ]);
     }
 
@@ -150,25 +169,19 @@ $armsOnly = function (): void {
 
 // ── Arms public routes ──────────────────────────────────────────
 
-// Per-listing detail page. Each visible listing gets its own URL so it can
-// be indexed individually, share with the listing's own photo, and surface
-// in long-tail searches like "used Glock 19 Pretoria". Archived listings
-// 404 so search engines drop them from the index. Sold listings deliberately
-// stay live (HTTP 200, indexable) with a "Sold" state + SoldOut JSON-LD, so a
-// firearm selling never turns its URL into a 404 as stock churns.
+// Per-listing detail page. Sold and archived listings stay on a 200 page
+// with noindex, no enquiry form, and up to three similar firearms.
 Route::get('/listings/{listing:slug}', function (ArmsListing $listing) use ($armsOnly) {
     $armsOnly();
 
-    if ($listing->status === 'archived') {
-        abort(404);
-    }
+    $unavailable = ! $listing->isLive();
 
     return view('arms-listing-detail', [
         'listing' => $listing,
-        'related' => ArmsListing::prioritised()
-            ->where('id', '!=', $listing->id)
-            ->limit(6)
-            ->get(),
+        'related' => $unavailable
+            ? $listing->similarActive(3)
+            : ArmsListing::prioritised()->where('id', '!=', $listing->id)->limit(3)->get(),
+        'unavailable' => $unavailable,
     ]);
 })->name('arms.listing.show');
 
@@ -209,13 +222,34 @@ Route::post('/arms/send-otp', function (Request $request) use ($armsOnly) {
 Route::post('/listing/{listing:id}/enquire', function (Request $request, ArmsListing $listing) use ($armsOnly) {
     $armsOnly();
 
+    $rateLimitKey = 'arms-enquiry:'.$request->ip();
+    if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+        return response()->json(['error' => 'Too many enquiries. Please wait a few minutes and try again.'], 429);
+    }
+
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
-        'phone' => 'nullable|string|max:50',
+        'phone' => 'required|string|max:50',
         'message' => 'nullable|string|max:2000',
         'otp' => 'required|string|size:6',
+        'website' => 'nullable|string|max:255',
     ]);
+
+    if (filled($validated['website'] ?? null)) {
+        return response()->json(['success' => true, 'message' => 'Thanks. We have your enquiry and will get back to you.']);
+    }
+
+    if (! $listing->isLive()) {
+        return response()->json([
+            'error' => 'This firearm is sold. Look at the similar stock on the page, or send a general enquiry.',
+        ], 422);
+    }
+
+    $phone = ArmsPhone::normalise($validated['phone']);
+    if ($phone === null) {
+        return response()->json(['error' => 'Enter a South African cell number, for example 082 000 0000.'], 422);
+    }
 
     $email = strtolower(trim($validated['email']));
     $cachedCode = Cache::get("arms-otp:{$email}");
@@ -225,13 +259,16 @@ Route::post('/listing/{listing:id}/enquire', function (Request $request, ArmsLis
     }
 
     Cache::forget("arms-otp:{$email}");
+    RateLimiter::hit($rateLimitKey, 600);
 
     $enquiry = ArmsEnquiry::create([
         'arms_listing_id' => $listing->id,
         'name' => $validated['name'],
         'email' => $validated['email'],
-        'phone' => $validated['phone'] ?? null,
+        'phone' => $phone,
+        'phone_e164' => $phone,
         'message' => $validated['message'] ?? null,
+        'status' => 'new',
     ]);
 
     try {
@@ -239,8 +276,58 @@ Route::post('/listing/{listing:id}/enquire', function (Request $request, ArmsLis
     } catch (Throwable $e) {
     }
 
-    return response()->json(['success' => true, 'message' => 'Thank you! Your enquiry has been sent.']);
-})->name('arms.enquire');
+    return response()->json(['success' => true, 'message' => 'Thanks. We have your enquiry and will get back to you.']);
+})->middleware('throttle:30,1')->name('arms.enquire');
+
+Route::post('/arms/general-enquiry', function (Request $request) use ($armsOnly) {
+    $armsOnly();
+
+    $rateLimitKey = 'arms-enquiry:'.$request->ip();
+    if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+        return response()->json(['error' => 'Too many enquiries. Please wait a few minutes and try again.'], 429);
+    }
+
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|max:255',
+        'phone' => 'required|string|max:50',
+        'message' => 'required|string|max:2000',
+        'type' => 'nullable|in:handgun,rifle,shotgun',
+        'budget' => 'nullable|numeric|min:0',
+        'website' => 'nullable|string|max:255',
+    ]);
+
+    if (filled($validated['website'] ?? null)) {
+        return response()->json(['success' => true, 'message' => 'Thanks. We have your enquiry and will get back to you.']);
+    }
+
+    $phone = ArmsPhone::normalise($validated['phone']);
+    if ($phone === null) {
+        return response()->json(['error' => 'Enter a South African cell number, for example 082 000 0000.'], 422);
+    }
+
+    RateLimiter::hit($rateLimitKey, 600);
+
+    $lookingFor = trim($validated['message']);
+    if (! empty($validated['type'] ?? null)) {
+        $lookingFor .= "\nType: ".ArmsListing::TYPES[$validated['type']];
+    }
+    if (($validated['budget'] ?? null) !== null && $validated['budget'] !== '') {
+        $lookingFor .= "\nBudget: R ".number_format((float) $validated['budget'], 0, '.', ' ');
+    }
+
+    ArmsEnquiry::create([
+        'arms_listing_id' => null,
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'phone' => $phone,
+        'phone_e164' => $phone,
+        'message' => $lookingFor,
+        'status' => 'new',
+    ]);
+
+    return response()->json(['success' => true, 'message' => 'Thanks. We have your enquiry and will get back to you.']);
+})->name('arms.enquire.general');
 
 Route::get('/about', function () use ($apexOnly) {
     $apexOnly();
@@ -271,7 +358,7 @@ Route::get('/faq', function () {
     if (str_starts_with($host, 'motivations.')) {
         return view('seo.motivations.faq');
     }
-    abort_if(str_starts_with($host, 'storage.'), 404);
+    abort_if(str_starts_with($host, 'storage.') || str_starts_with($host, 'arms.'), 404);
 
     return view('seo.faq');
 });
@@ -563,10 +650,10 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     // 4 KPI tiles, phase pipeline card, "Needs your action" table. The
     // previous enquiries-only dashboard is now covered by the Enquiries
     // link in the sidebar and the "Unread enquiries" KPI tile.
-    Route::get('/', \App\Http\Controllers\Admin\DashboardController::class)->name('dashboard');
+    Route::get('/', App\Http\Controllers\Admin\DashboardController::class)->name('dashboard');
 
     // Global search used by the topbar search field (focus with `/`).
-    Route::get('/search', \App\Http\Controllers\Admin\SearchController::class)->name('search');
+    Route::get('/search', App\Http\Controllers\Admin\SearchController::class)->name('search');
 
     Route::get('/enquiries', function (Request $request) {
         $allowedFilters = ['unread', 'read', 'month', 'needs_reply', ...MotivationEnquiry::statusKeys()];
@@ -778,15 +865,24 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
     // ── Arms Listings Management ────────────────────────────────
 
     Route::get('/arms', function (Request $request) {
-        $allowedFilters = ['active', 'featured', 'sold', 'archived', 'reduced'];
-        $filter = in_array($request->query('filter'), $allowedFilters, true) ? $request->query('filter') : null;
-
+        $allowedFilters = ['all', 'active', 'featured', 'sold', 'archived', 'reduced'];
         $allowedSorts = ['created_at', 'price', 'status', 'title', 'enquiries_count'];
         $sort = in_array($request->query('sort'), $allowedSorts, true) ? $request->query('sort') : null;
         $direction = $request->query('direction') === 'asc' ? 'asc' : 'desc';
-
         $q = trim((string) $request->query('q', ''));
+        $requestedFilter = $request->query('filter');
 
+        if (! is_string($requestedFilter) || ! in_array($requestedFilter, $allowedFilters, true)) {
+            return redirect()->route('admin.arms', array_filter([
+                'filter' => 'active',
+                'q' => $q !== '' ? $q : null,
+                'sort' => $sort,
+                'direction' => $sort ? $direction : null,
+                'page' => $request->query('page'),
+            ]));
+        }
+
+        $filter = $requestedFilter;
         $query = ArmsListing::query()->withCount('enquiries');
 
         if ($q !== '') {
@@ -795,7 +891,8 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
                 $sub->where('title', 'like', $like)
                     ->orWhere('make', 'like', $like)
                     ->orWhere('model', 'like', $like)
-                    ->orWhere('calibre', 'like', $like);
+                    ->orWhere('calibre', 'like', $like)
+                    ->orWhere('stock_number', 'like', $like);
             });
         }
 
@@ -813,27 +910,25 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
                 $query->where('status', 'archived');
                 break;
             case 'reduced':
-                $query->where('status', 'reduced')
-                    ->orWhere(function ($sub) {
-                        $sub->whereNotNull('original_price')->whereColumn('original_price', '>', 'price');
-                    });
+                $query->priceReduced();
                 break;
         }
 
         if ($sort) {
             $query->orderBy($sort, $direction)->orderByDesc('id');
         } else {
-            // Default: featured pinned to top, matching the public grid ordering.
-            $query->orderByDesc('is_featured')
-                ->orderByDesc('featured_at')
-                ->orderByDesc('id');
+            $query->adminOrdered();
         }
+
+        $featuredCount = ArmsListing::featuredSpotCount();
+        $maxFeatured = ArmsListing::featuredLimit();
 
         return view('admin.arms.index', [
             'listings' => $query->paginate(25)->withQueryString(),
             'stats' => [
                 'active' => ArmsListing::whereIn('status', ['active', 'reduced'])->count(),
-                'featured' => ArmsListing::where('is_featured', true)->whereIn('status', ['active', 'reduced'])->count(),
+                'featured' => $featuredCount,
+                'reduced' => ArmsListing::priceReduced()->count(),
                 'sold' => ArmsListing::where('status', 'sold')->count(),
                 'archived' => ArmsListing::where('status', 'archived')->count(),
                 'enquiries' => ArmsEnquiry::count(),
@@ -843,27 +938,41 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'sort' => $sort,
             'direction' => $direction,
             'q' => $q,
+            'featuredCount' => $featuredCount,
+            'maxFeatured' => $maxFeatured,
+            'staleAfterDays' => max(1, (int) config('arms.stale_after_days', 60)),
         ]);
     })->name('arms');
 
     Route::get('/arms/create', function () {
-        return view('admin.arms.form', ['listing' => null]);
+        return view('admin.arms.form', [
+            'listing' => null,
+            'calibres' => ArmsListingNormaliser::calibreOptions(),
+            'featuredFull' => ArmsListing::featuredSpotCount() >= ArmsListing::featuredLimit(),
+        ]);
     })->name('arms.create');
 
     Route::post('/arms', function (Request $request) {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'make' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',
             'calibre' => 'required|string|max:255',
+            'type' => 'required|in:handgun,rifle,shotgun',
+            'condition' => 'required|in:excellent,very_good,good,fair',
             'accessories' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string|max:5000',
-            'description_long' => 'nullable|string|max:20000',
+            'description' => 'nullable|string|max:20000',
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:15360',
         ]);
+
+        $validated['model'] = ArmsListingNormaliser::model($validated['model'] ?? null);
+        $validated['calibre'] = ArmsListingNormaliser::calibre($validated['calibre']) ?? '';
+        $validated['description_long'] = $validated['description'] ?? null;
+        if ($validated['calibre'] === '') {
+            return back()->withErrors(['calibre' => 'Choose a calibre.'])->withInput();
+        }
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
@@ -881,11 +990,23 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             'created_by' => auth()->id(),
         ]);
 
-        return redirect()->route('admin.arms')->with('success', 'Listing created.');
+        $redirect = redirect()
+            ->route('admin.arms', ['filter' => 'active'])
+            ->with('success', 'Listing created.');
+
+        if ($warning = ArmsListingNormaliser::repeatWarning($validated['make'], $validated['model'])) {
+            $redirect->with('warning', $warning);
+        }
+
+        return $redirect;
     })->name('arms.store');
 
     Route::get('/arms/{listing}/edit', function (ArmsListing $listing) {
-        return view('admin.arms.form', compact('listing'));
+        return view('admin.arms.form', [
+            'listing' => $listing,
+            'calibres' => ArmsListingNormaliser::calibreOptions(),
+            'featuredFull' => ArmsListing::featuredSpotCount() >= ArmsListing::featuredLimit(),
+        ]);
     })->name('arms.edit');
 
     Route::get('/arms/{listing}/card', function (ArmsListing $listing) {
@@ -900,30 +1021,53 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'make' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
+            'model' => 'nullable|string|max:255',
             'calibre' => 'required|string|max:255',
+            'type' => 'required|in:handgun,rifle,shotgun',
+            'condition' => 'required|in:excellent,very_good,good,fair',
             'accessories' => 'nullable|string|max:2000',
             'price' => 'required|numeric|min:0',
-            'original_price' => 'nullable|numeric|min:0',
-            'description' => 'nullable|string|max:5000',
-            'description_long' => 'nullable|string|max:20000',
+            'description' => 'nullable|string|max:20000',
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:15360',
             'remove_images' => 'nullable|array',
             'remove_images.*' => 'integer',
+            'image_order' => 'nullable|array',
+            'image_order.*' => 'integer',
         ]);
 
-        $currentImages = $listing->images ?? [];
+        $validated['model'] = ArmsListingNormaliser::model($validated['model'] ?? null);
+        $validated['calibre'] = ArmsListingNormaliser::calibre($validated['calibre']) ?? '';
+        $validated['description_long'] = $validated['description'] ?? null;
+        if ($validated['calibre'] === '') {
+            return back()->withErrors(['calibre' => 'Choose a calibre.'])->withInput();
+        }
 
-        $removeIndexes = $request->input('remove_images', []);
-        if (! empty($removeIndexes)) {
-            foreach ($removeIndexes as $idx) {
-                if (isset($currentImages[$idx])) {
-                    Storage::disk('public')->delete($currentImages[$idx]);
-                    unset($currentImages[$idx]);
-                }
+        $existing = array_values($listing->images ?? []);
+        $remove = array_map('intval', (array) $request->input('remove_images', []));
+        $order = array_map('intval', (array) $request->input('image_order', []));
+
+        foreach ($remove as $idx) {
+            if (isset($existing[$idx]) && is_string($existing[$idx])) {
+                Storage::disk('public')->delete($existing[$idx]);
             }
-            $currentImages = array_values($currentImages);
+        }
+
+        $currentImages = [];
+        $used = [];
+        $sequence = $order !== [] ? $order : array_keys($existing);
+        foreach ($sequence as $idx) {
+            if (in_array($idx, $remove, true) || ! isset($existing[$idx]) || isset($used[$idx])) {
+                continue;
+            }
+            $currentImages[] = $existing[$idx];
+            $used[$idx] = true;
+        }
+        foreach ($existing as $idx => $path) {
+            if (isset($used[$idx]) || in_array($idx, $remove, true)) {
+                continue;
+            }
+            $currentImages[] = $path;
         }
 
         $newCount = $request->hasFile('images') ? count($request->file('images')) : 0;
@@ -940,7 +1084,7 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         }
 
         $updateData = [
-            ...Arr::except($validated, ['images', 'remove_images']),
+            ...Arr::except($validated, ['images', 'remove_images', 'image_order']),
             'images' => $currentImages,
         ];
 
@@ -952,7 +1096,15 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
 
         $listing->update($updateData);
 
-        return redirect()->route('admin.arms')->with('success', 'Listing updated.');
+        $redirect = redirect()
+            ->route('admin.arms', ['filter' => 'active'])
+            ->with('success', 'Listing updated.');
+
+        if ($warning = ArmsListingNormaliser::repeatWarning($validated['make'], $validated['model'])) {
+            $redirect->with('warning', $warning);
+        }
+
+        return $redirect;
     })->name('arms.update');
 
     Route::delete('/arms/{listing}', function (ArmsListing $listing) {
@@ -963,38 +1115,71 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
         }
         $listing->delete();
 
-        return redirect()->route('admin.arms')->with('success', 'Listing deleted.');
+        return redirect()->route('admin.arms', ['filter' => 'active'])->with('success', 'Listing deleted.');
     })->name('arms.delete');
 
     Route::post('/arms/{listing}/feature', function (ArmsListing $listing) {
-        $listing->feature();
+        if (! $listing->feature()) {
+            return back()->with('error', 'Remove another listing from the top first.');
+        }
 
-        return back()->with('success', 'Listing featured — it will appear at the top of the stock grid.');
+        return back()->with('success', 'Listing pinned to the top of the stock list.');
     })->name('arms.feature');
 
     Route::post('/arms/{listing}/unfeature', function (ArmsListing $listing) {
         $listing->unfeature();
 
-        return back()->with('success', 'Listing unfeatured.');
+        return back()->with('success', 'Removed from the top of the stock list.');
     })->name('arms.unfeature');
 
     Route::post('/arms/{listing}/restore', function (ArmsListing $listing) {
         $listing->restore();
 
-        return back()->with('success', 'Listing restored to the stock grid.');
+        return back()->with('success', 'Put back on sale.');
     })->name('arms.restore');
 
     Route::post('/arms/{listing}/archive', function (ArmsListing $listing) {
+        $wasFeatured = (bool) $listing->is_featured;
         $listing->archive();
 
-        return back()->with('success', 'Listing archived.');
+        return back()->with('success', $wasFeatured
+            ? 'Archived. Removed from the top.'
+            : 'Listing archived.');
     })->name('arms.archive');
 
     Route::post('/arms/{listing}/sold', function (ArmsListing $listing) {
+        $wasFeatured = (bool) $listing->is_featured;
         $listing->markSold();
 
-        return back()->with('success', 'Listing marked as sold. Its page stays live (200) with a Sold state.');
+        return back()->with('success', $wasFeatured
+            ? 'Marked as sold. Removed from the top.'
+            : 'Marked as sold.');
     })->name('arms.sold');
+
+    Route::post('/arms/{listing}/reduce', function (Request $request, ArmsListing $listing) {
+        abort_unless($listing->isLive(), 403);
+
+        $data = $request->validate([
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        if ((float) $data['price'] >= (float) $listing->price) {
+            return back()->with('error', 'Enter a price lower than the current price.');
+        }
+
+        $listing->update([
+            'original_price' => $listing->price,
+            'price' => $data['price'],
+        ]);
+
+        return back()->with('success', 'Price reduced. The previous price stays visible with a line through it.');
+    })->name('arms.reduce');
+
+    Route::post('/arms/{listing}/remove-reduction', function (ArmsListing $listing) {
+        $listing->update(['original_price' => null]);
+
+        return back()->with('success', 'Price reduction removed.');
+    })->name('arms.remove-reduction');
 
     Route::post('/arms/{listing}/duplicate', function (ArmsListing $listing) {
         // Photos: copy the underlying files so deleting either listing later
@@ -1026,8 +1211,9 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             }
         }
 
-        $copy = $listing->replicate(['slug', 'is_featured', 'featured_at', 'archived_at']);
+        $copy = $listing->replicate(['slug', 'stock_number', 'is_featured', 'featured_at', 'archived_at']);
         $copy->title = trim($listing->title.' (copy)');
+        $copy->stock_number = null;
         $copy->images = $copiedImages;
         $copy->status = 'active';
         $copy->is_featured = false;
@@ -1041,14 +1227,62 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             ->with('success', 'Duplicated — review the details and save when you\'re ready.');
     })->name('arms.duplicate');
 
+    // ── Arms saved replies ─────────────────────────────────────
+
+    Route::get('/arms/replies', function () {
+        return view('admin.arms.replies', [
+            'replies' => ArmsSavedReply::query()->orderBy('sort')->orderBy('id')->get(),
+        ]);
+    })->name('arms.replies');
+
+    Route::post('/arms/replies', function (Request $request) {
+        $data = $request->validate([
+            'title' => 'required|string|max:120',
+            'body' => 'required|string|max:2000',
+        ]);
+
+        ArmsSavedReply::create([
+            ...$data,
+            'sort' => (int) ArmsSavedReply::max('sort') + 1,
+        ]);
+
+        return back()->with('success', 'Saved reply added.');
+    })->name('arms.replies.store');
+
+    Route::put('/arms/replies/{reply}', function (Request $request, ArmsSavedReply $reply) {
+        $data = $request->validate([
+            'title' => 'required|string|max:120',
+            'body' => 'required|string|max:2000',
+        ]);
+
+        $reply->update($data);
+
+        return back()->with('success', 'Saved reply updated.');
+    })->name('arms.replies.update');
+
+    Route::delete('/arms/replies/{reply}', function (ArmsSavedReply $reply) {
+        $reply->delete();
+
+        return back()->with('success', 'Saved reply deleted.');
+    })->name('arms.replies.delete');
+
     // ── Arms Enquiries ─────────────────────────────────────────
 
     Route::get('/arms/enquiries', function (Request $request) {
-        $filter = in_array($request->query('filter'), ['unread', 'read'], true)
-            ? $request->query('filter')
-            : null;
+        $allowed = ['new', 'replied', 'closed', 'general', 'all'];
         $q = trim((string) $request->query('q', ''));
+        $listingId = $request->query('listing');
+        $listingId = is_numeric($listingId) ? (int) $listingId : null;
 
+        if (! in_array($request->query('filter'), $allowed, true)) {
+            return redirect()->route('admin.arms.enquiries', array_filter([
+                'filter' => 'new',
+                'q' => $q !== '' ? $q : null,
+                'listing' => $listingId,
+            ]));
+        }
+
+        $filter = $request->query('filter');
         $query = ArmsEnquiry::with('listing');
 
         if ($q !== '') {
@@ -1061,33 +1295,76 @@ Route::prefix('admin')->middleware('admin')->name('admin.')->group(function () {
             });
         }
 
-        if ($filter === 'unread') {
-            $query->whereNull('read_at');
-        } elseif ($filter === 'read') {
-            $query->whereNotNull('read_at');
+        if ($filter === 'general') {
+            $query->whereNull('arms_listing_id');
+        } elseif ($listingId !== null) {
+            $query->where('arms_listing_id', $listingId);
+        }
+
+        if (in_array($filter, ['new', 'replied', 'closed'], true)) {
+            $query->where('status', $filter);
+        }
+
+        $counts = ArmsEnquiry::query();
+        if ($listingId !== null && $filter !== 'general') {
+            $counts->where('arms_listing_id', $listingId);
         }
 
         return view('admin.arms.enquiries', [
             'enquiries' => $query->latest()->paginate(25)->withQueryString(),
-            'unreadCount' => ArmsEnquiry::whereNull('read_at')->count(),
-            'readCount' => ArmsEnquiry::whereNotNull('read_at')->count(),
-            'totalCount' => ArmsEnquiry::count(),
+            'counts' => [
+                'new' => (clone $counts)->where('status', 'new')->count(),
+                'replied' => (clone $counts)->where('status', 'replied')->count(),
+                'closed' => (clone $counts)->where('status', 'closed')->count(),
+                'general' => ArmsEnquiry::whereNull('arms_listing_id')->count(),
+                'all' => (clone $counts)->count(),
+            ],
             'activeFilter' => $filter,
             'q' => $q,
+            'listingId' => $listingId,
+            'listingFilter' => $listingId ? ArmsListing::find($listingId) : null,
+            'replies' => ArmsSavedReply::query()->orderBy('sort')->orderBy('id')->get(),
         ]);
     })->name('arms.enquiries');
 
-    Route::post('/arms/enquiries/{enquiry}/read', function (ArmsEnquiry $enquiry) {
-        $enquiry->update(['read_at' => now()]);
+    Route::post('/arms/enquiries/{enquiry}/replied', function (ArmsEnquiry $enquiry) {
+        $enquiry->update(['status' => 'replied', 'read_at' => now()]);
 
-        return back()->with('success', 'Marked as read.');
-    })->name('arms.enquiries.read');
+        return back()->with('success', 'Marked as replied.');
+    })->name('arms.enquiries.replied');
 
-    Route::post('/arms/enquiries/mark-all-read', function () {
-        ArmsEnquiry::whereNull('read_at')->update(['read_at' => now()]);
+    Route::post('/arms/enquiries/{enquiry}/close', function (ArmsEnquiry $enquiry) {
+        $enquiry->update(['status' => 'closed', 'read_at' => now()]);
 
-        return back()->with('success', 'All arms enquiries marked as read.');
-    })->name('arms.enquiries.mark-all-read');
+        return back()->with('success', 'Enquiry closed.');
+    })->name('arms.enquiries.close');
+
+    Route::post('/arms/enquiries/{enquiry}/whatsapp', function (Request $request, ArmsEnquiry $enquiry) {
+        $digits = ArmsPhone::whatsappDigits($enquiry->phone_e164);
+        if ($digits === null) {
+            return back()->with('error', 'That phone number is not a South African cell number.');
+        }
+
+        $enquiry->update(['status' => 'replied', 'read_at' => now()]);
+
+        $text = '';
+        if ($request->input('reply') === 'similar') {
+            $text = 'Hi '.$enquiry->name.', the '.$enquiry->firearmLabel().' has been sold. Similar stock: '.$enquiry->similarStockText();
+        } elseif ($request->filled('reply_id')) {
+            $saved = ArmsSavedReply::find($request->integer('reply_id'));
+            $text = $saved ? $saved->renderFor($enquiry) : '';
+        }
+
+        $url = 'https://wa.me/'.$digits.($text !== '' ? '?text='.rawurlencode($text) : '');
+
+        return redirect()->away($url);
+    })->name('arms.enquiries.whatsapp');
+
+    Route::delete('/arms/enquiries/{enquiry}', function (ArmsEnquiry $enquiry) {
+        $enquiry->delete();
+
+        return back()->with('success', 'Enquiry deleted.');
+    })->name('arms.enquiries.delete');
 
     // ── Documents (downloadable forms & questionnaires) ────────
 

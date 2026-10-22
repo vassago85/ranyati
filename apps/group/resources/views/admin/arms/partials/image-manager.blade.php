@@ -7,10 +7,19 @@
     <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; min-height: 90px;">
         @if($listing && $listing->images)
             @foreach($listing->images as $idx => $image)
-                <div x-show="!removedExisting.includes({{ $idx }})" style="position: relative; width: 120px; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+                <div
+                    x-show="!removedExisting.includes({{ $idx }})"
+                    draggable="true"
+                    @dragstart="dragFrom = {{ $idx }}"
+                    @dragover.prevent
+                    @drop.prevent="moveExisting({{ $idx }})"
+                    :style="'order:' + existingOrder.indexOf({{ $idx }})"
+                    style="position: relative; width: 120px; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0; cursor: grab;"
+                >
                     <img src="{{ asset('storage/' . $image) }}" alt="Image {{ $idx + 1 }}" style="width: 100%; height: 100%; object-fit: cover;">
-                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.6)); padding: 2px 6px; font-size: 9px; color: rgba(255,255,255,0.5); text-align: center;">Saved</div>
-                    <button type="button" @click="removeExisting({{ $idx }})" style="position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(239,68,68,0.9); border: none; cursor: pointer; font-size: 14px; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+                    <div x-show="isMainExisting({{ $idx }})" style="position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.72); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px;">Main photo</div>
+                    <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.6)); padding: 2px 6px; font-size: 9px; color: rgba(255,255,255,0.5); text-align: center;">Drag to reorder</div>
+                    <button type="button" @click="removeExisting({{ $idx }})" aria-label="Remove photo" style="position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border-radius: 50%; background: rgba(239,68,68,0.9); border: none; cursor: pointer; font-size: 18px; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
                 </div>
             @endforeach
         @endif
@@ -18,8 +27,9 @@
         <template x-for="(file, i) in newFiles" :key="i">
             <div style="position: relative; width: 120px; height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(196,90,60,0.25); flex-shrink: 0;">
                 <img :src="file.preview" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                <div x-show="remainingExisting() === 0 && i === 0" style="position: absolute; top: 4px; left: 4px; background: rgba(0,0,0,0.72); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px;">Main photo</div>
                 <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.6)); padding: 2px 6px; font-size: 9px; color: rgba(196,90,60,0.8); text-align: center;">New</div>
-                <button type="button" @click="removeNew(i)" style="position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: rgba(239,68,68,0.9); border: none; cursor: pointer; font-size: 14px; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
+                <button type="button" @click="removeNew(i)" aria-label="Remove photo" style="position: absolute; top: 4px; right: 4px; width: 44px; height: 44px; border-radius: 50%; background: rgba(239,68,68,0.9); border: none; cursor: pointer; font-size: 18px; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; line-height: 1;">&times;</button>
             </div>
         </template>
 
@@ -41,9 +51,12 @@
     <template x-for="idx in removedExisting" :key="'rm-'+idx">
         <input type="hidden" name="remove_images[]" :value="idx">
     </template>
+    <template x-for="idx in existingOrder" :key="'ord-'+idx">
+        <input type="hidden" name="image_order[]" :value="idx">
+    </template>
 
     <div class="form-hint" style="margin-top: 8px;">
-        <span x-text="totalCount()"></span>/10 images. Click the + box or drag &amp; drop. JPG, PNG, WebP accepted.
+        <span x-text="totalCount()"></span>/10 images. The first photo is the main photo. Drag saved photos to reorder, or drop new photos on Add.
     </div>
 
     <div x-show="imageError" style="margin-top: 8px; font-size: 12px; color: #ef4444;" x-text="imageError"></div>
@@ -56,9 +69,11 @@
 function imageManager() {
     return {
         existingCount: {{ $listing ? count($listing->images ?? []) : 0 }},
+        existingOrder: {{ json_encode($listing ? array_keys($listing->images ?? []) : []) }},
         removedExisting: [],
         newFiles: [],
         dragging: false,
+        dragFrom: null,
         imageError: '',
         _dataTransfer: null,
 
@@ -74,6 +89,31 @@ function imageManager() {
             if (!this.removedExisting.includes(idx)) {
                 this.removedExisting.push(idx);
             }
+        },
+
+        remainingExisting() {
+            return this.existingOrder.filter((idx) => !this.removedExisting.includes(idx)).length;
+        },
+
+        isMainExisting(idx) {
+            const first = this.existingOrder.find((item) => !this.removedExisting.includes(item));
+            return first === idx;
+        },
+
+        moveExisting(target) {
+            if (this.dragFrom === null || this.dragFrom === target) {
+                return;
+            }
+            const from = this.existingOrder.indexOf(this.dragFrom);
+            const to = this.existingOrder.indexOf(target);
+            if (from < 0 || to < 0) {
+                return;
+            }
+            const next = this.existingOrder.slice();
+            const [moved] = next.splice(from, 1);
+            next.splice(to, 0, moved);
+            this.existingOrder = next;
+            this.dragFrom = null;
         },
 
         addFiles(files) {

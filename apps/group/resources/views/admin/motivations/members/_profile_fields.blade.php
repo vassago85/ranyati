@@ -8,12 +8,12 @@
         <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <label>
                 <span style="display:block;color:rgba(255,255,255,.7);font-size:12px;margin-bottom:4px;">Full name on the account *</span>
-                <input type="text" name="name" value="{{ old('name') }}" required class="form-input">
+                <input type="text" name="name" value="{{ old('name', $prefillName ?? '') }}" required class="form-input">
                 @error('name')<span style="color:#f87171;font-size:11px;">{{ $message }}</span>@enderror
             </label>
             <label>
                 <span style="display:block;color:rgba(255,255,255,.7);font-size:12px;margin-bottom:4px;">Login email *</span>
-                <input type="email" name="account_email" value="{{ old('account_email') }}" required class="form-input">
+                <input type="email" name="account_email" value="{{ old('account_email', $prefillEmail ?? '') }}" required class="form-input">
                 @error('account_email')<span style="color:#f87171;font-size:11px;">{{ $message }}</span>@enderror
             </label>
         </div>

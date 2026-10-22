@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('title', 'WhatsApp Card')
+@section('title', 'WhatsApp card')
 
 @section('actions')
     <a href="{{ route('admin.arms') }}" class="btn btn-secondary btn-sm">
@@ -12,7 +12,8 @@
     $imageList = $images->all();
     $hasReduced = $listing->original_price && $listing->original_price > $listing->price;
 
-    $makeModel = trim($listing->make.' '.$listing->model);
+    $makeModel = $listing->displayName();
+    $cardExcerpt = $listing->cardDescription();
     $titleText = trim((string) $listing->title);
     $showTitle = $titleText !== '' && mb_strtolower($titleText) !== mb_strtolower($makeModel);
 
@@ -182,8 +183,11 @@
                     <div class="acard-subtitle">{{ $titleText }}</div>
                 @endif
 
-                @if($listing->description)
-                    <div class="acard-description">{{ $listing->description }}</div>
+                @if($listing->stock_number)
+                    <div class="acard-description" style="font-size: 28px; opacity: 0.7;">{{ $listing->stock_number }}</div>
+                @endif
+                @if($cardExcerpt)
+                    <div class="acard-description">{{ $cardExcerpt }}</div>
                 @endif
 
                 @if($listing->accessories)
@@ -196,11 +200,11 @@
                     <div class="acard-price-label">Asking Price</div>
                     <div class="acard-price-row">
                         @if($hasReduced)
-                            <span class="acard-price" style="color:#ef4444;">R{{ number_format($listing->price, 0) }}</span>
-                            <span class="acard-price-strike">R{{ number_format($listing->original_price, 0) }}</span>
+                            <span class="acard-price" style="color:#ef4444;">{{ \App\Support\ArmsFormat::money($listing->price) }}</span>
+                            <span class="acard-price-strike">{{ \App\Support\ArmsFormat::money($listing->original_price) }}</span>
                             <span class="acard-reduced">Reduced</span>
                         @else
-                            <span class="acard-price" style="color:#fff;">R{{ number_format($listing->price, 0) }}</span>
+                            <span class="acard-price" style="color:#fff;">{{ \App\Support\ArmsFormat::money($listing->price) }}</span>
                         @endif
                     </div>
                 </div>
@@ -244,7 +248,7 @@
             <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
                 <button type="button" class="btn btn-primary" @click="download()" :disabled="working" :style="working ? 'opacity:0.6;cursor:wait;' : ''">
                     <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
-                    <span x-text="working ? 'Generating…' : 'Download Card (PNG)'"></span>
+                    <span x-text="working ? 'Generating…' : 'Download WhatsApp card'"></span>
                 </button>
                 <a href="{{ route('admin.arms.edit', $listing) }}" class="btn btn-secondary">Edit Listing</a>
             </div>

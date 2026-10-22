@@ -49,10 +49,16 @@ class MotivationMemberController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(Request $request)
     {
         return view('admin.motivations.members.create', [
-            'profile' => new ClientProfile,
+            'profile' => new ClientProfile([
+                'full_names' => $request->query('name'),
+                'cell' => $request->query('phone'),
+                'email' => $request->query('email'),
+            ]),
+            'prefillName' => $request->query('name'),
+            'prefillEmail' => $request->query('email'),
         ]);
     }
 

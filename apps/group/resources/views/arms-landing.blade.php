@@ -69,11 +69,11 @@
                     'position' => $i + 1,
                     'item'     => [
                         '@type'         => 'Product',
-                        'name'          => trim($l->make.' '.$l->model.' — '.$l->calibre),
+                        'name'          => trim($l->displayName().' — '.$l->calibre),
                         'url'           => $l->getPublicUrl(),
                         'image'         => $imgUrl,
                         'brand'         => ['@type' => 'Brand', 'name' => $l->make],
-                        'sku'           => 'RA-'.$l->id,
+                        'sku'           => $l->stock_number ?: ('RA-'.$l->id),
                         'category'      => 'Used Firearm',
                         'itemCondition' => 'https://schema.org/UsedCondition',
                         'offers'        => [
@@ -449,10 +449,7 @@
                     </a>
                 </div>
                 <div class="header-contact" style="width: 25%; flex-direction: column; align-items: flex-end; gap: 0; margin-left: auto;">
-                    <a href="mailto:info@firearmstorage.co.za" style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='rgba(255,255,255,0.7)'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
-                        <svg style="width: 11px; height: 11px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
-                        info@firearmstorage.co.za
-                    </a>
+                    <a href="#listings" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; font-size: 13px; font-weight: 700; color: #fff; text-decoration: none; background: rgba(196,90,60,0.85);">Make an enquiry</a>
                 </div>
             </div>
         </div>
@@ -493,9 +490,53 @@
         </div>
     </section>
 
+    <section class="relative bg-[#020810] pb-10">
+        <div class="mx-auto max-w-6xl px-6 lg:px-8">
+            <h2 class="text-[1.25rem] font-black text-white">How buying works</h2>
+            <ol class="mt-4 grid gap-3 sm:grid-cols-3 text-[13px] leading-relaxed text-white/70">
+                <li class="rounded-xl border border-white/10 p-4"><strong class="block text-white mb-1">1. Enquire</strong>Browse the stock and send an enquiry on the firearm you want.</li>
+                <li class="rounded-xl border border-white/10 p-4"><strong class="block text-white mb-1">2. Pay and paperwork</strong>You pay for the firearm, and we issue a SAPS 271 so you can apply for the licence.</li>
+                <li class="rounded-xl border border-white/10 p-4"><strong class="block text-white mb-1">3. Transfer</strong>The firearm is transferred to you only once your licence is granted.</li>
+            </ol>
+        </div>
+    </section>
+
     {{-- Listings --}}
     <section id="listings" class="relative bg-[#020810] pb-28 sm:pb-36">
         <div class="mx-auto max-w-6xl px-6 lg:px-8">
+            @php
+                $typeCounts = $typeCounts ?? ['all' => $listings->count(), 'handgun' => 0, 'rifle' => 0, 'shotgun' => 0];
+                $activeType = $activeType ?? null;
+                $activeSort = $activeSort ?? 'newest';
+                $stockUrl = function (?string $type, ?string $sort = null) use ($activeType, $activeSort) {
+                    $chosenSort = $sort ?? $activeSort;
+                    return url('/').'?'.http_build_query(array_filter([
+                        'type' => $type,
+                        'sort' => $chosenSort === 'newest' ? null : $chosenSort,
+                    ])).'#listings';
+                };
+            @endphp
+            <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex flex-wrap gap-2">
+                    @foreach(['' => 'All', 'handgun' => 'Handguns', 'rifle' => 'Rifles', 'shotgun' => 'Shotguns'] as $typeKey => $typeLabel)
+                        @continue($typeKey !== '' && ($typeCounts[$typeKey] ?? 0) === 0)
+                        <a href="{{ $stockUrl($typeKey === '' ? null : $typeKey) }}" class="inline-flex items-center min-h-[44px] px-4 rounded-full text-[13px] font-bold {{ ($activeType === ($typeKey === '' ? null : $typeKey)) ? 'bg-white text-[#020810]' : 'bg-white/5 text-white' }}">
+                            {{ $typeLabel }} <span class="ml-2 opacity-60">{{ $typeCounts[$typeKey === '' ? 'all' : $typeKey] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+                <form method="GET" action="{{ url('/') }}">
+                    @if($activeType)
+                        <input type="hidden" name="type" value="{{ $activeType }}">
+                    @endif
+                    <label class="sr-only" for="stock-sort">Sort</label>
+                    <select id="stock-sort" name="sort" class="form-input" style="min-height:44px;" onchange="this.form.submit()">
+                        <option value="newest" @selected($activeSort === 'newest')>Newest</option>
+                        <option value="price_asc" @selected($activeSort === 'price_asc')>Price low to high</option>
+                        <option value="price_desc" @selected($activeSort === 'price_desc')>Price high to low</option>
+                    </select>
+                </form>
+            </div>
 
             @if($listings->count() > 0)
                 <div class="text-center mb-12 anim-4">
@@ -511,32 +552,41 @@
                         @php
                             $imgUrls = collect($listing->images ?? [])->map(fn($img) => '/storage/' . $img)->values();
                             $shareLines = [
-                                $listing->make.' '.$listing->model.' — '.$listing->calibre,
-                                'R'.number_format($listing->price, 0, '.', ' ').($listing->original_price && $listing->original_price > $listing->price ? ' (was R'.number_format($listing->original_price, 0, '.', ' ').')' : ''),
-                                '',
+                                $listing->displayName().' — '.$listing->calibre,
+                                \App\Support\ArmsFormat::money($listing->price).($listing->isPriceReduced() ? ' (was '.\App\Support\ArmsFormat::money($listing->original_price).')' : ''),
+                                $listing->stock_number ? 'Stock '.$listing->stock_number : '',
                                 url('/').'#listing-'.$listing->id,
                             ];
                             $shareUrl = 'https://wa.me/?text='.rawurlencode(implode("\n", $shareLines));
-                            $descTruncated = $listing->description && mb_strlen($listing->description) > 120;
                             $listingData = [
                                 'id' => $listing->id,
                                 'make' => $listing->make,
-                                'model' => $listing->model,
+                                'model' => $listing->model ?: '',
+                                'stockNumber' => $listing->stock_number,
+                                'condition' => $listing->conditionLabel(),
                                 'calibre' => $listing->calibre,
-                                'priceFormatted' => 'R'.number_format($listing->price, 0, '.', ' '),
-                                'originalPriceFormatted' => $listing->original_price && $listing->original_price > $listing->price
-                                    ? 'R'.number_format($listing->original_price, 0, '.', ' ')
+                                'priceFormatted' => \App\Support\ArmsFormat::money($listing->price),
+                                'originalPriceFormatted' => $listing->isPriceReduced()
+                                    ? \App\Support\ArmsFormat::money($listing->original_price)
                                     : null,
-                                'description' => $listing->description,
+                                'description' => $listing->cardDescription(),
                                 'accessories' => $listing->accessories,
                                 'images' => $imgUrls->all(),
                                 'shareUrl' => $shareUrl,
                             ];
                         @endphp
                         <div id="listing-{{ $listing->id }}" class="card-listing rounded-2xl flex flex-col" x-data="{ hovered: false, activeImg: 0, images: {{ $imgUrls->toJson() }} }" @mouseenter="hovered = true" @mouseleave="hovered = false">
-                            @if($listing->original_price && $listing->original_price > $listing->price)
-                                <div style="position: absolute; top: 16px; left: 16px; z-index: 10; background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 4px;">Reduced</div>
-                            @endif
+                            <div style="position: absolute; top: 16px; left: 16px; z-index: 10; display: flex; gap: 6px; flex-wrap: wrap;">
+                                @if($listing->isNewArrival())
+                                    @include('partials.arms-status', ['label' => 'New', 'tone' => 'new'])
+                                @endif
+                                @if($listing->isPriceReduced())
+                                    @include('partials.arms-status', ['label' => 'Reduced', 'tone' => 'reduced'])
+                                @endif
+                                @if($listing->conditionLabel())
+                                    @include('partials.arms-status', ['label' => $listing->conditionLabel(), 'tone' => 'muted'])
+                                @endif
+                            </div>
                             {{-- Image Gallery --}}
                             <div style="padding: 12px 12px 0;">
                                 @if($imgUrls->count() > 0)
@@ -573,9 +623,12 @@
                                         @endif
                                     </div>
 
-                                    <h3 class="listing-title" style="margin-top: 8px; font-size: 17px; font-weight: 800; line-height: 1.3;">
-                                        <a href="{{ route('arms.listing.show', $listing) }}" @click.prevent="openDetails(@js($listingData))" style="color: #fff; text-decoration: none;">{{ $listing->make }} {{ $listing->model }}</a>
+                                        <h3 class="listing-title" style="margin-top: 8px; font-size: 17px; font-weight: 800; line-height: 1.3;">
+                                        <a href="{{ route('arms.listing.show', $listing) }}" @click.prevent="openDetails(@js($listingData))" style="color: #fff; text-decoration: none;">{{ $listing->displayName() }}</a>
                                     </h3>
+                                    @if($listing->stock_number)
+                                        <p style="margin-top: 4px; font-size: 12px; color: rgba(255,255,255,0.45);">{{ $listing->stock_number }}</p>
+                                    @endif
 
                                     @if($listing->accessories)
                                         <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.5);">
@@ -583,9 +636,9 @@
                                         </p>
                                     @endif
 
-                                    @if($listing->description)
+                                    @if($listing->cardDescription())
                                         <p style="margin-top: 6px; font-size: 12px; line-height: 1.6; color: rgba(255,255,255,0.45);">
-                                            {{ Str::limit($listing->description, 120) }}@if($descTruncated)<span class="listing-readmore">Read more</span>@endif
+                                            {{ $listing->cardDescription() }}
                                         </p>
                                     @endif
 
@@ -596,16 +649,16 @@
                                 <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between;">
                                     <div>
                                         <span style="font-size: 11px; color: rgba(255,255,255,0.25); font-weight: 500;">Asking Price</span>
-                                        @if($listing->original_price && $listing->original_price > $listing->price)
+                                        @if($listing->isPriceReduced())
                                             <div style="font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.25); text-decoration: line-through; letter-spacing: -0.01em; white-space: nowrap;">
-                                                R{{ number_format($listing->original_price, 0, '.', ' ') }}
+                                                {{ \App\Support\ArmsFormat::money($listing->original_price) }}
                                             </div>
                                             <div style="font-size: 20px; font-weight: 800; color: #ef4444; letter-spacing: -0.02em; white-space: nowrap;">
-                                                R{{ number_format($listing->price, 0, '.', ' ') }}
+                                                {{ \App\Support\ArmsFormat::money($listing->price) }}
                                             </div>
                                         @else
                                             <div style="font-size: 20px; font-weight: 800; color: #fff; letter-spacing: -0.02em; white-space: nowrap;">
-                                                R{{ number_format($listing->price, 0, '.', ' ') }}
+                                                {{ \App\Support\ArmsFormat::money($listing->price) }}
                                             </div>
                                         @endif
                                     </div>
@@ -615,7 +668,7 @@
                                             <span>Share on WhatsApp</span>
                                         </a>
                                         <button
-                                            @click="openEnquiry({{ $listing->id }}, '{{ addslashes($listing->make) }} {{ addslashes($listing->model) }}', '{{ addslashes($listing->calibre) }}', 'R{{ number_format($listing->price, 0, '.', ' ') }}')"
+                                            @click="openEnquiry({{ $listing->id }}, @js($listing->displayName()), @js($listing->calibre), @js(\App\Support\ArmsFormat::money($listing->price)))"
                                             class="btn-cta rounded-lg px-5 py-2.5 text-[12px] font-bold text-white tracking-wide">
                                             Enquire
                                         </button>
@@ -627,11 +680,41 @@
                 </div>
             @else
                 <div class="empty-state">
-                    <svg style="width: 64px; height: 64px; color: rgba(255,255,255,0.06); margin: 0 auto 16px;" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z"/></svg>
-                    <h2 style="font-size: 20px; font-weight: 800; color: rgba(255,255,255,0.4);">No listings available</h2>
-                    <p style="margin-top: 8px; font-size: 14px; color: rgba(255,255,255,0.2);">Check back soon — new firearms are added regularly.</p>
+                    <h2 style="font-size: 20px; font-weight: 800; color: rgba(255,255,255,0.7);">{{ $activeType ? 'Nothing in this category right now.' : 'No firearms listed right now.' }}</h2>
+                    <p style="margin-top: 8px; font-size: 14px; color: rgba(255,255,255,0.45);">Send a general enquiry below and tell us what you are looking for.</p>
                 </div>
             @endif
+
+            <div id="general-enquiry" class="mt-16 rounded-2xl border border-white/10 p-6">
+                <h2 class="text-[1.25rem] font-black text-white">Looking for something else?</h2>
+                <p class="mt-2 text-[13px] text-white/55">Tell us what you want. This is the only way to contact us.</p>
+                <ol class="mt-4 grid gap-2 text-[12px] text-white/60 sm:grid-cols-3">
+                    <li>1. Enquire</li>
+                    <li>2. You pay, and we issue a SAPS 271</li>
+                    <li>3. Transfer once your licence is granted</li>
+                </ol>
+                <form class="mt-5 grid gap-3" @submit.prevent="submitGeneral()">
+                    <div style="position:absolute; left:-9999px;" aria-hidden="true">
+                        <label>Website <input type="text" tabindex="-1" autocomplete="off" x-model="general.website"></label>
+                    </div>
+                    <input type="text" class="form-input" placeholder="Your name" x-model="general.name" required spellcheck="true" lang="en-ZA" style="min-height:44px;">
+                    <input type="tel" class="form-input" placeholder="Cell number" x-model="general.phone" required style="min-height:44px;">
+                    <input type="email" class="form-input" placeholder="Email" x-model="general.email" required style="min-height:44px;">
+                    <textarea class="form-input" rows="3" placeholder="What are you looking for?" x-model="general.message" required spellcheck="true" lang="en-ZA"></textarea>
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <select class="form-input" x-model="general.type" style="min-height:44px;">
+                            <option value="">Type (optional)</option>
+                            <option value="handgun">Handgun</option>
+                            <option value="rifle">Rifle</option>
+                            <option value="shotgun">Shotgun</option>
+                        </select>
+                        <input type="number" min="0" step="1" class="form-input" placeholder="Budget (optional)" x-model="general.budget" style="min-height:44px;">
+                    </div>
+                    <p x-show="generalError" x-text="generalError" style="color:#fca5a5; font-size:13px;"></p>
+                    <p x-show="generalSuccess" x-text="generalSuccess" style="color:#34d399; font-size:13px;"></p>
+                    <button type="submit" class="btn-cta rounded-lg px-5 text-[13px] font-bold text-white" style="min-height:44px;" :disabled="generalLoading">Send enquiry</button>
+                </form>
+            </div>
 
         </div>
     </section>
@@ -679,7 +762,8 @@
 
                 <div class="details-header">
                     <div class="details-calibre" x-text="detailsListing.calibre"></div>
-                    <h3 class="details-title"><span x-text="detailsListing.make"></span> <span x-text="detailsListing.model"></span></h3>
+                    <h3 class="details-title"><span x-text="detailsListing.make"></span> <span x-show="detailsListing.model" x-text="detailsListing.model"></span></h3>
+                    <p x-show="detailsListing.stockNumber" x-text="detailsListing.stockNumber" style="margin-top:6px; font-size:12px; color:rgba(255,255,255,0.45);"></p>
                 </div>
 
                 <div x-show="detailsListing.images && detailsListing.images.length > 0" class="details-images">
@@ -746,6 +830,15 @@
                     <div style="flex: 1; height: 3px; border-radius: 2px;" :style="step >= 3 ? 'background: rgba(196,90,60,0.6)' : 'background: rgba(255,255,255,0.06)'"></div>
                 </div>
 
+                <ol style="margin: 0 0 16px; padding-left: 18px; font-size: 12px; color: rgba(255,255,255,0.55); display: grid; gap: 4px;">
+                    <li>Enquire on this firearm.</li>
+                    <li>You pay, and we issue a SAPS 271.</li>
+                    <li>The firearm is transferred once your licence is granted.</li>
+                </ol>
+                <div style="position:absolute; left:-9999px;" aria-hidden="true">
+                    <label>Website <input type="text" tabindex="-1" autocomplete="off" x-model="form.website"></label>
+                </div>
+
                 {{-- Error / Success messages --}}
                 <div x-show="formError" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #ef4444;" x-text="formError"></div>
                 <div x-show="formSuccess" style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #34d399;" x-text="formSuccess"></div>
@@ -807,8 +900,8 @@
                             <input type="text" x-model="form.name" class="form-input" placeholder="Your full name" required>
                         </div>
                         <div style="margin-bottom: 16px;">
-                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Phone</label>
-                            <input type="tel" x-model="form.phone" class="form-input" placeholder="+27 ...">
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Cell number *</label>
+                            <input type="tel" x-model="form.phone" class="form-input" placeholder="082 000 0000" required style="min-height:44px;">
                         </div>
                         <div style="margin-bottom: 20px;">
                             <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Comments</label>
@@ -873,12 +966,9 @@
                     </p>
                 </div>
                 <div class="footer-right" style="display: flex; flex-direction: column;">
-                    <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">Contact</h4>
+                    <h4 style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em; color: rgba(255,255,255,0.2);">Enquiries</h4>
                     <div class="footer-right-inner" style="margin-top: 16px; display: flex; flex-direction: column; gap: 0;">
-                        <a href="mailto:info@firearmstorage.co.za" style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
-                            <svg style="width: 14px; height: 14px; flex-shrink: 0; color: rgba(255,255,255,0.15);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/></svg>
-                            info@firearmstorage.co.za
-                        </a>
+                        <p style="font-size: 13px; color: rgba(255,255,255,0.55);">Enquire on any listing and we'll get back to you.</p>
                         <div style="width: 100%; height: 1px; background: rgba(255,255,255,0.06); margin: 8px 0;"></div>
                         <a href="https://ranyati.co.za" style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: rgba(255,255,255,0.35); text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.35)'">
                             <svg style="width: 14px; height: 14px; flex-shrink: 0; color: rgba(255,255,255,0.15);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"/></svg>
@@ -968,7 +1058,11 @@
             showModal: false,
             step: 1,
             modalListing: { id: null, name: '', calibre: '', price: '', label: '' },
-            form: { name: '', email: '', phone: '', message: '', otp: '' },
+            form: { name: '', email: '', phone: '', message: '', otp: '', website: '' },
+            general: { name: '', email: '', phone: '', message: '', type: '', budget: '', website: '' },
+            generalError: '',
+            generalSuccess: '',
+            generalLoading: false,
             formLoading: false,
             formError: '',
             formSuccess: '',
@@ -977,7 +1071,7 @@
 
             openEnquiry(id, name, calibre, price) {
                 this.modalListing = { id, name, calibre, price, label: name + ' — ' + calibre };
-                this.form = { name: '', email: '', phone: '', message: '', otp: '' };
+                this.form = { name: '', email: '', phone: '', message: '', otp: '', website: '' };
                 this.formError = '';
                 this.formSuccess = '';
                 this.step = 1;
@@ -1063,6 +1157,7 @@
                             phone: this.form.phone,
                             message: this.form.message,
                             otp: this.form.otp,
+                            website: this.form.website,
                         }),
                     });
 
@@ -1082,13 +1177,41 @@
                         }
                     } else {
                         this.formSuccess = data.message || 'Enquiry sent successfully!';
-                        this.form = { name: '', email: '', phone: '', message: '', otp: '' };
+                        this.form = { name: '', email: '', phone: '', message: '', otp: '', website: '' };
                         setTimeout(() => this.closeModal(), 2500);
                     }
                 } catch (e) {
                     this.formError = 'Network error. Please try again.';
                 } finally {
                     this.formLoading = false;
+                }
+            },
+
+            async submitGeneral() {
+                this.generalError = '';
+                this.generalSuccess = '';
+                this.generalLoading = true;
+                try {
+                    const res = await fetch('/arms/general-enquiry', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify(this.general),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        this.generalError = data.error || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Something went wrong.');
+                    } else {
+                        this.generalSuccess = data.message;
+                        this.general = { name: '', email: '', phone: '', message: '', type: '', budget: '', website: '' };
+                    }
+                } catch (e) {
+                    this.generalError = 'Network error. Please try again.';
+                } finally {
+                    this.generalLoading = false;
                 }
             }
         };

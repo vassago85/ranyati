@@ -351,10 +351,10 @@ class Phase1BugAuditTest extends TestCase
         $members = $this->actingAs($admin)->get(route('admin.motivation-members.index'))->assertOk()->getContent();
         $this->assertStringContainsString('aria-label="Search motivation members"', $members);
 
-        $arms = $this->actingAs($admin)->get(route('admin.arms'))->assertOk()->getContent();
+        $arms = $this->actingAs($admin)->followingRedirects()->get(route('admin.arms'))->assertOk()->getContent();
         $this->assertStringContainsString('aria-label="Search arms listings"', $arms);
 
-        $armsEnquiries = $this->actingAs($admin)->get(route('admin.arms.enquiries'))->assertOk()->getContent();
+        $armsEnquiries = $this->actingAs($admin)->followingRedirects()->get(route('admin.arms.enquiries'))->assertOk()->getContent();
         $this->assertStringContainsString('aria-label="Search arms enquiries"', $armsEnquiries);
     }
 }
