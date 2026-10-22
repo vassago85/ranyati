@@ -292,6 +292,7 @@ Route::post('/arms/general-enquiry', function (Request $request) use ($armsOnly)
         'email' => 'required|email|max:255',
         'phone' => 'required|string|max:50',
         'message' => 'required|string|max:2000',
+        'otp' => 'required|string|size:6',
         'type' => 'nullable|in:handgun,rifle,shotgun',
         'budget' => 'nullable|numeric|min:0',
         'website' => 'nullable|string|max:255',
@@ -306,6 +307,19 @@ Route::post('/arms/general-enquiry', function (Request $request) use ($armsOnly)
         return response()->json(['error' => 'Enter a South African cell number, for example 082 000 0000.'], 422);
     }
 
+    // Same OTP flow as the per-listing enquiry — the code is set by the
+    // shared `/arms/send-otp` endpoint and read back from the application
+    // cache. Having one unified cache key means a user who verified an
+    // email for a per-listing enquiry does not have to verify it again
+    // for the general-enquiry form in the same session.
+    $email = strtolower(trim($validated['email']));
+    $cachedCode = Cache::get("arms-otp:{$email}");
+
+    if (! $cachedCode || $cachedCode !== $validated['otp']) {
+        return response()->json(['error' => 'Invalid or expired verification code.'], 422);
+    }
+
+    Cache::forget("arms-otp:{$email}");
     RateLimiter::hit($rateLimitKey, 600);
 
     $lookingFor = trim($validated['message']);

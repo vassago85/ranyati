@@ -229,27 +229,63 @@ class ArmsSectionTest extends TestCase
         $this->assertSame(0, ArmsEnquiry::count());
     }
 
+    public function test_general_enquiry_requires_verified_email(): void
+    {
+        // Posting without an OTP fails validation — the per-listing enquiry
+        // already enforced this and the general-enquiry endpoint now matches.
+        $this->postJson($this->armsUrl('/arms/general-enquiry'), [
+            'name' => 'Buyer',
+            'email' => 'buyer@example.com',
+            'phone' => '0827454813',
+            'message' => 'A .308 rifle',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['otp']);
+
+        // Posting with an OTP that doesn't match the cached code is rejected.
+        Cache::put('arms-otp:buyer@example.com', '111111', 300);
+        $this->postJson($this->armsUrl('/arms/general-enquiry'), [
+            'name' => 'Buyer',
+            'email' => 'buyer@example.com',
+            'phone' => '0827454813',
+            'message' => 'A .308 rifle',
+            'otp' => '000000',
+        ])->assertStatus(422)
+            ->assertJsonFragment(['error' => 'Invalid or expired verification code.']);
+
+        $this->assertSame(0, ArmsEnquiry::count());
+    }
+
     public function test_general_enquiry_honeypot_and_rate_limit(): void
     {
+        // Honeypot still short-circuits BEFORE the OTP check, so a bot that
+        // sends a dummy 6-digit code and fills the hidden `website` field
+        // still gets the friendly response with nothing stored.
         $this->postJson($this->armsUrl('/arms/general-enquiry'), [
             'name' => 'Bot',
             'email' => 'bot@example.com',
             'phone' => '0827454813',
             'message' => 'A rifle',
+            'otp' => '000000',
             'website' => 'http://spam.test',
         ])->assertOk();
 
         $this->assertSame(0, ArmsEnquiry::count());
 
+        Cache::put('arms-otp:buyer@example.com', '123456', 300);
         $this->postJson($this->armsUrl('/arms/general-enquiry'), [
             'name' => 'Buyer',
             'email' => 'buyer@example.com',
             'phone' => '(076) 601-2082',
             'message' => 'A .308 rifle',
+            'otp' => '123456',
             'type' => 'rifle',
             'budget' => 15000,
         ])->assertOk()
             ->assertJsonFragment(['message' => 'Thanks. We have your enquiry and will get back to you.']);
+
+        // Successful submit should consume the cached code so it can't be
+        // reused for a second enquiry on the same email.
+        $this->assertNull(Cache::get('arms-otp:buyer@example.com'));
 
         $saved = ArmsEnquiry::first();
         $this->assertNull($saved->arms_listing_id);
@@ -262,19 +298,23 @@ class ArmsSectionTest extends TestCase
             ->assertSee('Buyer');
 
         for ($i = 0; $i < 4; $i++) {
+            Cache::put("arms-otp:buyer{$i}@example.com", '123456', 300);
             $this->postJson($this->armsUrl('/arms/general-enquiry'), [
                 'name' => 'Buyer '.$i,
                 'email' => "buyer{$i}@example.com",
                 'phone' => '0827454813',
                 'message' => 'Another',
+                'otp' => '123456',
             ])->assertOk();
         }
 
+        Cache::put('arms-otp:many@example.com', '123456', 300);
         $this->postJson($this->armsUrl('/arms/general-enquiry'), [
             'name' => 'Too Many',
             'email' => 'many@example.com',
             'phone' => '0827454813',
             'message' => 'Stop',
+            'otp' => '123456',
         ])->assertStatus(429);
     }
 

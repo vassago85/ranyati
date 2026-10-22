@@ -216,6 +216,30 @@
         }
         .form-input:focus { border-color: rgba(196,90,60,0.5); box-shadow: 0 0 0 3px rgba(196,90,60,0.1); }
         .form-input::placeholder { color: rgba(255,255,255,0.2); }
+        /*
+         * Native <select> dropdowns inherit `color: #fff` into the native
+         * option list, which Chrome on Windows then paints on top of its
+         * default *white* panel — making every option invisible until the
+         * user hovers it (hover turns the row blue, which is why the
+         * selected row is readable but the rest look like empty space).
+         *
+         * `color-scheme: dark` tells the browser to use its dark native
+         * widget styling. The explicit `option` rule is a belt-and-braces
+         * fallback for engines that don't honour `color-scheme` on <select>.
+         */
+        select.form-input {
+            color-scheme: dark;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path fill='none' stroke='%23ffffff80' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5l5 5 5-5'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 34px;
+        }
+        select.form-input option {
+            background-color: #140a06;
+            color: #fff;
+        }
 
         .empty-state {
             text-align: center; padding: 80px 24px;
@@ -693,27 +717,84 @@
                     <li>2. You pay, and we issue a SAPS 271</li>
                     <li>3. Transfer once your licence is granted</li>
                 </ol>
-                <form class="mt-5 grid gap-3" @submit.prevent="submitGeneral()">
-                    <div style="position:absolute; left:-9999px;" aria-hidden="true">
-                        <label>Website <input type="text" tabindex="-1" autocomplete="off" x-model="general.website"></label>
+
+                {{-- Step indicator — same visual language as the per-listing modal. --}}
+                <div style="display: flex; align-items: center; gap: 8px; margin-top: 20px; margin-bottom: 20px;">
+                    <div style="flex: 1; height: 3px; border-radius: 2px;" :style="generalStep >= 1 ? 'background: rgba(196,90,60,0.6)' : 'background: rgba(255,255,255,0.06)'"></div>
+                    <div style="flex: 1; height: 3px; border-radius: 2px;" :style="generalStep >= 2 ? 'background: rgba(196,90,60,0.6)' : 'background: rgba(255,255,255,0.06)'"></div>
+                    <div style="flex: 1; height: 3px; border-radius: 2px;" :style="generalStep >= 3 ? 'background: rgba(196,90,60,0.6)' : 'background: rgba(255,255,255,0.06)'"></div>
+                </div>
+
+                <p x-show="generalError" x-text="generalError" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #ef4444;"></p>
+                <p x-show="generalSuccess" x-text="generalSuccess" style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #34d399;"></p>
+
+                {{-- Honeypot — hidden from humans but visible to naïve bots. --}}
+                <div style="position:absolute; left:-9999px;" aria-hidden="true">
+                    <label>Website <input type="text" tabindex="-1" autocomplete="off" x-model="general.website"></label>
+                </div>
+
+                {{-- Step 1: Email — same OTP flow as the per-listing enquiry. --}}
+                <div x-show="generalStep === 1">
+                    <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">
+                        We'll send a 6-digit code to your email to confirm it's really you.
+                    </p>
+                    <form @submit.prevent="sendGeneralOtp()" class="grid gap-3">
+                        <input type="email" class="form-input" placeholder="Email address" x-model="general.email" required style="min-height:44px;">
+                        <button type="submit" class="btn-cta rounded-lg px-5 text-[13px] font-bold text-white" style="min-height:44px;" :disabled="generalLoading">
+                            <span x-show="!generalLoading">Send verification code</span>
+                            <span x-show="generalLoading">Sending…</span>
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Step 2: OTP input. --}}
+                <div x-show="generalStep === 2">
+                    <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 4px;">A 6-digit code has been sent to:</p>
+                    <p style="font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 16px;" x-text="general.email"></p>
+                    <form @submit.prevent="verifyGeneralOtp()" class="grid gap-3">
+                        <input type="text" class="form-input" placeholder="000000" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" autocomplete="one-time-code" x-model="general.otp" required style="text-align:center; font-size:20px; font-weight:700; letter-spacing:6px; min-height:44px;">
+                        <button type="submit" class="btn-cta rounded-lg px-5 text-[13px] font-bold text-white" style="min-height:44px;" :disabled="generalLoading">
+                            <span x-show="!generalLoading">Verify code</span>
+                            <span x-show="generalLoading">Verifying…</span>
+                        </button>
+                    </form>
+                    <div style="margin-top: 12px; text-align: center;">
+                        <button type="button" @click="generalStep = 1; generalError = ''" style="font-size: 12px; color: rgba(255,255,255,0.3); background: none; border: none; cursor: pointer; text-decoration: underline;">
+                            Use a different email
+                        </button>
+                        <span style="color: rgba(255,255,255,0.1); margin: 0 6px;">&middot;</span>
+                        <button type="button" @click="resendGeneralOtp()" :disabled="generalResendCooldown > 0" style="font-size: 12px; color: rgba(196,90,60,0.6); background: none; border: none; cursor: pointer; text-decoration: underline;" :style="generalResendCooldown > 0 ? 'opacity:0.3;cursor:not-allowed;' : ''">
+                            <span x-show="generalResendCooldown <= 0">Resend code</span>
+                            <span x-show="generalResendCooldown > 0" x-text="'Resend in ' + generalResendCooldown + 's'"></span>
+                        </button>
                     </div>
-                    <input type="text" class="form-input" placeholder="Your name" x-model="general.name" required spellcheck="true" lang="en-ZA" style="min-height:44px;">
-                    <input type="tel" class="form-input" placeholder="Cell number" x-model="general.phone" required style="min-height:44px;">
-                    <input type="email" class="form-input" placeholder="Email" x-model="general.email" required style="min-height:44px;">
-                    <textarea class="form-input" rows="3" placeholder="What are you looking for?" x-model="general.message" required spellcheck="true" lang="en-ZA"></textarea>
-                    <div class="grid gap-3 sm:grid-cols-2">
-                        <select class="form-input" x-model="general.type" style="min-height:44px;">
-                            <option value="">Type (optional)</option>
-                            <option value="handgun">Handgun</option>
-                            <option value="rifle">Rifle</option>
-                            <option value="shotgun">Shotgun</option>
-                        </select>
-                        <input type="number" min="0" step="1" class="form-input" placeholder="Budget (optional)" x-model="general.budget" style="min-height:44px;">
+                </div>
+
+                {{-- Step 3: Details — only revealed once the email is verified. --}}
+                <div x-show="generalStep === 3">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding: 8px 12px; background: rgba(52,211,153,0.08); border: 1px solid rgba(52,211,153,0.15); border-radius: 8px;">
+                        <svg style="width: 16px; height: 16px; color: #34d399; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                        <span style="font-size: 12px; color: rgba(52,211,153,0.8);">Email verified: <strong x-text="general.email" style="color: #34d399;"></strong></span>
                     </div>
-                    <p x-show="generalError" x-text="generalError" style="color:#fca5a5; font-size:13px;"></p>
-                    <p x-show="generalSuccess" x-text="generalSuccess" style="color:#34d399; font-size:13px;"></p>
-                    <button type="submit" class="btn-cta rounded-lg px-5 text-[13px] font-bold text-white" style="min-height:44px;" :disabled="generalLoading">Send enquiry</button>
-                </form>
+                    <form class="grid gap-3" @submit.prevent="submitGeneral()">
+                        <input type="text" class="form-input" placeholder="Your name" x-model="general.name" required spellcheck="true" lang="en-ZA" style="min-height:44px;">
+                        <input type="tel" class="form-input" placeholder="Cell number" x-model="general.phone" required style="min-height:44px;">
+                        <textarea class="form-input" rows="3" placeholder="What are you looking for?" x-model="general.message" required spellcheck="true" lang="en-ZA"></textarea>
+                        <div class="grid gap-3 sm:grid-cols-2">
+                            <select class="form-input" x-model="general.type" style="min-height:44px;">
+                                <option value="">Type (optional)</option>
+                                <option value="handgun">Handgun</option>
+                                <option value="rifle">Rifle</option>
+                                <option value="shotgun">Shotgun</option>
+                            </select>
+                            <input type="number" min="0" step="1" class="form-input" placeholder="Budget (optional)" x-model="general.budget" style="min-height:44px;">
+                        </div>
+                        <button type="submit" class="btn-cta rounded-lg px-5 text-[13px] font-bold text-white" style="min-height:44px;" :disabled="generalLoading">
+                            <span x-show="!generalLoading">Send enquiry</span>
+                            <span x-show="generalLoading">Sending…</span>
+                        </button>
+                    </form>
+                </div>
             </div>
 
         </div>
@@ -1059,10 +1140,16 @@
             step: 1,
             modalListing: { id: null, name: '', calibre: '', price: '', label: '' },
             form: { name: '', email: '', phone: '', message: '', otp: '', website: '' },
-            general: { name: '', email: '', phone: '', message: '', type: '', budget: '', website: '' },
+            general: { name: '', email: '', phone: '', message: '', type: '', budget: '', otp: '', website: '' },
             generalError: '',
             generalSuccess: '',
             generalLoading: false,
+            // The general-enquiry form uses the same 3-step email → OTP →
+            // details flow as the per-listing modal. Each step unlocks
+            // the next so bots can't skip the email verification.
+            generalStep: 1,
+            generalResendCooldown: 0,
+            _generalResendTimer: null,
             formLoading: false,
             formError: '',
             formSuccess: '',
@@ -1187,6 +1274,66 @@
                 }
             },
 
+            _startGeneralResendCooldown() {
+                this.generalResendCooldown = 60;
+                if (this._generalResendTimer) clearInterval(this._generalResendTimer);
+                this._generalResendTimer = setInterval(() => {
+                    this.generalResendCooldown--;
+                    if (this.generalResendCooldown <= 0) {
+                        clearInterval(this._generalResendTimer);
+                        this._generalResendTimer = null;
+                    }
+                }, 1000);
+            },
+
+            async sendGeneralOtp() {
+                this.generalError = '';
+                this.generalSuccess = '';
+                if (!this.general.email) { this.generalError = 'Please enter your email.'; return; }
+                this.generalLoading = true;
+
+                try {
+                    const res = await fetch('/arms/send-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        },
+                        body: JSON.stringify({ email: this.general.email }),
+                    });
+                    const data = await res.json();
+
+                    if (!res.ok) {
+                        this.generalError = data.error || data.message || 'Failed to send code.';
+                    } else {
+                        this.generalStep = 2;
+                        this.general.otp = '';
+                        this._startGeneralResendCooldown();
+                    }
+                } catch (e) {
+                    this.generalError = 'Network error. Please try again.';
+                } finally {
+                    this.generalLoading = false;
+                }
+            },
+
+            async resendGeneralOtp() {
+                if (this.generalResendCooldown > 0) return;
+                await this.sendGeneralOtp();
+            },
+
+            verifyGeneralOtp() {
+                this.generalError = '';
+                if (!this.general.otp || this.general.otp.length !== 6) {
+                    this.generalError = 'Please enter the 6-digit code.';
+                    return;
+                }
+                // The server re-checks the code when the enquiry is submitted,
+                // so this step just unlocks the details form client-side.
+                this.generalStep = 3;
+            },
+
             async submitGeneral() {
                 this.generalError = '';
                 this.generalSuccess = '';
@@ -1203,10 +1350,19 @@
                     });
                     const data = await res.json();
                     if (!res.ok) {
-                        this.generalError = data.error || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Something went wrong.');
+                        if (data.error && data.error.toLowerCase().includes('verification code')) {
+                            // Code expired between step 2 and step 3 — send
+                            // them back to re-request a fresh code.
+                            this.generalError = data.error;
+                            this.generalStep = 2;
+                            this.general.otp = '';
+                        } else {
+                            this.generalError = data.error || (data.errors ? Object.values(data.errors).flat().join(' ') : 'Something went wrong.');
+                        }
                     } else {
                         this.generalSuccess = data.message;
-                        this.general = { name: '', email: '', phone: '', message: '', type: '', budget: '', website: '' };
+                        this.general = { name: '', email: '', phone: '', message: '', type: '', budget: '', otp: '', website: '' };
+                        this.generalStep = 1;
                     }
                 } catch (e) {
                     this.generalError = 'Network error. Please try again.';
