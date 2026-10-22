@@ -733,27 +733,16 @@
                     <label>Website <input type="text" tabindex="-1" autocomplete="off" x-model="general.website"></label>
                 </div>
 
-                {{-- Step 1: Email — same OTP flow as the per-listing enquiry.
-                     The second input catches typos BEFORE the verification code is
-                     mailed off; without it, a mistyped address receives the OTP
-                     and the real customer never gets back to us. --}}
+                {{-- Step 1: Email — the OTP delivery is the typo check.
+                     If the address is wrong the code never arrives and the
+                     user re-enters; no separate confirm field needed. --}}
                 <div x-show="generalStep === 1">
                     <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 12px;">
                         We'll send a 6-digit code to your email to confirm it's really you.
                     </p>
                     <form @submit.prevent="sendGeneralOtp()" class="grid gap-3">
-                        <div>
-                            <input type="email" class="form-input" placeholder="Email address"
-                                   x-model="general.email" @blur="validateGeneralEmailMatch()"
-                                   autocomplete="email" required style="min-height:44px;">
-                        </div>
-                        <div>
-                            <input type="email" class="form-input" placeholder="Confirm email"
-                                   x-model="general.email_confirmation" @blur="validateGeneralEmailMatch()"
-                                   autocomplete="off" required style="min-height:44px;">
-                            <p x-show="generalEmailMatchError" x-text="generalEmailMatchError"
-                               style="color:#fca5a5; font-size:12px; margin-top:6px;"></p>
-                        </div>
+                        <input type="email" class="form-input" placeholder="Email address"
+                               x-model="general.email" autocomplete="email" required style="min-height:44px;">
                         <button type="submit" class="btn-cta rounded-lg px-5 text-[13px] font-bold text-white" style="min-height:44px;" :disabled="generalLoading">
                             <span x-show="!generalLoading">Send verification code</span>
                             <span x-show="generalLoading">Sending…</span>
@@ -773,7 +762,7 @@
                         </button>
                     </form>
                     <div style="margin-top: 12px; text-align: center;">
-                        <button type="button" @click="generalStep = 1; generalError = ''; general.email_confirmation = ''; generalEmailMatchError = ''" style="font-size: 12px; color: rgba(255,255,255,0.3); background: none; border: none; cursor: pointer; text-decoration: underline;">
+                        <button type="button" @click="generalStep = 1; generalError = ''" style="font-size: 12px; color: rgba(255,255,255,0.3); background: none; border: none; cursor: pointer; text-decoration: underline;">
                             Use a different email
                         </button>
                         <span style="color: rgba(255,255,255,0.1); margin: 0 6px;">&middot;</span>
@@ -938,25 +927,15 @@
                 <div x-show="formError" style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #ef4444;" x-text="formError"></div>
                 <div x-show="formSuccess" style="background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.2); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 13px; color: #34d399;" x-text="formSuccess"></div>
 
-                {{-- Step 1: Email + Confirm Email --}}
+                {{-- Step 1: Email --}}
                 <div x-show="step === 1">
                     <p style="font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 16px;">
                         We'll send a verification code to your email to confirm your identity.
                     </p>
                     <form @submit.prevent="sendOtp()">
-                        <div style="margin-bottom: 12px;">
-                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Email Address *</label>
-                            <input type="email" x-model="form.email" @blur="validateFormEmailMatch()"
-                                   class="form-input" placeholder="your@email.com"
-                                   autocomplete="email" required>
-                        </div>
                         <div style="margin-bottom: 16px;">
-                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Confirm Email *</label>
-                            <input type="email" x-model="form.email_confirmation" @blur="validateFormEmailMatch()"
-                                   class="form-input" placeholder="your@email.com"
-                                   autocomplete="off" required>
-                            <p x-show="formEmailMatchError" x-text="formEmailMatchError"
-                               style="color:#fca5a5; font-size:12px; margin-top:6px;"></p>
+                            <label style="display: block; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.4); margin-bottom: 6px;">Email Address *</label>
+                            <input type="email" x-model="form.email" class="form-input" placeholder="your@email.com" autocomplete="email" required>
                         </div>
                         <button type="submit" class="btn-cta rounded-lg text-[13px] font-bold text-white tracking-wide" style="width: 100%; padding: 12px; display: flex; align-items: center; justify-content: center; gap: 8px;" :disabled="formLoading">
                             <span x-show="!formLoading">Send Verification Code</span>
@@ -982,7 +961,7 @@
                         </button>
                     </form>
                     <div style="margin-top: 12px; text-align: center;">
-                        <button @click="step = 1; formError = ''; form.email_confirmation = ''; formEmailMatchError = ''" style="font-size: 12px; color: rgba(255,255,255,0.3); background: none; border: none; cursor: pointer; text-decoration: underline;">
+                        <button @click="step = 1; formError = ''" style="font-size: 12px; color: rgba(255,255,255,0.3); background: none; border: none; cursor: pointer; text-decoration: underline;">
                             Use a different email
                         </button>
                         <span style="color: rgba(255,255,255,0.1); margin: 0 6px;">&middot;</span>
@@ -1163,16 +1142,11 @@
             showModal: false,
             step: 1,
             modalListing: { id: null, name: '', calibre: '', price: '', label: '' },
-            form: { name: '', email: '', email_confirmation: '', phone: '', message: '', otp: '', website: '' },
-            general: { name: '', email: '', email_confirmation: '', phone: '', message: '', type: '', budget: '', otp: '', website: '' },
+            form: { name: '', email: '', phone: '', message: '', otp: '', website: '' },
+            general: { name: '', email: '', phone: '', message: '', type: '', budget: '', otp: '', website: '' },
             generalError: '',
             generalSuccess: '',
             generalLoading: false,
-            // Inline error for the "Confirm email" blur check on each form.
-            // Kept separate from the general*/form*Error buffers so a mismatch
-            // doesn't clobber a server-side error message (and vice versa).
-            formEmailMatchError: '',
-            generalEmailMatchError: '',
             // The general-enquiry form uses the same 3-step email → OTP →
             // details flow as the per-listing modal. Each step unlocks
             // the next so bots can't skip the email verification.
@@ -1187,37 +1161,12 @@
 
             openEnquiry(id, name, calibre, price) {
                 this.modalListing = { id, name, calibre, price, label: name + ' — ' + calibre };
-                this.form = { name: '', email: '', email_confirmation: '', phone: '', message: '', otp: '', website: '' };
+                this.form = { name: '', email: '', phone: '', message: '', otp: '', website: '' };
                 this.formError = '';
                 this.formSuccess = '';
-                this.formEmailMatchError = '';
                 this.step = 1;
                 this.resendCooldown = 0;
                 this.showModal = true;
-            },
-
-            // Shared blur-side comparator for both forms. Only shows the
-            // mismatch message once the confirm field has actually been
-            // touched; otherwise typing the first email flashes a red
-            // "do not match" error against an empty confirm field.
-            validateFormEmailMatch() {
-                if (!this.form.email_confirmation) {
-                    this.formEmailMatchError = '';
-                    return;
-                }
-                this.formEmailMatchError = this.form.email === this.form.email_confirmation
-                    ? ''
-                    : 'Email addresses do not match.';
-            },
-
-            validateGeneralEmailMatch() {
-                if (!this.general.email_confirmation) {
-                    this.generalEmailMatchError = '';
-                    return;
-                }
-                this.generalEmailMatchError = this.general.email === this.general.email_confirmation
-                    ? ''
-                    : 'Email addresses do not match.';
             },
 
             closeModal() {
@@ -1237,11 +1186,6 @@
             async sendOtp() {
                 this.formError = '';
                 if (!this.form.email) { this.formError = 'Please enter your email.'; return; }
-                if (!this.form.email_confirmation) { this.formError = 'Please confirm your email.'; return; }
-                if (this.form.email !== this.form.email_confirmation) {
-                    this.formError = 'Email addresses do not match.';
-                    return;
-                }
                 this.formLoading = true;
 
                 try {
@@ -1252,21 +1196,12 @@
                             'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         },
-                        body: JSON.stringify({
-                            email: this.form.email,
-                            email_confirmation: this.form.email_confirmation,
-                        }),
+                        body: JSON.stringify({ email: this.form.email }),
                     });
                     const data = await res.json();
 
                     if (!res.ok) {
-                        // Server validation errors come back as { errors: { field: [msg] } };
-                        // flatten the first message so the user sees whichever check failed.
-                        if (data.errors) {
-                            this.formError = Object.values(data.errors).flat()[0] || 'Failed to send code.';
-                        } else {
-                            this.formError = data.error || data.message || 'Failed to send code.';
-                        }
+                        this.formError = data.error || data.message || 'Failed to send code.';
                     } else {
                         this.step = 2;
                         this.form.otp = '';
@@ -1332,8 +1267,7 @@
                         }
                     } else {
                         this.formSuccess = data.message || 'Enquiry sent successfully!';
-                        this.form = { name: '', email: '', email_confirmation: '', phone: '', message: '', otp: '', website: '' };
-                        this.formEmailMatchError = '';
+                        this.form = { name: '', email: '', phone: '', message: '', otp: '', website: '' };
                         setTimeout(() => this.closeModal(), 2500);
                     }
                 } catch (e) {
@@ -1359,11 +1293,6 @@
                 this.generalError = '';
                 this.generalSuccess = '';
                 if (!this.general.email) { this.generalError = 'Please enter your email.'; return; }
-                if (!this.general.email_confirmation) { this.generalError = 'Please confirm your email.'; return; }
-                if (this.general.email !== this.general.email_confirmation) {
-                    this.generalError = 'Email addresses do not match.';
-                    return;
-                }
                 this.generalLoading = true;
 
                 try {
@@ -1374,19 +1303,12 @@
                             'Accept': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                         },
-                        body: JSON.stringify({
-                            email: this.general.email,
-                            email_confirmation: this.general.email_confirmation,
-                        }),
+                        body: JSON.stringify({ email: this.general.email }),
                     });
                     const data = await res.json();
 
                     if (!res.ok) {
-                        if (data.errors) {
-                            this.generalError = Object.values(data.errors).flat()[0] || 'Failed to send code.';
-                        } else {
-                            this.generalError = data.error || data.message || 'Failed to send code.';
-                        }
+                        this.generalError = data.error || data.message || 'Failed to send code.';
                     } else {
                         this.generalStep = 2;
                         this.general.otp = '';
@@ -1442,8 +1364,7 @@
                         }
                     } else {
                         this.generalSuccess = data.message;
-                        this.general = { name: '', email: '', email_confirmation: '', phone: '', message: '', type: '', budget: '', otp: '', website: '' };
-                        this.generalEmailMatchError = '';
+                        this.general = { name: '', email: '', phone: '', message: '', type: '', budget: '', otp: '', website: '' };
                         this.generalStep = 1;
                     }
                 } catch (e) {

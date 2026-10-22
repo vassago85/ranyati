@@ -229,44 +229,6 @@ class ArmsSectionTest extends TestCase
         $this->assertSame(0, ArmsEnquiry::count());
     }
 
-    public function test_send_otp_requires_matching_email_confirmation(): void
-    {
-        // Missing confirmation → 422 with the "please confirm" copy from
-        // routes/web.php. We assert on the message so a future regression
-        // that drops the custom message is caught.
-        $this->postJson($this->armsUrl('/arms/send-otp'), [
-            'email' => 'buyer@gmail.com',
-        ])->assertStatus(422)
-            ->assertJsonValidationErrors(['email_confirmation'])
-            ->assertJsonFragment(['email_confirmation' => ['Please confirm your email.']]);
-
-        // Mismatched confirmation → 422 with the "do not match" copy.
-        $this->postJson($this->armsUrl('/arms/send-otp'), [
-            'email' => 'buyer@gmail.com',
-            'email_confirmation' => 'byuer@gmail.com',
-        ])->assertStatus(422)
-            ->assertJsonValidationErrors(['email_confirmation'])
-            ->assertJsonFragment(['email_confirmation' => ['Email addresses do not match.']]);
-
-        // Nothing is cached because we never got past validation.
-        $this->assertNull(Cache::get('arms-otp:buyer@gmail.com'));
-        $this->assertNull(Cache::get('arms-otp:byuer@gmail.com'));
-
-        // Matching confirmation → 200 and a 6-digit code lands in the cache
-        // under the primary email, ready for the subsequent OTP check on
-        // either /listing/{id}/enquire or /arms/general-enquiry.
-        \Illuminate\Support\Facades\Mail::fake();
-        $this->postJson($this->armsUrl('/arms/send-otp'), [
-            'email' => 'buyer@gmail.com',
-            'email_confirmation' => 'buyer@gmail.com',
-        ])->assertOk()
-            ->assertJsonFragment(['message' => 'Verification code sent.']);
-
-        $code = Cache::get('arms-otp:buyer@gmail.com');
-        $this->assertIsString($code);
-        $this->assertSame(6, strlen($code));
-    }
-
     public function test_general_enquiry_requires_verified_email(): void
     {
         // Posting without an OTP fails validation — the per-listing enquiry
