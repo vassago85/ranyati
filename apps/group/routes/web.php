@@ -188,7 +188,19 @@ Route::get('/listings/{listing:slug}', function (ArmsListing $listing) use ($arm
 Route::post('/arms/send-otp', function (Request $request) use ($armsOnly) {
     $armsOnly();
 
-    $request->validate(['email' => 'required|email|max:255']);
+    // Require both the email and a matching confirmation so a typo'd address
+    // never gets a verification code mailed into the void. Both the per-listing
+    // modal and the general-enquiry form on arms-landing.blade.php send
+    // `email_confirmation` alongside `email`. We use the explicit
+    // `required|same:email` pair (rather than Laravel's `confirmed` rule) so
+    // the two failure modes can carry distinct user-facing messages.
+    $request->validate([
+        'email' => 'required|email:rfc|max:255',
+        'email_confirmation' => 'required|same:email',
+    ], [
+        'email_confirmation.required' => 'Please confirm your email.',
+        'email_confirmation.same' => 'Email addresses do not match.',
+    ]);
 
     $email = strtolower(trim($request->email));
     $rateLimitKey = 'arms-otp-send:'.$email;
