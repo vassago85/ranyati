@@ -186,6 +186,27 @@ class ListingTypeConditionBackfillSeederTest extends TestCase
             ->expectsOutputToContain('Stock numbers not found in DB (38)');
     }
 
+    public function test_seeder_prints_before_and_after_counts_without_a_reserved_word_crash(): void
+    {
+        // Regression: `condition` is a reserved word in MySQL and an earlier
+        // version of this seeder built `selectRaw('condition, COUNT(*) ...')`
+        // which crashed in production even though SQLite accepted it. Seed a
+        // couple of rows so the aggregate queries have real data to group on,
+        // then assert the output contains the formatted count lines. If the
+        // raw SQL regresses, this test fails with an exception at `::call()`
+        // instead of silently printing zeros.
+        $admin = $this->admin();
+        $this->listing($admin, 'A-0001', ['type' => 'rifle',   'condition' => 'excellent']);
+        $this->listing($admin, 'A-0012', ['type' => 'shotgun', 'condition' => 'very_good']);
+        $this->listing($admin, 'A-0022', ['type' => 'handgun', 'condition' => 'good']);
+
+        $this->artisan('db:seed', ['--class' => ListingTypeConditionBackfillSeeder::class])
+            ->assertSuccessful()
+            ->expectsOutputToContain('39-row scope — type:')
+            ->expectsOutputToContain('39-row scope — condition:')
+            ->expectsOutputToContain('All listings  — type:');
+    }
+
     public function test_seeder_rejects_unknown_condition_labels(): void
     {
         // Guard against someone adding a condition label to the mapping that

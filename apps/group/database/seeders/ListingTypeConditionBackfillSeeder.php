@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\ArmsListing;
 use App\Support\ArmsDescriptions;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 /**
  * One-shot backfill of `type` and `condition` on the 39 live arms_listings
@@ -185,20 +186,27 @@ class ListingTypeConditionBackfillSeeder extends Seeder
     {
         $scoped = ArmsListing::query()->whereIn('stock_number', $stockNumbers);
 
+        // IMPORTANT: use the fluent `->select()` + `DB::raw` rather than
+        // `->selectRaw('condition, COUNT(*) as c')`. `condition` is a
+        // reserved word in MySQL and crashes a raw-string select, even
+        // though SQLite (used in tests) happily accepts it. The query
+        // builder wraps identifiers in the grammar's quote char
+        // (backticks on MySQL, double quotes on Postgres), which bypasses
+        // the reserved-word collision.
         $typeCounts = (clone $scoped)
-            ->selectRaw('type, COUNT(*) as c')
+            ->select('type', DB::raw('COUNT(*) as c'))
             ->groupBy('type')
             ->pluck('c', 'type')
             ->all();
 
         $conditionCounts = (clone $scoped)
-            ->selectRaw('condition, COUNT(*) as c')
+            ->select('condition', DB::raw('COUNT(*) as c'))
             ->groupBy('condition')
             ->pluck('c', 'condition')
             ->all();
 
         $totalCounts = ArmsListing::query()
-            ->selectRaw('type, COUNT(*) as c')
+            ->select('type', DB::raw('COUNT(*) as c'))
             ->groupBy('type')
             ->pluck('c', 'type')
             ->all();
