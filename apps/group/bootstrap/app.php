@@ -26,6 +26,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             SecurityHeaders::class,
         ]);
+
+        // Public JSON endpoints hit by Alpine fetch() from long-lived HTML
+        // (Arms modal, Motivations OTP step). On mobile the session cookie
+        // routinely expires or gets cycled while the tab is backgrounded,
+        // which triggers "CSRF token mismatch." on the first click — even
+        // though no real CSRF attack vector exists on these endpoints.
+        //
+        // All four are already defended by per-email + per-IP rate limiting,
+        // email OTP verification, and a honeypot field, so CSRF adds friction
+        // without adding security. Leave the HTML form POST at /enquire under
+        // CSRF — it's a full navigation, not a fetch, and doesn't suffer the
+        // same stale-token problem.
+        $middleware->validateCsrfTokens(except: [
+            'enquire/send-otp',
+            'arms/send-otp',
+            'arms/general-enquiry',
+            'listing/*/enquire',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
