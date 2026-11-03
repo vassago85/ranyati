@@ -412,10 +412,14 @@
                 <form method="POST" :action="confirm ? confirm.action : ''">
                     @csrf
                     <input type="hidden" name="_method" :value="confirm ? confirm.method : 'POST'">
-                    <label x-show="confirm && confirm.needsPrice" style="display:block; margin-bottom: 16px;">
-                        <span style="display:block; font-size:12px; color:rgba(255,255,255,0.55); margin-bottom:6px;">New price</span>
-                        <input type="number" name="price" min="0" step="1" class="form-input" placeholder="7500" :required="confirm && confirm.needsPrice">
-                    </label>
+                    {{-- x-if, not x-show: a hidden number input left in the form stays
+                         required and the browser then swallows the Delete click. --}}
+                    <template x-if="confirm && confirm.needsPrice">
+                        <label style="display:block; margin-bottom: 16px;">
+                            <span style="display:block; font-size:12px; color:rgba(255,255,255,0.55); margin-bottom:6px;">New price</span>
+                            <input type="number" name="price" min="0" step="1" class="form-input" placeholder="7500" required>
+                        </label>
+                    </template>
                     <div class="arms-modal-actions">
                         <button type="button" class="btn btn-secondary" @click="confirm = null">Cancel</button>
                         <button type="submit" class="btn" :class="confirm && confirm.label === 'Delete' ? 'btn-danger' : 'btn-primary'" x-text="confirm ? confirm.label : 'Confirm'"></button>

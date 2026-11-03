@@ -34,6 +34,27 @@
         .listing-form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .listing-form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
         [x-cloak] { display: none !important; }
+        /* The shared .card rule sets overflow:hidden, which clips this menu,
+           and the Edit Listing card below paints over whatever still escapes.
+           Lift this card above the form so the menu can hang out of it. */
+        .listing-actions-card {
+            margin-bottom: 20px;
+            overflow: visible;
+            position: relative;
+            z-index: 20;
+        }
+        .listing-actions-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            z-index: 30;
+            min-width: 200px;
+            padding: 6px;
+            border-radius: 10px;
+            background: #0d1424;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+        }
         .row-menu-item { display:block; width:100%; text-align:left; background:transparent; border:0; color:rgba(255,255,255,0.82); font:inherit; font-size:13px; font-weight:500; padding:10px; border-radius:6px; cursor:pointer; min-height:44px; text-decoration:none; }
         .row-menu-item:hover { background: rgba(255,255,255,0.06); color:#fff; }
         .row-menu-item:disabled { opacity:0.4; cursor:not-allowed; }
@@ -51,7 +72,7 @@
     @if($listing)
         {{-- Quick-action toolbar: same status verbs as the listings index but
              within reach of the edit form so operators don't round-trip. --}}
-        <div class="card" style="margin-bottom: 20px;" x-data="{ open: false, confirm: null }" @keydown.escape.window="open = false; confirm = null">
+        <div class="card listing-actions-card" x-data="{ open: false, confirm: null }" @keydown.escape.window="open = false; confirm = null">
             <div class="card-body" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
                 <div style="flex:1; min-width:180px;">
                     <div style="font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: rgba(255,255,255,0.4); font-weight: 600;">{{ $listing->stock_number }}</div>
@@ -80,7 +101,7 @@
                     @endif
 
                     <button type="button" class="btn btn-secondary btn-sm" @click="open = !open">More</button>
-                    <div x-show="open" x-cloak @click.outside="open = false" style="position:absolute; right:0; top:calc(100% + 6px); z-index:30; min-width:200px; padding:6px; border-radius:10px; background:#0d1424; border:1px solid rgba(255,255,255,0.1);">
+                    <div x-show="open" x-cloak @click.outside="open = false" class="listing-actions-menu">
                         @if($listing->isLive())
                             @if($listing->is_featured)
                                 <form method="POST" action="{{ route('admin.arms.unfeature', $listing) }}">@csrf<button type="submit" class="row-menu-item">Remove from top</button></form>
@@ -112,7 +133,9 @@
                 <form method="POST" :action="confirm ? confirm.action : ''">
                     @csrf
                     <input type="hidden" name="_method" :value="confirm && confirm.method ? confirm.method : 'POST'">
-                    <input x-show="confirm && confirm.needsPrice" type="number" name="price" min="0" step="1" class="form-input" placeholder="New price" style="margin-bottom:12px;" :required="confirm && confirm.needsPrice">
+                    <template x-if="confirm && confirm.needsPrice">
+                        <input type="number" name="price" min="0" step="1" class="form-input" placeholder="New price" style="margin-bottom:12px;" required>
+                    </template>
                     <div style="display:flex; gap:8px; justify-content:flex-end;">
                         <button type="button" class="btn btn-secondary" @click="confirm = null">Cancel</button>
                         <button type="submit" class="btn btn-primary">Confirm</button>
